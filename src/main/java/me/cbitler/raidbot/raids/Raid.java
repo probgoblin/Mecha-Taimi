@@ -495,10 +495,10 @@ public class Raid {
         String text = "";
         for (RaidRole role : roles) {
             List<RaidUser> raidUsersInRole = getUsersInRole(role.name);
-            text += ("**" + role.name + " ( " + raidUsersInRole + " / " + role.amount + " ):** \n");
+            text += ("**" + role.name + " ( " + raidUsersInRole.size() + " / " + role.amount + " ):** \n");
             for (RaidUser user : raidUsersInRole) {
-                List<Emote> reactions = Reactions.getEmotes();
-                text += "   :" + user.spec + ": " + user.name + " (" + user.spec + ")\n";
+                Emote userEmote = Reactions.getEmoteByName(user.spec);
+                text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + user.name + " (" + user.spec + ")\n";
             }
             text += "\n";
         }
