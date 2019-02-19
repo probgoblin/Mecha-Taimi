@@ -498,8 +498,7 @@ public class Raid {
             List<RaidUser> raidUsersInRole = getUsersInRole(role.name);
             text += ("**" + role.name + " ( " + raidUsersInRole.size() + " / " + role.amount + " ):** \n");
             for (RaidUser user : raidUsersInRole) {
-                Emote userEmote   = Reactions.getEmot e ByN a me(user.spec);  
-                        
+                Emote userEmote = Reactions.getEmoteByName(user.spec);
                 text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + user.name + " (" + user.spec + ")\n";
             }
             text += "\n";
