@@ -480,9 +480,9 @@ public class Raid {
                 for (FlexRole frole : flex.getValue()) {
                     Emote userEmote = Reactions.getEmoteByName(frole.spec);
                     if(userEmote == null)
-                        text += ("<:"+userEmote.getName()+":"+userEmote.getId()+"> " + flex.getKey().getName() + " (" + frole.spec + "/" + frole.role + ")\n");
-                    else
                         text += ("- " + flex.getKey().getName() + " (" + frole.spec + "/" + frole.role + ")\n");
+                    else
+                        text += ("<:"+userEmote.getName()+":"+userEmote.getId()+"> " + flex.getKey().getName() + " (" + frole.spec + "/" + frole.role + ")\n");
                 }
             }
         }
