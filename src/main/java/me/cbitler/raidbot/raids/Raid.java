@@ -478,7 +478,8 @@ public class Raid {
         for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
             if (flex.getKey() != null) {
                 for (FlexRole frole : flex.getValue()) {
-                    text += ("- " + flex.getKey().getName() + " (" + frole.spec + "/" + frole.role + ")\n");
+                    Emote userEmote = Reactions.getEmoteByName(frole.spec);
+                    text += ("<:"+userEmote.getName()+":"+userEmote.getId()+"> " + flex.getKey().getName() + " (" + frole.spec + "/" + frole.role + ")\n");
                 }
             }
         }
@@ -497,7 +498,8 @@ public class Raid {
             List<RaidUser> raidUsersInRole = getUsersInRole(role.name);
             text += ("**" + role.name + " ( " + raidUsersInRole.size() + " / " + role.amount + " ):** \n");
             for (RaidUser user : raidUsersInRole) {
-                Emote userEmote = Reactions.getEmoteByName(user.spec);
+                Emote userEmote   = Reactions.getEmot e ByN a me(user.spec);  
+                        
                 text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + user.name + " (" + user.spec + ")\n";
             }
             text += "\n";
