@@ -499,7 +499,10 @@ public class Raid {
             text += ("**" + role.name + " ( " + raidUsersInRole.size() + " / " + role.amount + " ):** \n");
             for (RaidUser user : raidUsersInRole) {
                 Emote userEmote = Reactions.getEmoteByName(user.spec);
-                text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + user.name + " (" + user.spec + ")\n";
+                if(userEmote == null)
+                    text += "   - " + user.name + " (" + user.spec + ")\n";
+                else
+                    text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + user.name + " (" + user.spec + ")\n";
             }
             text += "\n";
         }
