@@ -42,7 +42,7 @@ public class DeselectFlexRoleStep implements DeselectionStep {
     	    		return true;
     	    	}
     			else {
-    				e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Specify another [role, class] to remove or write done.").queue());
+    				e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Specify another role, class to remove or write done.").queue());
     			}
     		} else {
     			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Please specify a valid role and class for which you are signed up.").queue());
@@ -66,6 +66,6 @@ public class DeselectFlexRoleStep implements DeselectionStep {
      */
     @Override
     public String getStepText() {
-        return "Specify [role, class] you want to remove or write done to quit deselection.";
+        return "Specify role, class you want to remove or write done to quit deselection.";
     }
 }

@@ -390,13 +390,25 @@ public class Raid {
      * @param id The user's id
      */
     public void removeUser(String id) {
+    	boolean foundMain = false;
         Iterator<Map.Entry<RaidUser, String>> users = userToRole.entrySet().iterator();
         while (users.hasNext()) {
             Map.Entry<RaidUser, String> user = users.next();
             if (user.getKey().getId().equalsIgnoreCase(id)) {
                 users.remove();
                 usersToFlexRoles.remove(user.getKey());
+                foundMain = true;
             }
+        }
+        
+        if (foundMain == false) { // in this case, we need to iterate over flex roles as well
+        	Iterator<Map.Entry<RaidUser, List<FlexRole>>> usersFlex = usersToFlexRoles.entrySet().iterator();
+        	while (usersFlex.hasNext()) {
+        		Map.Entry<RaidUser, List<FlexRole>> userFlex = usersFlex.next();
+        		if (userFlex.getKey().getId().equalsIgnoreCase(id)) {
+        			usersFlex.remove();
+        		}
+        	}
         }
 
         try {
