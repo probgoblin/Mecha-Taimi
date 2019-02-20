@@ -32,7 +32,7 @@ public class DeselectFlexRoleStep implements DeselectionStep {
     		return true;
     	} else {
     		// user has flex roles and did not type done
-    		String rawMessage = e.getMessage().getRawContent();
+    		String rawMessage = e.getMessage().getRawContent().replaceAll("\\s","");
     		String[] roleClass = rawMessage.split(",");
     		if (roleClass.length > 1 && raid.removeUserFromFlexRoles(e.getAuthor().getId(), roleClass[0], roleClass[1])) {
     			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully removed from flex role.").queue());	
@@ -42,10 +42,10 @@ public class DeselectFlexRoleStep implements DeselectionStep {
     	    		return true;
     	    	}
     			else {
-    				e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Specify another role, class to remove or write done.").queue());
+    				e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Specify another [role],[class] to remove or write done.").queue());
     			}
     		} else {
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Please specify a valid role and class for which you are signed up.").queue());
+    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Please specify a valid role and class for which you are signed up (format: [role],[class] e.g. DPS, Weaver).").queue());
     		}
     		return false;    		
     	}
@@ -66,6 +66,6 @@ public class DeselectFlexRoleStep implements DeselectionStep {
      */
     @Override
     public String getStepText() {
-        return "Specify role, class you want to remove or write done to quit deselection.";
+        return "Specify [role],[class] (e.g. DPS, Weaver) you want to remove or write done to quit deselection.";
     }
 }

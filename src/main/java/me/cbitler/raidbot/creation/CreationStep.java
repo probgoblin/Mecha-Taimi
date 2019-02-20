@@ -3,7 +3,7 @@ package me.cbitler.raidbot.creation;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
- * Represents a step in the creation of a raid
+ * Represents a step in the creation of an event
  * @author Christopher Bitler
  */
 public interface CreationStep {

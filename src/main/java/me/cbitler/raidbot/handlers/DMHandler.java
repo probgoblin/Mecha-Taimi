@@ -32,7 +32,7 @@ public class DMHandler extends ListenerAdapter {
 
     /**
      * Handle receiving a private message.
-     * This checks to see if the user is currently going through the raid creation process or
+     * This checks to see if the user is currently going through the event creation process or
      * the role selection process and acts accordingly.
      * @param e The private message event
      */
@@ -47,7 +47,7 @@ public class DMHandler extends ListenerAdapter {
                 if(bot.getPendingRaids().get(author.getId()) != null) {
                     bot.getPendingRaids().remove(author.getId());
                 }
-                e.getChannel().sendMessage("Raid creation cancelled.").queue();
+                e.getChannel().sendMessage("Event creation cancelled.").queue();
                 return;
             }
 
@@ -66,9 +66,9 @@ public class DMHandler extends ListenerAdapter {
                     PendingRaid raid = bot.getPendingRaids().remove(author.getId());
                     try {
                         RaidManager.createRaid(raid);
-                        e.getChannel().sendMessage("Raid Created").queue();
+                        e.getChannel().sendMessage("Event created.").queue();
                     } catch (Exception exception) {
-                        e.getChannel().sendMessage("Cannot create raid - does the bot have permission to post in the specified channel?").queue();
+                        e.getChannel().sendMessage("Cannot create event - does the bot have permission to post in the specified channel?").queue();
                     }
                 }
             }
@@ -108,7 +108,7 @@ public class DMHandler extends ListenerAdapter {
                     // finish editing
                     bot.getEditMap().remove(author.getId());
                     bot.getEditList().remove(messageId);
-                    e.getChannel().sendMessage("Finished editing raid.").queue();
+                    e.getChannel().sendMessage("Finished editing event.").queue();
                 }
             }
         } else if (bot.getRoleDeselectionMap().containsKey(author.getId())) {

@@ -5,13 +5,13 @@ import me.cbitler.raidbot.raids.PendingRaid;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
- * Set the description for the raid
+ * Set the description for the event
  * @author Christopher Bitler
  */
 public class RunDescriptionStep implements CreationStep {
 
     /**
-     * Set the decsription for the raid
+     * Set the decsription for the event
      * @param e The direct message event
      * @return True always
      */
@@ -31,7 +31,7 @@ public class RunDescriptionStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter description for raid run:";
+        return "Enter description for the event:";
     }
 
     /**

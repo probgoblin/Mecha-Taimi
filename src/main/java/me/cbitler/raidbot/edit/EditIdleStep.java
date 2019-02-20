@@ -5,16 +5,16 @@ import me.cbitler.raidbot.raids.PendingRaid;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
- * Edit a property for the raid
+ * Edit a property for the event
  * @author Franziska Mueller
  */
 public class EditIdleStep implements EditStep {
 
-	private String m_messageID;
-	private EditStep m_nextStep;
+	private String messageID;
+	private EditStep nextStep;
 	
 	public EditIdleStep(String messageId) {
-		m_messageID = messageId;
+		this.messageID = messageId;
 	}
 	
     /**
@@ -25,15 +25,15 @@ public class EditIdleStep implements EditStep {
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         boolean valid = true;
     	if (e.getMessage().getRawContent().equalsIgnoreCase("time")) {
-        	m_nextStep = new EditTimeStep(m_messageID);
+        	nextStep = new EditTimeStep(messageID);
         } else if (e.getMessage().getRawContent().equalsIgnoreCase("date")) {
-        	m_nextStep = new EditDateStep(m_messageID);
+        	nextStep = new EditDateStep(messageID);
         } else if (e.getMessage().getRawContent().equalsIgnoreCase("name")) {
-        	m_nextStep = new EditNameStep(m_messageID);
+        	nextStep = new EditNameStep(messageID);
         } else if (e.getMessage().getRawContent().equalsIgnoreCase("description")) {
-        	m_nextStep = new EditDescriptionStep(m_messageID);
+        	nextStep = new EditDescriptionStep(messageID);
         } else if(e.getMessage().getRawContent().equalsIgnoreCase("done")) {
-            m_nextStep = null;
+            nextStep = null;
         }
         else {
         	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid property. Supported properties: time, date, name, description.").queue());
@@ -53,11 +53,11 @@ public class EditIdleStep implements EditStep {
      * {@inheritDoc}
      */
     public EditStep getNextStep() {
-        return m_nextStep;
+        return nextStep;
     }
 
 	@Override
 	public String getMessageID() {
-		return m_messageID;
+		return messageID;
 	}
 }

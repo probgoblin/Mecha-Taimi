@@ -43,7 +43,6 @@ public class RaidManager {
                         newRaid.updateMessage();
 
                         for (Emote emote : Reactions.getEmotes()) {
-                        	//System.out.println("emote!");
                             message1.addReaction(emote).queue();
                         }
                     } else {
@@ -168,7 +167,7 @@ public class RaidManager {
                 raid.updateMessage();
             }
         } catch (SQLException e) {
-            System.out.println("Couldn't load raids.. exiting");
+            System.out.println("Couldn't load events... exiting.");
             e.printStackTrace();
             System.exit(1);
         }
@@ -207,7 +206,7 @@ public class RaidManager {
                 RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsersFlexRoles` WHERE `raidId` = ?",
                         new String[]{messageId});
             } catch (Exception e) {
-                System.out.println("Error encountered deleting raid");
+                System.out.println("Error encountered deleting event.");
             }
 
             return true;

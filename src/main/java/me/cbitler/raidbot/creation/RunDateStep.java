@@ -5,13 +5,13 @@ import me.cbitler.raidbot.raids.PendingRaid;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
- * Step to set the date of the raid
+ * Step to set the date of the event
  * @author Christopher Bitler
  */
 public class RunDateStep implements CreationStep {
 
     /**
-     * Handle inputting the date for the raid
+     * Handle inputting the date for the event
      * @param e The direct message event
      * @return True if the date was set, false otherwise
      */
@@ -31,7 +31,7 @@ public class RunDateStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the date for raid run:";
+        return "Enter the date for the event:";
     }
 
     /**

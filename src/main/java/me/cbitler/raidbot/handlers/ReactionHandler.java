@@ -55,7 +55,7 @@ public class ReactionHandler extends ListenerAdapter {
             		e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(step.getStepText()).queue());
             	}
             	else {
-            		e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for this raid.").queue());
+            		e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for this event.").queue());
             	}
             }
 

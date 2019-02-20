@@ -5,7 +5,7 @@ import me.cbitler.raidbot.raids.PendingRaid;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
- * Set the name for the raid
+ * Set the name for the event
  * @author Christopher Bitler
  */
 public class RunNameStep implements CreationStep {
@@ -21,7 +21,7 @@ public class RunNameStep implements CreationStep {
     }
 
     /**
-     * Set the name of the raid and the server ID. Also create the raid if it doesn't exist
+     * Set the name of the event and the server ID. Also create the event if it doesn't exist
      * @param e The direct message event
      * @return True always
      */
@@ -44,7 +44,7 @@ public class RunNameStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Raid Setup:\nYou can type cancel at any point during this process to cancel the raid setup\n\nEnter the name for raid run:";
+        return "Event Setup:\nYou can type cancel at any point during this process to cancel the event setup\n\nEnter the name for the event:";
     }
 
     /**

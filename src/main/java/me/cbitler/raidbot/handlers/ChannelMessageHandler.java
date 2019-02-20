@@ -28,7 +28,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 public class ChannelMessageHandler extends ListenerAdapter {
 
     /**
-     * Handle receiving a message. This checks to see if it matches the !createRaid or !removeFromRaid commands
+     * Handle receiving a message. This checks to see if it matches the !createEvent or !removeFromEvent commands
      * and acts on them accordingly.
      *
      * @param e The event
@@ -54,15 +54,15 @@ public class ChannelMessageHandler extends ListenerAdapter {
         }
 
         if (PermissionsUtil.hasRaidLeaderRole(e.getMember())) {
-            if (e.getMessage().getRawContent().equalsIgnoreCase("!createRaid")) {
+            if (e.getMessage().getRawContent().equalsIgnoreCase("!createEvent")) {
                 CreationStep runNameStep = new RunNameStep(e.getMessage().getGuild().getId());
                 e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(runNameStep.getStepText()).queue());
                 bot.getCreationMap().put(e.getAuthor().getId(), runNameStep);
                 e.getMessage().delete().queue();
-            } else if (e.getMessage().getRawContent().toLowerCase().startsWith("!removefromraid")) {
+            } else if (e.getMessage().getRawContent().toLowerCase().startsWith("!removefromevent")) {
                 String[] split = e.getMessage().getRawContent().split(" ");
                 if(split.length < 3) {
-                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Format for !removeFromRaid: !removeFromRaid [raid id] [name]").queue());
+                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Format for !removeFromEvent: !removeFromEvent [event id] [name]").queue());
                 } else {
                     String messageId = split[1];
                     String name = split[2];
@@ -74,16 +74,16 @@ public class ChannelMessageHandler extends ListenerAdapter {
                             raid.removeUserByName(name);
                         }
                     } else {
-                        e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Non-existant raid").queue());
+                        e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Non-existant event.").queue());
                     }
                 }
                 try {
                     e.getMessage().delete().queue();
                 } catch (Exception exception) {}
-            } else if (e.getMessage().getRawContent().toLowerCase().startsWith("!editraid")) {
+            } else if (e.getMessage().getRawContent().toLowerCase().startsWith("!editevent")) {
             	String[] split = e.getMessage().getRawContent().split(" ");
                 if(split.length < 2) {
-                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Format for !editRaid: !editRaid [raid id]").queue());
+                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Format for !editEvent: !editEvent [event id]").queue());
                 } else {
                     String messageId = split[1];
 
@@ -92,11 +92,11 @@ public class ChannelMessageHandler extends ListenerAdapter {
                     if (raid != null && raid.getServerId().equalsIgnoreCase(e.getGuild().getId())) {
                         // check if this user is already editing or creating, or the raid is being edited by someone else
                     	if (bot.getCreationMap().get(e.getAuthor().getId()) != null) {
-                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You cannot edit a raid while creating.").queue());                   			
+                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You cannot edit an event while creating.").queue());                   			
                     	} else if (bot.getEditMap().get(e.getAuthor().getId()) != null) {
-                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You can only edit one raid at a time.").queue());                   			
+                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You can only edit one event at a time.").queue());                   			
                     	} else if (bot.getEditList().contains(messageId)) {
-                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The selected raid is already being edited.").queue());                   			
+                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The selected event is already being edited.").queue());                   			
                     	} else {
                     		// start editing process
                     		EditStep editIdleStep = new EditIdleStep(messageId);
@@ -105,7 +105,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
                     		bot.getEditList().add(messageId);
                     	}
                     } else {
-                        e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Non-existant raid").queue());
+                        e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Non-existant event.").queue());
                     }
                 }
                 try {
@@ -116,11 +116,11 @@ public class ChannelMessageHandler extends ListenerAdapter {
         }
 
         if (e.getMember().getPermissions().contains(Permission.MANAGE_SERVER)) {
-            if(e.getMessage().getRawContent().toLowerCase().startsWith("!setraidleaderrole")) {
+            if(e.getMessage().getRawContent().toLowerCase().startsWith("!seteventleaderrole")) {
                 String[] commandParts = e.getMessage().getRawContent().split(" ");
                 String raidLeaderRole = combineArguments(commandParts,1);
                 RaidBot.getInstance().setRaidLeaderRole(e.getMember().getGuild().getId(), raidLeaderRole);
-                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Raid leader role updated to: " + raidLeaderRole).queue());
+                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event leader role updated to: " + raidLeaderRole).queue());
                 e.getMessage().delete().queue();
             }
         }

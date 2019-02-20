@@ -5,13 +5,13 @@ import me.cbitler.raidbot.raids.PendingRaid;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
- * Set the time for the raid
+ * Set the time for the event
  * @author Christopher Bitler
  */
 public class RunTimeStep implements CreationStep {
 
     /**
-     * Handle setting the time for the raid
+     * Handle setting the time for the event
      * @param e The direct message event
      * @return True if the time is set, false otherwise
      */
@@ -31,7 +31,7 @@ public class RunTimeStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the time for raid run:";
+        return "Enter the time for the event:";
     }
 
     /**

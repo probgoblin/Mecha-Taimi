@@ -6,7 +6,7 @@ import me.cbitler.raidbot.raids.RaidRole;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
- * Role setup step for the raid.
+ * Role setup step for the event.
  * This one should take multiple inputs and as a result it doesn't finish until the user
  * types 'done'.
  * @author Christopher Bitler
@@ -32,7 +32,7 @@ public class RunRoleSetupStep implements CreationStep {
         } else {
             String[] parts = e.getMessage().getRawContent().split(":");
             if(parts.length < 2) {
-                e.getChannel().sendMessage("You need to specify the role in the format [amount]:[Role name]").queue();
+                e.getChannel().sendMessage("You need to specify the role in the format [amount]:[role name]").queue();
             } else {
                 try {
                     int amnt = Integer.parseInt(parts[0]);
@@ -40,7 +40,7 @@ public class RunRoleSetupStep implements CreationStep {
                     raid.getRolesWithNumbers().add(new RaidRole(amnt, roleName));
                     e.getChannel().sendMessage("Role added").queue();
                 } catch (Exception ex) {
-                    e.getChannel().sendMessage("Invalid input: Make sure it's in the format of [number]:[role], like 1:DPS").queue();
+                    e.getChannel().sendMessage("Invalid input: Make sure it's in the format of [amount]:[role name], like 1:DPS").queue();
                 }
             }
             return false;
@@ -51,7 +51,7 @@ public class RunRoleSetupStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the roles for raid run (format: [amount]:[Role name]). Type done to finish entering roles:";
+        return "Enter the roles for the event (format: [amount]:[role name], e.g. 1:DPS). Type done to finish entering roles:";
     }
 
     /**

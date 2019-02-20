@@ -6,7 +6,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
- * Get the announcement channel for the raid from the user
+ * Get the announcement channel for the event from the user
  * @author Christopher Bitler
  */
 public class RunChannelStep implements CreationStep {
@@ -44,7 +44,7 @@ public class RunChannelStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the channel for raid run announcement:";
+        return "Enter the channel for event announcement:";
     }
 
     /**

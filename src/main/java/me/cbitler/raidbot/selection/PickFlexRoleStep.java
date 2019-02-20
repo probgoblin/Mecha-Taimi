@@ -31,7 +31,7 @@ public class PickFlexRoleStep implements SelectionStep {
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         if(raid.isValidRole(e.getMessage().getRawContent())) {
             raid.addUserFlexRole(e.getAuthor().getId(), e.getAuthor().getName(), spec, e.getMessage().getRawContent(), true, true);
-            e.getChannel().sendMessage("Added to raid roster as flex role.").queue();
+            e.getChannel().sendMessage("Added to event roster as flex role.").queue();
             return true;
         } else {
             e.getChannel().sendMessage("Please choose a valid flex role.").queue();

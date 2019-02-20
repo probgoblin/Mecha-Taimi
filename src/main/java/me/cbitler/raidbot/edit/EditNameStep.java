@@ -5,24 +5,24 @@ import me.cbitler.raidbot.raids.RaidManager;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
- * Edit the name for the raid
+ * Edit the name for the event
  * @author Franziska Mueller
  */
 public class EditNameStep implements EditStep {
 
-	private String m_messageID;
+	private String messageID;
 	
 	public EditNameStep(String messageId) {
-		m_messageID = messageId;
+		this.messageID = messageId;
 	}
 	
     /**
-     * Handle changing the name for the raid
+     * Handle changing the name for the event
      * @param e The direct message event
      * @return True if the name is set, false otherwise
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-        Raid raid = RaidManager.getRaid(m_messageID);
+        Raid raid = RaidManager.getRaid(messageID);
         raid.setName(e.getMessage().getRawContent());
         if (raid.updateNameDB()) {
         	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Name successfully updated in database.").queue());
@@ -38,18 +38,18 @@ public class EditNameStep implements EditStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the new name for raid run:";
+        return "Enter the new name for the event:";
     }
 
     /**
      * {@inheritDoc}
      */
     public EditStep getNextStep() {
-        return new EditIdleStep(m_messageID);
+        return new EditIdleStep(messageID);
     }
 
 	@Override
 	public String getMessageID() {
-		return m_messageID;
+		return messageID;
 	}
 }

@@ -5,24 +5,24 @@ import me.cbitler.raidbot.raids.RaidManager;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
- * Edit the description for the raid
+ * Edit the description for the event
  * @author Franziska Mueller
  */
 public class EditDescriptionStep implements EditStep {
 
-	private String m_messageID;
+	private String messageID;
 	
 	public EditDescriptionStep(String messageId) {
-		m_messageID = messageId;
+		this.messageID = messageId;
 	}
 	
     /**
-     * Handle changing the description for the raid
+     * Handle changing the description for the event
      * @param e The direct message event
      * @return True if the description is set, false otherwise
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-        Raid raid = RaidManager.getRaid(m_messageID);
+        Raid raid = RaidManager.getRaid(messageID);
         raid.setDescription(e.getMessage().getRawContent());
         if (raid.updateDescriptionDB()) {
         	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Description successfully updated in database.").queue());
@@ -38,18 +38,18 @@ public class EditDescriptionStep implements EditStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the new description for raid run:";
+        return "Enter the new description for the event:";
     }
 
     /**
      * {@inheritDoc}
      */
     public EditStep getNextStep() {
-        return new EditIdleStep(m_messageID);
+        return new EditIdleStep(messageID);
     }
 
 	@Override
 	public String getMessageID() {
-		return m_messageID;
+		return messageID;
 	}
 }
