@@ -2,6 +2,7 @@ package me.cbitler.raidbot.handlers;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.creation.CreationStep;
+import me.cbitler.raidbot.deselection.DeselectionStep;
 import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.logs.LogParser;
 import me.cbitler.raidbot.raids.PendingRaid;
@@ -48,7 +49,6 @@ public class DMHandler extends ListenerAdapter {
                 }
                 e.getChannel().sendMessage("Raid creation cancelled.").queue();
                 return;
-
             }
 
             CreationStep step = bot.getCreationMap().get(author.getId());
@@ -111,6 +111,22 @@ public class DMHandler extends ListenerAdapter {
                     e.getChannel().sendMessage("Finished editing raid.").queue();
                 }
             }
+        } else if (bot.getRoleDeselectionMap().containsKey(author.getId())) {
+        	DeselectionStep step = bot.getRoleDeselectionMap().get(author.getId());
+        	boolean done = step.handleDM(e);
+
+        	// If this step is done, move onto the next one or finish
+        	if (done) {
+        		DeselectionStep nextStep = step.getNextStep();
+        		if(nextStep != null) {
+        			bot.getRoleDeselectionMap().put(author.getId(), nextStep);
+        			e.getChannel().sendMessage(nextStep.getStepText()).queue();
+        		} else {
+        			// finish deselection
+        			bot.getRoleDeselectionMap().remove(author.getId());
+        			e.getChannel().sendMessage("Finished deselection.").queue();
+        		}
+        	}
         }
 
         if(e.getMessage().getAttachments().size() > 0 && e.getChannelType() == ChannelType.PRIVATE) {

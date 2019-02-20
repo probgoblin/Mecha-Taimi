@@ -5,6 +5,7 @@ import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.database.QueryResult;
+import me.cbitler.raidbot.deselection.DeselectionStep;
 import me.cbitler.raidbot.handlers.ChannelMessageHandler;
 import me.cbitler.raidbot.handlers.DMHandler;
 import me.cbitler.raidbot.handlers.ReactionHandler;
@@ -39,6 +40,7 @@ public class RaidBot {
     HashMap<String, EditStep> edits = new HashMap<String, EditStep>();
     HashMap<String, PendingRaid> pendingRaids = new HashMap<String, PendingRaid>();
     HashMap<String, SelectionStep> roleSelection = new HashMap<String, SelectionStep>();
+    HashMap<String, DeselectionStep> roleDeselection = new HashMap<String, DeselectionStep>();
     
     Set<String> editList = new HashSet<String>();
 
@@ -102,6 +104,14 @@ public class RaidBot {
      */
     public HashMap<String, SelectionStep> getRoleSelectionMap() {
         return roleSelection;
+    }
+    
+    /**
+     * Map of the UserId -> roleDeselection step for people in the role deselection process
+     * @return The map of the UserId -> roleDeselection step for people in the role deselection process
+     */
+    public HashMap<String, DeselectionStep> getRoleDeselectionMap() {
+        return roleDeselection;
     }
 
     /**

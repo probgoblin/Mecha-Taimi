@@ -1,6 +1,8 @@
 package me.cbitler.raidbot.handlers;
 
 import me.cbitler.raidbot.RaidBot;
+import me.cbitler.raidbot.deselection.DeselectIdleStep;
+import me.cbitler.raidbot.deselection.DeselectionStep;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.selection.PickFlexRoleStep;
@@ -47,7 +49,14 @@ public class ReactionHandler extends ListenerAdapter {
                     //e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are already in this raid. Click the X to select a new role").queue());
                 }
             } else if(e.getReactionEmote().getEmote().getName().equalsIgnoreCase("X_")) {
-                raid.removeUser(e.getUser().getId());
+            	if (raid.isUserInRaid(e.getUser().getId())) {
+            		DeselectionStep step = new DeselectIdleStep(raid);
+            		RaidBot.getInstance().getRoleDeselectionMap().put(e.getUser().getId(), step);
+            		e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(step.getStepText()).queue());
+            	}
+            	else {
+            		e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for this raid.").queue());
+            	}
             }
 
             e.getReaction().removeReaction(e.getUser()).queue();
