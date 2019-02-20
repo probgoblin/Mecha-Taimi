@@ -29,7 +29,7 @@ public class DeselectIdleStep implements DeselectionStep {
     public boolean handleDM(PrivateMessageReceivedEvent e) {
     	if (e.getMessage().getRawContent().equalsIgnoreCase("main")) {
     		// check if this user has a main role
-    		if (raid.isUserInMainRoles(e.getAuthor().getId())) {
+    		if (raid.isUserInRaid(e.getAuthor().getId())) {
     			raid.removeUserFromMainRoles(e.getAuthor().getId());
     			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Removed from main role. You can choose another type or write done.").queue());
     			return false;
@@ -41,7 +41,7 @@ public class DeselectIdleStep implements DeselectionStep {
     	} else if (e.getMessage().getRawContent().equalsIgnoreCase("flex")) {
     		// check if this user has at least one flex role
     		if (raid.getUserNumFlexRoles(e.getAuthor().getId()) > 0) {
-    			nextStep = DeselectFlexRoleStep(raid);
+    			nextStep = new DeselectFlexRoleStep(raid);
     			return true;
     		}
     		else {
@@ -55,6 +55,9 @@ public class DeselectIdleStep implements DeselectionStep {
     		nextStep = null;
     		raid.removeUser(e.getAuthor().getId());
     		return true;
+    	} else {
+    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Supported choices: main, flex, all, or done.").queue());
+    		return false;
     	}
     }
 
@@ -73,6 +76,6 @@ public class DeselectIdleStep implements DeselectionStep {
      */
     @Override
     public String getStepText() {
-        return "Choose the role type you want to remove a sign-up from (main, flex, all) or write cancel to quit deselection.";
+        return "Choose the role type you want to remove a sign-up from (main, flex, all) or write done to quit deselection.";
     }
 }

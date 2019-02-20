@@ -16,7 +16,7 @@ public class DeselectFlexRoleStep implements DeselectionStep {
      * Create a new step for role deselection with the specified raid 
      * @param raid The raid
      */
-    public DeselectIdleStep(Raid raid) {
+    public DeselectFlexRoleStep(Raid raid) {
         this.raid = raid;
     }
 
@@ -27,34 +27,27 @@ public class DeselectFlexRoleStep implements DeselectionStep {
      */
     @Override
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-    	if (e.getMessage().getRawContent().equalsIgnoreCase("main")) {
-    		// check if this user has a main role
-    		if (raid.isUserInMainRoles(e.getAuthor().getId())) {
-    			raid.removeUserFromMainRoles(e.getAuthor().getId());
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Removed from main role. You can choose another type or write done.").queue());
-    			return false;
-    		}
-    		else {
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for a main role. Choose a different type or cancel.").queue());
-            	return false;
-    		} 
-    	} else if (e.getMessage().getRawContent().equalsIgnoreCase("flex")) {
-    		// check if this user has at least one flex role
-    		if (raid.getUserNumFlexRoles(e.getAuthor().getId()) > 0) {
-    			nextStep = DeselectFlexRoleStep(raid);
-    			return true;
-    		}
-    		else {
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for any flex role. Choose a different type or cancel.").queue());
-            	return false;
-    		}    	
-    	} else if (e.getMessage().getRawContent().equalsIgnoreCase("done")) {
-    		nextStep = null;    
-    		return true;
-    	} else if (e.getMessage().getRawContent().equalsIgnoreCase("all")) {
+    	if (e.getMessage().getRawContent().equalsIgnoreCase("done")) {
     		nextStep = null;
-    		raid.removeUser(e.getAuthor().getId());
     		return true;
+    	} else {
+    		// user has flex roles and did not type done
+    		String rawMessage = e.getMessage().getRawContent();
+    		String[] roleClass = rawMessage.split(",");
+    		if (roleClass.length > 1 && raid.removeUserFromFlexRoles(e.getAuthor().getId(), roleClass[0], roleClass[1])) {
+    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully removed from flex role.").queue());	
+    			if (raid.getUserNumFlexRoles(e.getAuthor().getId()) == 0) {
+    	    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for any flex role anymore.").queue());
+    	    		nextStep = null;
+    	    		return true;
+    	    	}
+    			else {
+    				e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Specify another [role, class] to remove or write done.").queue());
+    			}
+    		} else {
+    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Please specify a valid role and class for which you are signed up.").queue());
+    		}
+    		return false;    		
     	}
     }
 
@@ -73,6 +66,6 @@ public class DeselectFlexRoleStep implements DeselectionStep {
      */
     @Override
     public String getStepText() {
-        return "Choose the role type you want to remove a sign-up from (main, flex, all) or write cancel to quit deselection.";
+        return "Specify [role, class] you want to remove or write done to quit deselection.";
     }
 }

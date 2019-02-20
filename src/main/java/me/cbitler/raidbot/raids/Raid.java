@@ -369,7 +369,7 @@ public class Raid {
     }
 
     /**
-     * Check if a specific user is in this raid
+     * Check if a specific user is in this raid (main roles)
      *
      * @param id The id of the user
      * @return True if they are in the raid, false otherwise
@@ -542,6 +542,70 @@ public class Raid {
 
         removeUser(idToRemove);
     }
+    
+    
+    /**
+     * Remove a user from their main role
+     *
+     * @param id The id of the user being removed
+     */
+	public void removeUserFromMainRoles(String id) {
+		Iterator<Map.Entry<RaidUser, String>> users = userToRole.entrySet().iterator();
+        while (users.hasNext()) {
+            Map.Entry<RaidUser, String> user = users.next();
+            if (user.getKey().getId().equalsIgnoreCase(id)) {
+                users.remove();
+            }
+        }
+
+        try {
+            RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsers` WHERE `userId` = ? AND `raidId` = ?",
+                    new String[] { id, getMessageId() });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        updateMessage();
+	}
+    
+	
+	/**
+     * Remove a user from their main role
+     *
+     * @param id The id of the user being removed
+     * @param role The role that should be removed
+     * @param spec The class specialization that should be removed
+     * @return true if user was signed up for this role and class, false otherwise
+     */
+    public boolean removeUserFromFlexRoles(String id, String role, String spec) {
+    	boolean found = false;
+    	Iterator<Map.Entry<RaidUser, List<FlexRole>>> users = usersToFlexRoles.entrySet().iterator();
+        while (users.hasNext()) {
+            Map.Entry<RaidUser, List<FlexRole>> user = users.next();
+            if (user.getKey().getId().equalsIgnoreCase(id)) {
+            	Iterator<FlexRole> froles = user.getValue().iterator();
+                while (froles.hasNext()) {
+                	FlexRole frole = froles.next();
+                	if (frole.getSpec().equals(spec) && frole.getRole().equals(role)) {
+                		froles.remove();
+                		found = true;
+                	}
+                }
+            }
+        }
+
+        try {
+            RaidBot.getInstance().getDatabase().update(
+                    "DELETE FROM `raidUsersFlexRoles` WHERE `userId` = ? and `raidId` = ? and `role` = ? and `spec` = ?",
+                    new String[] { id, getMessageId(), role, spec });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        updateMessage();
+        return found;
+    }
+
 
     /**
      * Get the number of flex roles a user has
