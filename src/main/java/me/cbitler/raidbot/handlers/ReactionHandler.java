@@ -9,6 +9,7 @@ import me.cbitler.raidbot.selection.PickFlexRoleStep;
 import me.cbitler.raidbot.selection.PickRoleStep;
 import me.cbitler.raidbot.selection.SelectionStep;
 import me.cbitler.raidbot.utility.Reactions;
+import net.dv8tion.jda.core.entities.Emote;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -23,7 +24,8 @@ public class ReactionHandler extends ListenerAdapter {
             return;
         }
         if (raid != null) {
-            if (Reactions.getSpecs().contains(e.getReactionEmote().getEmote().getName())) {
+        	Emote emote = e.getReactionEmote().getEmote();
+            if (emote != null && Reactions.getSpecs().contains(emote.getName())) {
                 RaidBot bot = RaidBot.getInstance();
                 if(!raid.isUserInRaid(e.getUser().getId())) {
                     if (bot.getRoleSelectionMap().get(e.getUser().getId()) == null) {
@@ -48,7 +50,7 @@ public class ReactionHandler extends ListenerAdapter {
                     }
                     //e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are already in this raid. Click the X to select a new role").queue());
                 }
-            } else if(e.getReactionEmote().getEmote().getName().equalsIgnoreCase("X_")) {
+            } else if(emote != null && emote.getName().equalsIgnoreCase("X_")) {
             	if (raid.isUserInRaid(e.getUser().getId())) {
             		DeselectionStep step = new DeselectIdleStep(raid);
             		RaidBot.getInstance().getRoleDeselectionMap().put(e.getUser().getId(), step);

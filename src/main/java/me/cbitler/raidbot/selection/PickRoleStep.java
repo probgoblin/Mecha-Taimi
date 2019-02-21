@@ -7,6 +7,7 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 /**
  * Step for picking a role for a raid
  * @author Christopher Bitler
+ * @author Franziska Mueller
  */
 public class PickRoleStep implements SelectionStep {
     Raid raid;
@@ -31,14 +32,23 @@ public class PickRoleStep implements SelectionStep {
      */
     @Override
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-        if(raid.isValidNotFullRole(e.getMessage().getRawContent())) {
-            raid.addUser(e.getAuthor().getId(), e.getAuthor().getName(), spec, e.getMessage().getRawContent(), true, true);
+    	boolean success = true;
+    	try {
+    		int roleId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+    		String roleName = raid.getRoles().get(roleId).getName();
+    		if(raid.isValidNotFullRole(roleName)) {
+                raid.addUser(e.getAuthor().getId(), e.getAuthor().getName(), spec, roleName, true, true);
+            }
+    	} catch (Exception exp) {
+    		success = false;	
+    	}
+    	
+        if(success) {
             e.getChannel().sendMessage("Added to event roster.").queue();
-            return true;
         } else {
             e.getChannel().sendMessage("Please choose a valid role that is not full.").queue();
-            return false;
         }
+        return success;
     }
 
     /**
@@ -56,15 +66,11 @@ public class PickRoleStep implements SelectionStep {
      */
     @Override
     public String getStepText() {
-        String text = "Pick a role (";
+        String text = "Pick a role:\n";
         for (int i = 0; i < raid.getRoles().size(); i++) {
-            if (i == raid.getRoles().size()-1) {
-                text += raid.getRoles().get(i).getName();
-            } else {
-                text += (raid.getRoles().get(i).getName() + ", ");
-            }
+            text += "`" + (i+1) + "` " + raid.getRoles().get(i).getName() + "\n";
         }
-        text += ") or type cancel to cancel role selection.";
+        text += "or type cancel to cancel role selection.";
 
         return text;
     }

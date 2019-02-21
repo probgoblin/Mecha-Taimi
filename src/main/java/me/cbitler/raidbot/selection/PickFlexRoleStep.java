@@ -29,14 +29,23 @@ public class PickFlexRoleStep implements SelectionStep {
      */
     @Override
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-        if(raid.isValidRole(e.getMessage().getRawContent())) {
-            raid.addUserFlexRole(e.getAuthor().getId(), e.getAuthor().getName(), spec, e.getMessage().getRawContent(), true, true);
+        boolean success = true;
+    	try {
+    		int roleId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+    		String roleName = raid.getRoles().get(roleId).getName();
+    		if(raid.isValidRole(roleName)) {
+                raid.addUserFlexRole(e.getAuthor().getId(), e.getAuthor().getName(), spec, roleName, true, true);
+            }
+    	} catch (Exception exp) {
+    		success = false;	
+    	}
+    	
+        if(success) {
             e.getChannel().sendMessage("Added to event roster as flex role.").queue();
-            return true;
         } else {
             e.getChannel().sendMessage("Please choose a valid flex role.").queue();
-            return false;
         }
+        return success;     
     }
 
     /**
@@ -54,15 +63,11 @@ public class PickFlexRoleStep implements SelectionStep {
      */
     @Override
     public String getStepText() {
-        String text = "Pick a flex role (";
+    	String text = "Pick a flex role:\n";
         for (int i = 0; i < raid.getRoles().size(); i++) {
-            if (i == raid.getRoles().size()-1) {
-                text += raid.getRoles().get(i).getName();
-            } else {
-                text += (raid.getRoles().get(i).getName() + ", ");
-            }
+            text += "`" + (i+1) + "` " + raid.getRoles().get(i).getName() + "\n";
         }
-        text += ") or type cancel to cancel role selection.";
+        text += "or type cancel to cancel role selection.";
 
         return text;
     }
