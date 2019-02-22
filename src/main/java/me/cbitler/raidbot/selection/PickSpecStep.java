@@ -41,11 +41,11 @@ public class PickSpecStep implements SelectionStep {
     	try {
     		int specId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
     		nextStep = new PickRoleStep(raid, allSpecs[specId], isFlexRole);
-    		return true;    		
+    		return true;
     	} catch (Exception exp) {
             e.getChannel().sendMessage("Please choose a valid specialization.").queue();
             return false;
-    	}    
+    	}
     }
 
     /**
@@ -54,7 +54,7 @@ public class PickSpecStep implements SelectionStep {
      */
     @Override
     public SelectionStep getNextStep() {
-        return null;
+        return this.nextStep;
     }
 
     /**
