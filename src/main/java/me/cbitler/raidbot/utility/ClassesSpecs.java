@@ -10,7 +10,7 @@ public class ClassesSpecs {
     /**
      * List of classes and their specializations
      */
-    static String[][] classesSpecs = { 
+    static String[][] classesSpecs = {
     		{	"Guardian",
     			"Dragonhunter", // 547490713764364329
             	"Firebrand"	}, // 547490713928204308
@@ -29,10 +29,10 @@ public class ClassesSpecs {
     		{	"Thief",
             	"Daredevil", // 547490713927942169
             	"Deadeye" }, // 547490714209222676
-    		{ 	"Elementalist", 
+    		{ 	"Elementalist",
             	"Weaver", // 547490714007764994
             	"Tempest" }, // 547490714045644810
-    		{ 	"Mesmer", 
+    		{ 	"Mesmer",
             	"Chronomancer", // 547490713567232021
             	"Mirage" }, // 547490714624458752
     		{ 	"Necromancer",
@@ -40,7 +40,6 @@ public class ClassesSpecs {
             	"Scourge" } // 547490713965690897
     };
 
-    /*
     static HashMap<String, Integer> coreClassIds = new HashMap<String, Integer>() {{
         put("Guardian", 0);
         put("Revenant", 1);
@@ -52,24 +51,11 @@ public class ClassesSpecs {
         put("Mesmer", 7);
         put("Necromancer", 8);
     }};
-    */
-    
-    static HashMap<String, Integer> coreClassIds = new HashMap<String, Integer>() {{
-        put("Dragonhunter", 0);
-        put("Herald", 1);
-        put("Berserker", 2);
-        put("Scrapper", 3);
-        put("Druid", 4);
-        put("Daredevil", 5);
-        put("Tempest", 6);
-        put("Chronomancer", 7);
-        put("Reaper", 8);
-    }};
-    
-    
+
+
     /**
      * Get the array of available specializations for this core class
-     * 
+     *
      * @param coreclass The core class
      * @return The array of available specializations for this core class
      */
