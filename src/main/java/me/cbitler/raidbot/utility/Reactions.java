@@ -12,80 +12,80 @@ public class Reactions {
      * List of reactions representing classes
      */
     static String[] specs = { "Dragonhunter", // 547490713764364329
-            "Firebrand", // 547490713928204308
-            "Herald", // 547490714049708032
-            "Renegade", // 547490713584140323
-            "Berserker", // 547490714041450496
-            "Spellbreaker", // 547490713990987806
-            "Scrapper", // 547490714079068184
-            "Holosmith", // 547490713911296040
-            "Druid", // 547490713894518792
-            "Soulbeast", // 547490714041319439
-            "Daredevil", // 547490713927942169
-            "Deadeye", // 547490714209222676
-            "Weaver", // 547490714007764994
-            "Tempest", // 547490714045644810
-            "Chronomancer", // 547490713567232021
-            "Mirage", // 547490714624458752
-            "Reaper", // 547490713642729478
-            "Scourge" // 547490713965690897
-            /* ,"Guardian",
-            "Revenant",
-            "Warrior",
-            "Engineer",
-            "Ranger",
-            "Thief",
-            "Elementalist",
-            "Mesmer",
-            "Necromancer" */
+            "Firebrand", // 530541440300744705
+            "Herald", // 530541440086966283
+            "Renegade", // 530541439478661120
+            "Berserker", // 530541439625592852
+            "Spellbreaker", // 530541439675793408
+            "Scrapper", // 530541438895652914
+            "Holosmith", // 530541438837194753
+            "Druid", // 530541439105499136
+            "Soulbeast", // 530541439415746585
+            "Daredevil", // 530541439705415680
+            "Deadeye", // 530541440225509377
+            "Weaver", // 530541439239716874
+            "Tempest", // 530541439252430858
+            "Chronomancer", // 530541439621267456
+            "Mirage", // 530541438707040277
+            "Reaper", // 530541439038259216
+            "Scourge", // 530541439772393484
+            "Guardian", // 530541438891589643
+            "Revenant", // 530541439751290901
+            "Warrior", // 530541440145555466
+            "Engineer", // 530541439172608062
+            "Ranger", // 530541439642501121
+            "Thief", // 530541439701221378
+            "Elementalist", // 530541438891589642
+            "Mesmer", // 530541438769823747
+            "Necromancer" // 530541439218876416
     };
 
     static Emote[] reactions = { getEmoji("547490713764364329"), // Dragonhunter
-            getEmoji("547490713928204308"), // Firebrand
-            getEmoji("547490714049708032"), // Herald
-            getEmoji("547490713584140323"), // Renegade
-            getEmoji("547490714041450496"), // Berserker
-            getEmoji("547490713990987806"), // Spellbreaker
-            getEmoji("547490714079068184"), // Scrapper
-            getEmoji("547490713911296040"), // Holosmith
-            getEmoji("547490713894518792"), // Druid
-            getEmoji("547490714041319439"), // Soulbeast
-            getEmoji("547490713927942169"), // Daredevil
-            getEmoji("547490714209222676"), // Deadeye
-            getEmoji("547490714007764994"), // Weaver
-            getEmoji("547490714045644810"), // Tempest
-            getEmoji("547490713567232021"), // Chronomancer
-            getEmoji("547490714624458752"), // Mirage
-            getEmoji("547490713642729478"), // Reaper
-            getEmoji("547490713965690897"), // Scourge
-            /*, getEmoji("547490713965690897"), // Guardian
-             * getEmoji("547490713965690897"), // Revenant
-             * getEmoji("547490713965690897"), // Warrior
-             * getEmoji("547490713965690897"), // Engineer
-             * getEmoji("547490713965690897"), // Ranger
-             * getEmoji("547490713965690897"), // Thief
-             * getEmoji("547490713965690897"), // Elementalist
-             * getEmoji("547490713965690897"), // Mesmer
-             * getEmoji("547490713965690897"), // Necromancer  
-             * */
-            getEmoji("547490713818890266") // X_
+            getEmoji("530541440300744705"), // Firebrand
+            getEmoji("530541440086966283"), // Herald
+            getEmoji("530541439478661120"), // Renegade
+            getEmoji("530541439625592852"), // Berserker
+            getEmoji("530541439675793408"), // Spellbreaker
+            getEmoji("530541438895652914"), // Scrapper
+            getEmoji("530541438837194753"), // Holosmith
+            getEmoji("530541439105499136"), // Druid
+            getEmoji("530541439415746585"), // Soulbeast
+            getEmoji("530541439705415680"), // Daredevil
+            getEmoji("530541440225509377"), // Deadeye
+            getEmoji("530541439239716874"), // Weaver
+            getEmoji("530541439252430858"), // Tempest
+            getEmoji("530541439621267456"), // Chronomancer
+            getEmoji("530541438707040277"), // Mirage
+            getEmoji("530541439038259216"), // Reaper
+            getEmoji("530541439772393484"), // Scourge
+            getEmoji("530541438891589643"), // Guardian
+            getEmoji("530541439751290901"), // Revenant
+            getEmoji("530541440145555466"), // Warrior
+            getEmoji("530541439172608062"), // Engineer
+            getEmoji("530541439642501121"), // Ranger
+            getEmoji("530541439701221378"), // Thief
+            getEmoji("530541438891589642"), // Elementalist
+            getEmoji("530541438769823747"), // Mesmer
+            getEmoji("530541439218876416"), // Necromancer
+            getEmoji("548530947591634944") // X_
     };
-    
-    static Emote[] reactionsCore = { getEmoji("547490713764364329"), // Guardian
-            getEmoji("547490714049708032"), // Revenant
-            getEmoji("547490714041450496"), // Warrior
-            getEmoji("547490714079068184"), // Engineer
-            getEmoji("547490713894518792"), // Ranger
-            getEmoji("547490713927942169"), // Thief
-            getEmoji("547490714007764994"), // Elementalist
-            getEmoji("547490713567232021"), // Mesmer
-            getEmoji("547490713642729478"), // Necromancer
-            getEmoji("547490713818890266") // X_
+
+    static Emote[] reactionsCore = {
+            getEmoji("530541438891589643"), // Guardian
+            getEmoji("530541439751290901"), // Revenant
+            getEmoji("530541440145555466"), // Warrior
+            getEmoji("530541439172608062"), // Engineer
+            getEmoji("530541439642501121"), // Ranger
+            getEmoji("530541439701221378"), // Thief
+            getEmoji("530541438891589642"), // Elementalist
+            getEmoji("530541438769823747"), // Mesmer
+            getEmoji("530541439218876416"), // Necromancer
+            getEmoji("548530947591634944") // X_
     };
 
     /**
      * Get an emoji from it's emote ID via JDA
-     * 
+     *
      * @param id The ID of the emoji
      * @return The emote object representing that emoji
      */
@@ -95,7 +95,7 @@ public class Reactions {
 
     /**
      * Get the list of reaction names as a list
-     * 
+     *
      * @return The list of reactions as a list
      */
     public static List<String> getSpecs() {
@@ -104,16 +104,16 @@ public class Reactions {
 
     /**
      * Get the list of emote objects
-     * 
+     *
      * @return The emotes
      */
     public static List<Emote> getEmotes() {
         return new ArrayList<>(Arrays.asList(reactions));
     }
-    
+
     /**
      * Get the list of core class emote objects
-     * 
+     *
      * @return The emotes
      */
     public static List<Emote> getCoreClassEmotes() {
