@@ -42,7 +42,7 @@ public class RaidManager {
                         raids.add(newRaid);
                         newRaid.updateMessage();
 
-                        for (Emote emote : Reactions.getEmotes()) {
+                        for (Emote emote : Reactions.getCoreClassEmotes()) {
                             message1.addReaction(emote).queue();
                         }
                     } else {

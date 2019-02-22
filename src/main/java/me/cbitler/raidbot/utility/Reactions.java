@@ -29,6 +29,15 @@ public class Reactions {
             "Mirage", // 547490714624458752
             "Reaper", // 547490713642729478
             "Scourge" // 547490713965690897
+            /* ,"Guardian",
+            "Revenant",
+            "Warrior",
+            "Engineer",
+            "Ranger",
+            "Thief",
+            "Elementalist",
+            "Mesmer",
+            "Necromancer" */
     };
 
     static Emote[] reactions = { getEmoji("547490713764364329"), // Dragonhunter
@@ -49,6 +58,28 @@ public class Reactions {
             getEmoji("547490714624458752"), // Mirage
             getEmoji("547490713642729478"), // Reaper
             getEmoji("547490713965690897"), // Scourge
+            /*, getEmoji("547490713965690897"), // Guardian
+             * getEmoji("547490713965690897"), // Revenant
+             * getEmoji("547490713965690897"), // Warrior
+             * getEmoji("547490713965690897"), // Engineer
+             * getEmoji("547490713965690897"), // Ranger
+             * getEmoji("547490713965690897"), // Thief
+             * getEmoji("547490713965690897"), // Elementalist
+             * getEmoji("547490713965690897"), // Mesmer
+             * getEmoji("547490713965690897"), // Necromancer  
+             * */
+            getEmoji("547490713818890266") // X_
+    };
+    
+    static Emote[] reactionsCore = { getEmoji("547490713764364329"), // Guardian
+            getEmoji("547490714049708032"), // Revenant
+            getEmoji("547490714041450496"), // Warrior
+            getEmoji("547490714079068184"), // Engineer
+            getEmoji("547490713894518792"), // Ranger
+            getEmoji("547490713927942169"), // Thief
+            getEmoji("547490714007764994"), // Elementalist
+            getEmoji("547490713567232021"), // Mesmer
+            getEmoji("547490713642729478"), // Necromancer
             getEmoji("547490713818890266") // X_
     };
 
@@ -79,10 +110,19 @@ public class Reactions {
     public static List<Emote> getEmotes() {
         return new ArrayList<>(Arrays.asList(reactions));
     }
+    
+    /**
+     * Get the list of core class emote objects
+     * 
+     * @return The emotes
+     */
+    public static List<Emote> getCoreClassEmotes() {
+        return new ArrayList<>(Arrays.asList(reactionsCore));
+    }
 
     public static Emote getEmoteByName(String name) {
         for (Emote emote : reactions) {
-            if (emote.getName() == name) {
+            if (emote != null && emote.getName() == name) {
                 return emote;
             }
         }

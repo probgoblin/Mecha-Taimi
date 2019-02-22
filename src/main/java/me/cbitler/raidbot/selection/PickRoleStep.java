@@ -12,6 +12,7 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 public class PickRoleStep implements SelectionStep {
     Raid raid;
     String spec;
+    boolean isFlexRole;
 
     /**
      * Create a new step for this role selection with the specified raid and spec
@@ -19,9 +20,10 @@ public class PickRoleStep implements SelectionStep {
      * @param raid The raid
      * @param spec The specialization that the user chose
      */
-    public PickRoleStep(Raid raid, String spec) {
+    public PickRoleStep(Raid raid, String spec, boolean isflex) {
         this.raid = raid;
         this.spec = spec;
+        this.isFlexRole = isflex;
     }
 
     /**
@@ -36,17 +38,23 @@ public class PickRoleStep implements SelectionStep {
     	try {
     		int roleId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
     		String roleName = raid.getRoles().get(roleId).getName();
-    		if(raid.isValidNotFullRole(roleName)) {
-                raid.addUser(e.getAuthor().getId(), e.getAuthor().getName(), spec, roleName, true, true);
-            }
+    		if (isFlexRole) {
+    			if(raid.isValidRole(roleName)) {
+                    raid.addUserFlexRole(e.getAuthor().getId(), e.getAuthor().getName(), spec, roleName, true, true);
+                }
+    		} else {
+    			if(raid.isValidNotFullRole(roleName)) {
+    				raid.addUser(e.getAuthor().getId(), e.getAuthor().getName(), spec, roleName, true, true);
+    			}
+    		}
     	} catch (Exception exp) {
     		success = false;	
     	}
     	
         if(success) {
-            e.getChannel().sendMessage("Added to event roster.").queue();
+            e.getChannel().sendMessage("Added to event roster" + (isFlexRole ? " as flex role" : "") + ".").queue();
         } else {
-            e.getChannel().sendMessage("Please choose a valid role that is not full.").queue();
+            e.getChannel().sendMessage("Please choose a valid role" + (isFlexRole ? "" : " that is not full") + ".").queue();
         }
         return success;
     }
