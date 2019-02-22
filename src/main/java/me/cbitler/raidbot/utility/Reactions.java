@@ -11,7 +11,8 @@ public class Reactions {
     /**
      * List of reactions representing classes
      */
-    static String[] specs = { "Dragonhunter", // 547490713764364329
+    static String[] specs = {
+            "Dragonhunter", // 530541439180996638
             "Firebrand", // 530541440300744705
             "Herald", // 530541440086966283
             "Renegade", // 530541439478661120
@@ -40,7 +41,8 @@ public class Reactions {
             "Necromancer" // 530541439218876416
     };
 
-    static Emote[] reactions = { getEmoji("547490713764364329"), // Dragonhunter
+    static Emote[] reactions = {
+            getEmoji("530541439180996638"), // Dragonhunter
             getEmoji("530541440300744705"), // Firebrand
             getEmoji("530541440086966283"), // Herald
             getEmoji("530541439478661120"), // Renegade
@@ -122,7 +124,7 @@ public class Reactions {
 
     public static Emote getEmoteByName(String name) {
         for (Emote emote : reactions) {
-            if (emote != null && emote.getName() == name) {
+            if (emote != null && emote.getName().equalsIgnoreCase(name)) {
                 return emote;
             }
         }
