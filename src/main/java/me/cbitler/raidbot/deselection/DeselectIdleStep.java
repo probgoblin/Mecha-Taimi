@@ -27,38 +27,47 @@ public class DeselectIdleStep implements DeselectionStep {
      */
     @Override
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-    	if (e.getMessage().getRawContent().equalsIgnoreCase("main")) {
-    		// check if this user has a main role
-    		if (raid.isUserInRaid(e.getAuthor().getId())) {
-    			raid.removeUserFromMainRoles(e.getAuthor().getId());
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Removed from main role. You can choose another type or write done.").queue());
-    			return false;
-    		}
-    		else {
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for a main role. Choose a different type or cancel.").queue());
-            	return false;
-    		} 
-    	} else if (e.getMessage().getRawContent().equalsIgnoreCase("flex")) {
-    		// check if this user has at least one flex role
-    		if (raid.getUserNumFlexRoles(e.getAuthor().getId()) > 0) {
-    			nextStep = new DeselectFlexRoleStep(raid);
-    			return true;
-    		}
-    		else {
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for any flex role. Choose a different type or cancel.").queue());
-            	return false;
-    		}    	
-    	} else if (e.getMessage().getRawContent().equalsIgnoreCase("done")) {
+    	if (e.getMessage().getRawContent().equalsIgnoreCase("done")) {
     		nextStep = null;    
     		return true;
-    	} else if (e.getMessage().getRawContent().equalsIgnoreCase("all")) {
-    		nextStep = null;
-    		raid.removeUser(e.getAuthor().getId());
-    		return true;
-    	} else {
-    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Supported choices: main, flex, all, or done.").queue());
-    		return false;
     	}
+    	
+    	try {
+    		int choiceId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+    		
+    		if (choiceId == 0) { // main
+        		// check if this user has a main role
+        		if (raid.isUserInRaid(e.getAuthor().getId())) {
+        			raid.removeUserFromMainRoles(e.getAuthor().getId());
+        			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Removed from main role. You can choose another type or write done.").queue());
+        			return false;
+        		}
+        		else {
+        			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for a main role. Choose a different type or cancel.").queue());
+                	return false;
+        		} 
+        	} else if (choiceId == 1) { // flex
+        		// check if this user has at least one flex role
+        		if (raid.getUserNumFlexRoles(e.getAuthor().getId()) > 0) {
+        			nextStep = new DeselectFlexRoleStep(raid);
+        			return true;
+        		}
+        		else {
+        			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for any flex role. Choose a different type or cancel.").queue());
+                	return false;
+        		}    	
+        	} else if (choiceId == 2) { // all
+        		nextStep = null;
+        		raid.removeUser(e.getAuthor().getId());
+        		return true;
+        	} else { // some other integer
+        		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Try again or type done to quit deselection.").queue());
+        		return false;
+        	}    		
+    	} catch (Exception excp) { 
+    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Try again or type done to quit deselection.").queue());
+    		return false;
+    	}	
     }
 
     /**
@@ -76,6 +85,10 @@ public class DeselectIdleStep implements DeselectionStep {
      */
     @Override
     public String getStepText() {
-        return "Choose the role type you want to remove a sign-up from (main, flex, all) or write done to quit deselection.";
+        return "Choose the role type you want to remove a sign-up from: \n" 
+        		+ "`1` main \n"
+        		+ "`2` flex \n"
+        		+ "`3` all \n"
+        		+ "or write done to quit deselection.";
     }
 }

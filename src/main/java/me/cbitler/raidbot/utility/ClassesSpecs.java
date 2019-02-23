@@ -1,9 +1,5 @@
 package me.cbitler.raidbot.utility;
 
-import me.cbitler.raidbot.RaidBot;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class ClassesSpecs {
