@@ -76,31 +76,6 @@ public class DeselectFlexRoleStep implements DeselectionStep {
         // Send new message because there was no valid selection
         e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid selection.\n\n"+buildSelectionText(rRoles)).queue());
         return false;
-
-        /*
-    	if (e.getMessage().getRawContent().equalsIgnoreCase("done")) {
-    		nextStep = null;
-    		return true;
-    	} else {
-    		// user has flex roles and did not type done
-    		String rawMessage = e.getMessage().getRawContent().replaceAll("\\s","");
-    		String[] roleClass = rawMessage.split(",");
-    		if (roleClass.length > 1 && raid.removeUserFromFlexRoles(e.getAuthor().getId(), roleClass[0], roleClass[1])) {
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully removed from flex role.").queue());
-    			if (raid.getUserNumFlexRoles(e.getAuthor().getId()) == 0) {
-    	    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for any flex role anymore.").queue());
-    	    		nextStep = null;
-    	    		return true;
-    	    	}
-    			else {
-    				e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Specify another [role],[class] to remove or write done.").queue());
-    			}
-    		} else {
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Please specify a valid role and class for which you are signed up (format: [role],[class] e.g. DPS, Weaver).").queue());
-    		}
-    		return false;
-        }
-        */
     }
 
     /**
