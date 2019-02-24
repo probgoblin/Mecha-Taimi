@@ -33,7 +33,7 @@ public class DeselectFlexRoleStep implements DeselectionStep {
      */
     @Override
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-        ArrayList<RaidUser> rUsers = this.raid.getRaidUsersById(this.user.getId());
+        ArrayList<RaidUser> rUsers = this.raid.getRaidUsersFlexRolesById(this.user.getId());
         String msg = e.getMessage().getRawContent();
         if(rUsers.size()==0){
             // no roles
@@ -53,7 +53,6 @@ public class DeselectFlexRoleStep implements DeselectionStep {
             }
         } else if(msg.contentEquals((rUsers.size()+2)+"")){
             // cancel
-            e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Deselection canceled.").queue());
             return true;
         } else {
             // remove list
@@ -134,7 +133,7 @@ public class DeselectFlexRoleStep implements DeselectionStep {
      */
     @Override
     public String getStepText() {
-        ArrayList<RaidUser> raidUsers = this.raid.getRaidUsersById(this.user.getId());
+        ArrayList<RaidUser> raidUsers = this.raid.getRaidUsersFlexRolesById(this.user.getId());
         if(raidUsers.size()==0){ return "You are not registered for any flex roles."; }
         return buildSelectionText(raidUsers);
     }

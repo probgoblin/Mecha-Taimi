@@ -525,7 +525,7 @@ public class Raid {
     }
 
     /**
-     * Get a List of RaidUsers in this raid by their ID
+     * Get a List of RaidUsers from main roles in this raid by their ID
      *
      * @param name The user's ID
      * @return The List of RaidUsers if they are in this raid, null otherwise
@@ -533,6 +533,22 @@ public class Raid {
     public ArrayList<RaidUser> getRaidUsersById(String id) {
         ArrayList<RaidUser> raidUsers = new ArrayList<RaidUser>();
         for (RaidUser user : userToRole.keySet()) {
+            if (user.getId().equalsIgnoreCase(id)) {
+                raidUsers.add(user);
+            }
+        }
+        return raidUsers;
+    }
+
+    /**
+     * Get a List of RaidUsers from flex roles in this raid by their ID
+     *
+     * @param name The user's ID
+     * @return The List of RaidUsers if they are in this raid, null otherwise
+     */
+    public ArrayList<RaidUser> getRaidUsersFlexRolesById(String id) {
+        ArrayList<RaidUser> raidUsers = new ArrayList<RaidUser>();
+        for (RaidUser user : usersToFlexRoles.keySet()) {
             if (user.getId().equalsIgnoreCase(id)) {
                 raidUsers.add(user);
             }
