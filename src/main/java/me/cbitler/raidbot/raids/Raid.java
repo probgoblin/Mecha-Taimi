@@ -546,14 +546,16 @@ public class Raid {
      * @param name The user's ID
      * @return The List of RaidUsers if they are in this raid, null otherwise
      */
-    public ArrayList<RaidUser> getRaidUsersFlexRolesById(String id) {
-        ArrayList<RaidUser> raidUsers = new ArrayList<RaidUser>();
+    public ArrayList<FlexRole> getRaidUsersFlexRolesById(String id) {
+        ArrayList<FlexRole> raidRoles = new ArrayList<FlexRole>();
         for (RaidUser user : usersToFlexRoles.keySet()) {
             if (user.getId().equalsIgnoreCase(id)) {
-                raidUsers.add(user);
+                for(FlexRole fRole : usersToFlexRoles.get(user)){
+                    raidRoles.add(fRole);
+                }
             }
         }
-        return raidUsers;
+        return raidRoles;
     }
 
     /**

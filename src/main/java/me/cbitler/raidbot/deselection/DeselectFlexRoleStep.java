@@ -2,6 +2,7 @@ package me.cbitler.raidbot.deselection;
 
 import java.util.ArrayList;
 
+import me.cbitler.raidbot.raids.FlexRole;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidUser;
 import me.cbitler.raidbot.utility.Reactions;
@@ -33,25 +34,25 @@ public class DeselectFlexRoleStep implements DeselectionStep {
      */
     @Override
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-        ArrayList<RaidUser> rUsers = this.raid.getRaidUsersFlexRolesById(this.user.getId());
+        ArrayList<FlexRole> rRoles = this.raid.getRaidUsersFlexRolesById(this.user.getId());
         String msg = e.getMessage().getRawContent();
-        if(rUsers.size()==0){
+        if(rRoles.size()==0){
             // no roles
             e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not registered for any flex roles.").queue());
             return true;
         } else if(msg.contentEquals("1")){
             // remove all
             ArrayList<String> removedRaidUsers = new ArrayList<String>();
-            for (RaidUser rUser : rUsers) {
-                if(raid.removeUserFromFlexRoles(e.getAuthor().getId(), rUser.getRole(), rUser.getSpec())){
-                    removedRaidUsers.add("\""+rUser.getSpec()+", "+rUser.getRole()+"\"");
+            for (FlexRole rRole : rRoles) {
+                if(raid.removeUserFromFlexRoles(e.getAuthor().getId(), rRole.getRole(), rRole.getSpec())){
+                    removedRaidUsers.add("\""+rRole.getSpec()+", "+rRole.getRole()+"\"");
                 }
             }
             if(removedRaidUsers.size()>0){
                 e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Selected roles have been removed:\n"+String.join("\n", removedRaidUsers)).queue());
                 return true;
             }
-        } else if(msg.contentEquals((rUsers.size()+2)+"")){
+        } else if(msg.contentEquals((rRoles.size()+2)+"")){
             // cancel
             return true;
         } else {
@@ -60,10 +61,10 @@ public class DeselectFlexRoleStep implements DeselectionStep {
             ArrayList<String> removedRaidUsers = new ArrayList<String>();
             for (String role : roles) {
                 int roleSelector = Integer.parseInt(role);
-                if(roleSelector <= rUsers.size() + 1){
-                    RaidUser raidUser = rUsers.get(roleSelector-2);
-                    if(raid.removeUserFromFlexRoles(e.getAuthor().getId(), raidUser.getRole(), raidUser.getSpec())){
-                        removedRaidUsers.add("\""+raidUser.getSpec()+", "+raidUser.getRole()+"\"");
+                if(roleSelector <= rRoles.size() + 1){
+                    FlexRole raidRole = rRoles.get(roleSelector-2);
+                    if(raid.removeUserFromFlexRoles(e.getAuthor().getId(), raidRole.getRole(), raidRole.getSpec())){
+                        removedRaidUsers.add("\""+raidRole.getSpec()+", "+raidRole.getRole()+"\"");
                     }
                 }
             }
@@ -73,7 +74,7 @@ public class DeselectFlexRoleStep implements DeselectionStep {
             }
         }
         // Send new message because there was no valid selection
-        e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid selection.\n\n"+buildSelectionText(rUsers)).queue());
+        e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid selection.\n\n"+buildSelectionText(rRoles)).queue());
         return false;
 
         /*
@@ -111,11 +112,11 @@ public class DeselectFlexRoleStep implements DeselectionStep {
         return nextStep;
     }
 
-    private String buildSelectionText(ArrayList<RaidUser> raidUsers){
+    private String buildSelectionText(ArrayList<FlexRole> raidUsers){
         int counter = 0;
         String outer = "";
         outer += "`"+(++counter)+"` all\n";
-        for (RaidUser rUser : raidUsers) {
+        for (FlexRole rUser : raidUsers) {
             Emote userEmote = Reactions.getEmoteByName(rUser.getSpec());
             if(userEmote!=null){
                 outer += "`"+(++counter)+"` <:"+userEmote.getName()+":"+userEmote.getId()+"> "+rUser.getSpec()+", "+rUser.getRole()+"\n";
@@ -133,7 +134,7 @@ public class DeselectFlexRoleStep implements DeselectionStep {
      */
     @Override
     public String getStepText() {
-        ArrayList<RaidUser> raidUsers = this.raid.getRaidUsersFlexRolesById(this.user.getId());
+        ArrayList<FlexRole> raidUsers = this.raid.getRaidUsersFlexRolesById(this.user.getId());
         if(raidUsers.size()==0){ return "You are not registered for any flex roles."; }
         return buildSelectionText(raidUsers);
     }
