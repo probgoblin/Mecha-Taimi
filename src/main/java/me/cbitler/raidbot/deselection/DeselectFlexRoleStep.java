@@ -69,7 +69,7 @@ public class DeselectFlexRoleStep implements DeselectionStep {
                 }
             }
             if(removedRaidUsers.size()>0){
-                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Selected roles have been removed:\n"+String.join("\n", removedRaidUsers)).queue());
+                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Selected flex roles have been removed:\n"+String.join("\n", removedRaidUsers)).queue());
                 return true;
             }
         }
