@@ -400,7 +400,7 @@ public class Raid {
                 foundMain = true;
             }
         }
-        
+
         if (foundMain == false) { // in this case, we need to iterate over flex roles as well
         	Iterator<Map.Entry<RaidUser, List<FlexRole>>> usersFlex = usersToFlexRoles.entrySet().iterator();
         	while (usersFlex.hasNext()) {
@@ -525,6 +525,22 @@ public class Raid {
     }
 
     /**
+     * Get a List of RaidUsers in this raid by their ID
+     *
+     * @param name The user's ID
+     * @return The List of RaidUsers if they are in this raid, null otherwise
+     */
+    public ArrayList<RaidUser> getRaidUsersById(String id) {
+        ArrayList<RaidUser> raidUsers = new ArrayList<RaidUser>();
+        for (RaidUser user : userToRole.keySet()) {
+            if (user.getId().equalsIgnoreCase(id)) {
+                raidUsers.add(user);
+            }
+        }
+        return raidUsers;
+    }
+
+    /**
      * Get a RaidUser in this raid by their name
      *
      * @param name The user's name
@@ -554,8 +570,8 @@ public class Raid {
 
         removeUser(idToRemove);
     }
-    
-    
+
+
     /**
      * Remove a user from their main role
      *
@@ -579,8 +595,8 @@ public class Raid {
 
         updateMessage();
 	}
-    
-	
+
+
 	/**
      * Remove a user from their main role
      *
