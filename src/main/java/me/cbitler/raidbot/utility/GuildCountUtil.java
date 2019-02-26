@@ -15,7 +15,8 @@ public class GuildCountUtil {
      * @throws IOException
      */
     public static void sendGuilds(JDA jda) throws IOException {
-        String url = "https://discordbots.org/api/bots/" + jda.getSelfUser().getId() + "/stats";
+        /*
+    	String url = "https://discordbots.org/api/bots/" + jda.getSelfUser().getId() + "/stats";
         int serverCount = jda.getGuilds().size();
         //int shardId = jda.getShardInfo().getShardId();
         //int shardCount = jda.getShardInfo().getShardTotal();
@@ -35,12 +36,14 @@ public class GuildCountUtil {
 
         // Note, this is for testing so that it's easy to see what guilds are running the bot in order to help them with issues
         saveGuilds(jda);
+        */
     }
 
     /**
      * Save a list of the guilds using the bot to a file for easier debugging. This can easily be removed.
      * @param jda
      */
+    /*
     private static void saveGuilds(JDA jda) {
         File file = new File("guilds");
         if(file.exists()) {
@@ -61,15 +64,18 @@ public class GuildCountUtil {
         }
 
     }
+    */
 
     /**
      * Read the token from the token file
      * @return The token text
      * @throws IOException
      */
+    /*
     private static String readToken() throws IOException {
         BufferedReader br = new BufferedReader(
                 new FileReader(new File("token")));
         return br.readLine();
     }
+    */
 }

@@ -1,3 +1,5 @@
+
+
 package me.cbitler.raidbot.deselection;
 
 import java.util.ArrayList;
@@ -60,13 +62,15 @@ public class DeselectFlexRoleStep implements DeselectionStep {
             String[] roles = msg.split(",");
             ArrayList<String> removedRaidUsers = new ArrayList<String>();
             for (String role : roles) {
-                int roleSelector = Integer.parseInt(role);
-                if(roleSelector <= rRoles.size() + 1){
-                    FlexRole raidRole = rRoles.get(roleSelector-2);
-                    if(raid.removeUserFromFlexRoles(e.getAuthor().getId(), raidRole.getRole(), raidRole.getSpec())){
-                        removedRaidUsers.add("\""+raidRole.getSpec()+", "+raidRole.getRole()+"\"");
-                    }
-                }
+            	try {
+            		int roleSelector = Integer.parseInt(role) - 2;
+            		if(roleSelector >= 0 && roleSelector < rRoles.size()){
+            			FlexRole raidRole = rRoles.get(roleSelector);
+            			if(raid.removeUserFromFlexRoles(e.getAuthor().getId(), raidRole.getRole(), raidRole.getSpec())){
+            				removedRaidUsers.add("\""+raidRole.getSpec()+", "+raidRole.getRole()+"\"");
+            			}
+            		}
+            	} catch (Exception excp) { }
             }
             if(removedRaidUsers.size()>0){
                 e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Selected flex roles have been removed:\n"+String.join("\n", removedRaidUsers)).queue());
