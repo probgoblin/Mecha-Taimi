@@ -36,7 +36,7 @@ public class Main {
      * @throws IOException
      */
     private static String readToken() throws IOException {
-        // get jar dir
+        // get token file from jar dir instead of execution dir
         URI tokenPath;
         try{
             tokenPath = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().resolve("token");
@@ -44,6 +44,7 @@ public class Main {
             throw new IOException();
         }
         File tokenFile = new File(tokenPath);
+        // if token file does not exist in jar dir, try loading it from execution dir
         if(!tokenFile.exists()) tokenFile = new File("token");
         BufferedReader br = new BufferedReader(
                 new FileReader(tokenFile));
