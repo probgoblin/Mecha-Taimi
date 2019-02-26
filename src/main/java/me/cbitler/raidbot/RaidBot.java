@@ -58,13 +58,13 @@ public class RaidBot {
 
         this.jda = jda;
         jda.addEventListener(new DMHandler(this), new ChannelMessageHandler(), new ReactionHandler());
-        db = new Database("raid.db");
+        db = new Database("events.db");
         db.connect();
         RaidManager.loadRaids();
         
         CommandRegistry.addCommand("help", new HelpCommand());
         CommandRegistry.addCommand("info", new InfoCommand());
-        CommandRegistry.addCommand("endRaid", new EndRaidCommand());
+        CommandRegistry.addCommand("endEvent", new EndRaidCommand());
 
         new Thread(() -> {
             while (true) {
