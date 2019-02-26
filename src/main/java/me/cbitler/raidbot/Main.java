@@ -37,16 +37,16 @@ public class Main {
      */
     private static String readToken() throws IOException {
         // get jar dir
-        URI jarDir;
+        URI tokenPath;
         try{
-            jarDir = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().resolve("token");
+            tokenPath = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().resolve("token");
         } catch(URISyntaxException e){
-            System.out.println(">> could not resolve URI of jar!");
             throw new IOException();
         }
-        System.out.println(jarDir);
+        File tokenFile = new File(tokenPath);
+        if(!tokenFile.exists()) tokenFile = new File("token");
         BufferedReader br = new BufferedReader(
-                new FileReader(new File("token")));
+                new FileReader(tokenFile));
         return br.readLine();
     }
 }
