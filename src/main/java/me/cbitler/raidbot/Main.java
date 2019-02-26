@@ -9,6 +9,8 @@ import net.dv8tion.jda.core.exceptions.RateLimitedException;
 
 import javax.security.auth.login.LoginException;
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Start the program, read the token, and start the bot
@@ -32,8 +34,17 @@ public class Main {
      * Read the token from the token file
      * @return The token text
      * @throws IOException
-     */    
+     */
     private static String readToken() throws IOException {
+        // get jar dir
+        URI jarDir;
+        try{
+            jarDir = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().resolve("token");
+        } catch(URISyntaxException e){
+            System.out.println(">> could not resolve URI of jar!");
+            throw new IOException();
+        }
+        System.out.println(jarDir);
         BufferedReader br = new BufferedReader(
                 new FileReader(new File("token")));
         return br.readLine();
