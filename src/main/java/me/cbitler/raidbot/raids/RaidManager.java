@@ -181,12 +181,12 @@ public class RaidManager {
     public static boolean deleteRaid(String messageId) {
         Raid r = getRaid(messageId);
         if (r != null) {
-            try {
-                RaidBot.getInstance().getServer(r.getServerId())
-                        .getTextChannelById(r.getChannelId()).getMessageById(messageId).queue(message -> message.delete().queue());
-            } catch (Exception e) {
-                // Nothing, the message doesn't exist - it can happen
-            }
+            //try {
+            //    RaidBot.getInstance().getServer(r.getServerId())
+            //            .getTextChannelById(r.getChannelId()).getMessageById(messageId).queue(message -> message.delete().queue());
+            //} catch (Exception e) {
+            //    // Nothing, the message doesn't exist - it can happen
+            //}
 
             Iterator<Raid> raidIterator = raids.iterator();
             while (raidIterator.hasNext()) {
