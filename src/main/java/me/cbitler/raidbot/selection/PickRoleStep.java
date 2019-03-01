@@ -38,7 +38,7 @@ public class PickRoleStep implements SelectionStep {
     	try {
     		int roleId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
     		String roleName = raid.getRoles().get(roleId).getName();
-    		pickRole(e.getAuthor().getId(), e.getAuthor().getName(), roleName);
+    		success = pickRole(e.getAuthor().getId(), e.getAuthor().getName(), roleName);
     	} catch (Exception exp) {
     		success = false;	
     	}
@@ -78,17 +78,21 @@ public class PickRoleStep implements SelectionStep {
     /**
      * adds the user as the default role (first role)
      * */
-    public void pickRole(String userID, String username, String roleName) {
+    public boolean pickRole(String userID, String username, String roleName) {
+    	boolean success = true;
     	if (isFlexRole) {
 			if(raid.isValidRole(roleName)) {
                 raid.addUserFlexRole(userID, username, spec, roleName, true, true);
+            } else {
+            	success = false;
             }
 		} else {
 			if(raid.isValidNotFullRole(roleName)) {
 				raid.addUser(userID, username, spec, roleName, true, true);
+			} else {
+				success = false;
 			}
 		}
-    	
-    	
+    	return success;
     }
 }

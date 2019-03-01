@@ -47,8 +47,8 @@ public class RunRoleSetupStep implements CreationStep {
      */
     public String getStepText() {
         return "Choose if you want to select a role template or enter them manually:\n"
-        		+ "´1´ template \n"
-        		+ "´2´ manual";
+        		+ "`1` template \n"
+        		+ "`2` manual";
     }
 
     /**

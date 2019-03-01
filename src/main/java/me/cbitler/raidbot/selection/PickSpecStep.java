@@ -43,7 +43,11 @@ public class PickSpecStep implements SelectionStep {
     		String spec = allSpecs[specId];
     		if (raid.getRoles().size() == 1) { // if there is only one role, skip PickRoleStep
     			PickRoleStep autoRoleStep = new PickRoleStep(raid, spec, isFlexRole);
-    			autoRoleStep.pickRole(e.getAuthor().getId(), e.getAuthor().getName(), raid.getRoles().get(0).getName());
+    			if (autoRoleStep.pickRole(e.getAuthor().getId(), e.getAuthor().getName(), raid.getRoles().get(0).getName())) {
+    			    e.getChannel().sendMessage("Added to event roster" + (isFlexRole ? " as flex role" : "") + ".").queue();
+    		    } else {
+    		        e.getChannel().sendMessage("Please choose a valid role" + (isFlexRole ? "" : " that is not full") + ".").queue();
+    			}
     		} else {
     			nextStep = new PickRoleStep(raid, spec, isFlexRole);
     		}
