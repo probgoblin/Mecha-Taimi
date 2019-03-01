@@ -40,7 +40,13 @@ public class PickSpecStep implements SelectionStep {
     public boolean handleDM(PrivateMessageReceivedEvent e) {
     	try {
     		int specId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
-    		nextStep = new PickRoleStep(raid, allSpecs[specId], isFlexRole);
+    		String spec = allSpecs[specId];
+    		if (raid.getRoles().size() == 1) { // if there is only one role, skip PickRoleStep
+    			PickRoleStep autoRoleStep = new PickRoleStep(raid, spec, isFlexRole);
+    			autoRoleStep.pickRole(e.getAuthor().getId(), e.getAuthor().getName(), raid.getRoles().get(0).getName());
+    		} else {
+    			nextStep = new PickRoleStep(raid, spec, isFlexRole);
+    		}
     		return true;
     	} catch (Exception exp) {
             e.getChannel().sendMessage("Please choose a valid specialization.").queue();

@@ -38,15 +38,7 @@ public class PickRoleStep implements SelectionStep {
     	try {
     		int roleId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
     		String roleName = raid.getRoles().get(roleId).getName();
-    		if (isFlexRole) {
-    			if(raid.isValidRole(roleName)) {
-                    raid.addUserFlexRole(e.getAuthor().getId(), e.getAuthor().getName(), spec, roleName, true, true);
-                }
-    		} else {
-    			if(raid.isValidNotFullRole(roleName)) {
-    				raid.addUser(e.getAuthor().getId(), e.getAuthor().getName(), spec, roleName, true, true);
-    			}
-    		}
+    		pickRole(e.getAuthor().getId(), e.getAuthor().getName(), roleName);
     	} catch (Exception exp) {
     		success = false;	
     	}
@@ -81,5 +73,22 @@ public class PickRoleStep implements SelectionStep {
         text += "or type cancel to cancel role selection.";
 
         return text;
+    }
+    
+    /**
+     * adds the user as the default role (first role)
+     * */
+    public void pickRole(String userID, String username, String roleName) {
+    	if (isFlexRole) {
+			if(raid.isValidRole(roleName)) {
+                raid.addUserFlexRole(userID, username, spec, roleName, true, true);
+            }
+		} else {
+			if(raid.isValidNotFullRole(roleName)) {
+				raid.addUser(userID, username, spec, roleName, true, true);
+			}
+		}
+    	
+    	
     }
 }
