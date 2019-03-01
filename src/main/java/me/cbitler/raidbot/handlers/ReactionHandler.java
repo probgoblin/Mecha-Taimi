@@ -42,7 +42,7 @@ public class ReactionHandler extends ListenerAdapter {
                 	e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are already selecting a role.").queue());                	
                 }
             } else if(emote != null && emote.getName().equalsIgnoreCase("X_")) {
-            	if (raid.isUserInRaid(e.getUser().getId())) {
+            	if (raid.isUserInRaid(e.getUser().getId()) || raid.getUserNumFlexRoles(e.getUser().getId()) > 0) {
             		DeselectionStep step = new DeselectIdleStep(raid);
             		RaidBot.getInstance().getRoleDeselectionMap().put(e.getUser().getId(), step);
             		e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(step.getStepText()).queue());
