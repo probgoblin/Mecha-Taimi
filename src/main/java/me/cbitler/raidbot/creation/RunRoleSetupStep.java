@@ -3,61 +3,58 @@ package me.cbitler.raidbot.creation;
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidRole;
+import me.cbitler.raidbot.selection.PickRoleStep;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Role setup step for the event.
- * This one should take multiple inputs and as a result it doesn't finish until the user
- * types 'done'.
- * @author Christopher Bitler
+ * Gives a choice between role templates or manual role creation.
+ * @author Franziska Mueller
  */
 public class RunRoleSetupStep implements CreationStep {
 
+	CreationStep nextStep;
+	
     /**
-     * Handle user input - should be in the format [number]:[role] unless it is 'done'.
+     * Handle user input.
      * @param e The direct message event
-     * @return True if the user entered 'done', false otherwise
+     * @return True if the user entered a valid choice, false otherwise
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         RaidBot bot = RaidBot.getInstance();
         PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
 
-        if(e.getMessage().getRawContent().equalsIgnoreCase("done")) {
-            if(raid.getRolesWithNumbers().size() > 0) {
-                return true;
-            } else {
-                e.getChannel().sendMessage("You must add at least one role.").queue();
+        try {
+    		int choiceId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+    		if (choiceId == 0) { // role template
+    			nextStep = new RunRoleSetupTemplateStep();
+        		return true;
+    		} else if (choiceId == 1) {
+    			nextStep = new RunRoleSetupManualStep();
+        		return true;
+    		} else {
+    			e.getChannel().sendMessage("Please choose a valid option.").queue();
                 return false;
-            }
-        } else {
-            String[] parts = e.getMessage().getRawContent().split(":");
-            if(parts.length < 2) {
-                e.getChannel().sendMessage("You need to specify the role in the format [amount]:[role name]").queue();
-            } else {
-                try {
-                    int amnt = Integer.parseInt(parts[0]);
-                    String roleName = parts[1];
-                    raid.getRolesWithNumbers().add(new RaidRole(amnt, roleName));
-                    e.getChannel().sendMessage("Role added").queue();
-                } catch (Exception ex) {
-                    e.getChannel().sendMessage("Invalid input: Make sure it's in the format of [amount]:[role name], like 1:DPS").queue();
-                }
-            }
+    		}
+    	} catch (Exception exp) {
+            e.getChannel().sendMessage("Please choose a valid option.").queue();
             return false;
-        }
+    	}
     }
 
     /**
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the roles for the event (format: [amount]:[role name], e.g. 1:DPS). Type done to finish entering roles:";
+        return "Choose if you want to select a role template or enter them manually:\n"
+        		+ "´1´ template \n"
+        		+ "´2´ manual";
     }
 
     /**
      * {@inheritDoc}
      */
     public CreationStep getNextStep() {
-        return null;
+        return nextStep;
     }
 }
