@@ -29,7 +29,7 @@ public class ReactionHandler extends ListenerAdapter {
                 // check if the user is already selecting a role
                 if (bot.getRoleSelectionMap().get(e.getUser().getId()) == null) {
                 	// check if the user can select a role, i.e. not main + 2 flex roles yet
-                	if (raid.isUserInRaid(e.getUser().getId()) && raid.getUserNumFlexRoles(e.getUser().getId()) == 2) {
+                	if (raid.isUserInRaid(e.getUser().getId()) && raid.getUserNumFlexRoles(e.getUser().getId()) >= 2) {
                 		e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You have selected the maximum number of roles. Press the X reaction to re-select your roles.").queue());        		
                 	} else {
                 		SelectionStep step = new PickSpecStep(raid, e.getReactionEmote().getEmote().getName(), e.getUser());

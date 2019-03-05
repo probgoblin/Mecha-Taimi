@@ -321,7 +321,7 @@ public class Raid {
         }
 
         userToRole.put(user, role);
-        usersToFlexRoles.computeIfAbsent(user, k -> new ArrayList<>());
+        usersToFlexRoles.computeIfAbsent(new RaidUser(id, name, "", ""), k -> new ArrayList<>());
 
         if (update_message) {
             updateMessage();
@@ -344,7 +344,7 @@ public class Raid {
      */
     public boolean addUserFlexRole(String id, String name, String spec, String role, boolean db_insert,
             boolean update_message) {
-        RaidUser user = getUserByName(name);
+        RaidUser user = new RaidUser(id, name, "", "");
         FlexRole frole = new FlexRole(spec, role);
 
         if (db_insert) {
