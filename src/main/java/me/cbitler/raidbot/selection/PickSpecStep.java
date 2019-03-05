@@ -4,6 +4,7 @@ import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.utility.ClassesSpecs;
 import me.cbitler.raidbot.utility.Reactions;
 import net.dv8tion.jda.core.entities.Emote;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
@@ -11,8 +12,8 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
  */
 public class PickSpecStep implements SelectionStep {
     Raid raid;
+    User user;
     String coreClass;
-    boolean isFlexRole;
     SelectionStep nextStep;
     String[] allSpecs;
 
@@ -22,10 +23,10 @@ public class PickSpecStep implements SelectionStep {
      * @param raid The raid
      * @param spec The specialization that the user chose
      */
-    public PickSpecStep(Raid raid, String coreclass, boolean isflex) {
+    public PickSpecStep(Raid raid, String coreclass, User user) {
         this.raid = raid;
+        this.user = user;
         this.coreClass = coreclass;
-        this.isFlexRole = isflex;
         this.nextStep = null;
     	this.allSpecs = ClassesSpecs.getSpecsForCore(coreClass);
     }
@@ -42,14 +43,12 @@ public class PickSpecStep implements SelectionStep {
     		int specId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
     		String spec = allSpecs[specId];
     		if (raid.getRoles().size() == 1) { // if there is only one role, skip PickRoleStep
-    			PickRoleStep autoRoleStep = new PickRoleStep(raid, spec, isFlexRole);
-    			if (autoRoleStep.pickRole(e.getAuthor().getId(), e.getAuthor().getName(), raid.getRoles().get(0).getName())) {
-    			    e.getChannel().sendMessage("Added to event roster" + (isFlexRole ? " as flex role" : "") + ".").queue();
-    		    } else {
-    		        e.getChannel().sendMessage("Please choose a valid role" + (isFlexRole ? "" : " that is not full") + ".").queue();
-    			}
+    			PickRoleStep autoRoleStep = new PickRoleStep(raid, spec, user);
+    			if (false == autoRoleStep.pickRole(e.getAuthor().getId(), e.getAuthor().getName(), raid.getRoles().get(0).getName())) {
+    			    e.getChannel().sendMessage("Since there is only one role, selection was cancelled automatically.").queue();
+    		    }
     		} else {
-    			nextStep = new PickRoleStep(raid, spec, isFlexRole);
+    			nextStep = new PickRoleStep(raid, spec, user);
     		}
     		return true;
     	} catch (Exception exp) {

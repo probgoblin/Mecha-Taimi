@@ -668,7 +668,6 @@ public class Raid {
                 }
             }
         }
-
         return 0;
     }
 }
