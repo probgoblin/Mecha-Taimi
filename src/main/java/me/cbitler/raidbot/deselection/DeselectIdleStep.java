@@ -39,11 +39,11 @@ public class DeselectIdleStep implements DeselectionStep {
         		// check if this user has a main role
         		if (raid.isUserInRaid(e.getAuthor().getId())) {
         			raid.removeUserFromMainRoles(e.getAuthor().getId());
-        			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Removed from main role. You can choose another type or write done.").queue());
+        			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Removed from main role. You can choose another type or write *done*.").queue());
         			return false;
         		}
         		else {
-        			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for a main role. Choose a different type or cancel.").queue());
+        			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for a main role. Choose a different type or write *done*.").queue());
                 	return false;
         		}
         	} else if (choiceId == 1) { // flex
@@ -53,7 +53,7 @@ public class DeselectIdleStep implements DeselectionStep {
         			return true;
         		}
         		else {
-        			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for any flex role. Choose a different type or cancel.").queue());
+        			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for any flex role. Choose a different type or write *done*.").queue());
                 	return false;
         		}
         	} else if (choiceId == 2) { // all
@@ -61,11 +61,11 @@ public class DeselectIdleStep implements DeselectionStep {
         		raid.removeUser(e.getAuthor().getId());
         		return true;
         	} else { // some other integer
-        		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Try again or type done to quit deselection.").queue());
+        		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Try again or type *done* to quit deselection.").queue());
         		return false;
         	}
     	} catch (Exception excp) {
-    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Try again or type done to quit deselection.").queue());
+    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Try again or type *done* to quit deselection.").queue());
     		return false;
     	}
     }

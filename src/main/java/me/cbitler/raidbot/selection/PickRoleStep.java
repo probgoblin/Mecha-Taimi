@@ -97,7 +97,7 @@ public class PickRoleStep implements SelectionStep {
     					// role is full and user already has 2 flex roles
     					success = false;
     					user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Could not add since the role you selected is full and you reached the maximum number of flex roles.\n"
-    							+ "Please choose a non-full role or cancel selection.").queue());
+    							+ "Please choose a non-full role or write *cancel* to quit selection.").queue());
     				}
     			}
     		} else { 
