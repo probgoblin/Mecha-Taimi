@@ -24,21 +24,30 @@ public class EditIdleStep implements EditStep {
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         boolean valid = true;
-    	if (e.getMessage().getRawContent().equalsIgnoreCase("time")) {
-        	nextStep = new EditTimeStep(messageID);
-        } else if (e.getMessage().getRawContent().equalsIgnoreCase("date")) {
-        	nextStep = new EditDateStep(messageID);
-        } else if (e.getMessage().getRawContent().equalsIgnoreCase("name")) {
-        	nextStep = new EditNameStep(messageID);
-        } else if (e.getMessage().getRawContent().equalsIgnoreCase("description")) {
-        	nextStep = new EditDescriptionStep(messageID);
-        } else if(e.getMessage().getRawContent().equalsIgnoreCase("done")) {
+        if(e.getMessage().getRawContent().equalsIgnoreCase("done")) {
             nextStep = null;
+        } else {
+        	// try to parse an integer
+        	try {
+        		int choiceId = Integer.parseInt(e.getMessage().getRawContent());
+        		if (choiceId == 1) // time     			
+        			nextStep = new EditTimeStep(messageID);
+        		else if (choiceId == 2) // date
+        			nextStep = new EditDateStep(messageID);
+        		else if (choiceId == 3) // name
+        			nextStep = new EditNameStep(messageID);
+        		else if (choiceId == 4) // description
+        			nextStep = new EditDescriptionStep(messageID);
+        		else 
+        			valid = false;
+        	} catch (Exception excp) {
+        		valid = false;
+        	}
         }
-        else {
-        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid property. Supported properties: time, date, name, description.").queue());
-        	valid = false;
-        }
+    	
+    	if (valid == false) {
+    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Try again.").queue());
+    	}
     	return valid;
     }
 
@@ -46,7 +55,12 @@ public class EditIdleStep implements EditStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the name of the property you want to change [time, date, name, description] or done when you want to finish editing.";
+        return "Choose which property you want to change:\n"
+        		+ "`1` time \n"
+        		+ "`2` date \n"
+        		+ "`3` name \n"
+        		+ "`4` description \n"
+        		+ "or type *done* when you want to finish editing.";
     }
 
     /**
