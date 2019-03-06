@@ -559,21 +559,6 @@ public class Raid {
     }
 
     /**
-     * Get a RaidUser in this raid by their name
-     *
-     * @param name The user's name
-     * @return The RaidUser if they are in this raid, null otherwise
-     */
-    public RaidUser getUserByName(String name) {
-        for (RaidUser user : userToRole.keySet()) {
-            if (user.name.equalsIgnoreCase(name)) {
-                return user;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Remove a user by their username
      *
      * @param name The name of the user being removed
@@ -583,6 +568,15 @@ public class Raid {
         for (Map.Entry<RaidUser, String> entry : userToRole.entrySet()) {
             if (entry.getKey().name.equalsIgnoreCase(name)) {
                 idToRemove = entry.getKey().id;
+                break;
+            }
+        }
+        if (idToRemove.isEmpty()) { // did not find the user in main roles, check flex roles
+        	for (Map.Entry<RaidUser, List<FlexRole>> entry : usersToFlexRoles.entrySet()) {
+                if (entry.getKey().name.equalsIgnoreCase(name)) {
+                    idToRemove = entry.getKey().id;
+                    break;
+                }
             }
         }
 

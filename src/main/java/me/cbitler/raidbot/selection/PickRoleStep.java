@@ -66,7 +66,7 @@ public class PickRoleStep implements SelectionStep {
         for (int i = 0; i < raid.getRoles().size(); i++) {
             text += "`" + (i+1) + "` " + raid.getRoles().get(i).getName() + "\n";
         }
-        text += "or type cancel to cancel role selection.";
+        text += "or type *cancel* to cancel role selection.";
 
         return text;
     }

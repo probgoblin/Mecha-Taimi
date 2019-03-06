@@ -81,7 +81,7 @@ public class PickSpecStep implements SelectionStep {
         		text += "`" + (i+1) + "` " + allSpecs[i] + "\n";
         	}
         }
-        text += "or type cancel to cancel role selection.";
+        text += "or type *cancel* to cancel role selection.";
 
         return text;
     }

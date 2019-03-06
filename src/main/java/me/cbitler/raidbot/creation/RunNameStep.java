@@ -44,7 +44,7 @@ public class RunNameStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Event Setup:\nYou can type cancel at any point during this process to cancel the event setup\n\nEnter the name for the event:";
+        return "Event Setup:\nYou can type *cancel* at any point during this process to cancel the event setup\n\nEnter the name for the event:";
     }
 
     /**

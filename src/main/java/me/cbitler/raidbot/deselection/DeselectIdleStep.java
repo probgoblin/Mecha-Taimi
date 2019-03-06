@@ -89,6 +89,6 @@ public class DeselectIdleStep implements DeselectionStep {
         		+ "`1` main\n"
         		+ "`2` flex\n"
         		+ "`3` all\n"
-        		+ "or write done to quit deselection.";
+        		+ "or write *done* to quit deselection.";
     }
 }
