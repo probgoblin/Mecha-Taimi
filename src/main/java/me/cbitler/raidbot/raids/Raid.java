@@ -100,6 +100,29 @@ public class Raid {
         }
         return true;
     }
+    
+    /**
+     * Set the leader of the raid
+     *
+     * @param leader The leader of the raid
+     */
+    public void setLeader(String leader) {
+        this.raidLeaderName = leader;
+    }
+
+    /**
+     * Updates the leader of the raid in the database
+     */
+    public boolean updateLeaderDB() {
+        try {
+            RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `leader`=? WHERE `raidId`=?",
+                    new String[] { raidLeaderName, messageId });
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
 
     /**
      * Get the description of the raid

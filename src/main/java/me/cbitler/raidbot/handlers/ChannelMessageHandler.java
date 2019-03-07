@@ -114,11 +114,11 @@ public class ChannelMessageHandler extends ListenerAdapter {
         }
 
         if (e.getMember().getPermissions().contains(Permission.MANAGE_SERVER)) {
-            if(e.getMessage().getRawContent().toLowerCase().startsWith("!seteventleaderrole")) {
+            if(e.getMessage().getRawContent().toLowerCase().startsWith("!seteventmanagerrole")) {
                 String[] commandParts = e.getMessage().getRawContent().split(" ");
                 String raidLeaderRole = combineArguments(commandParts,1);
                 RaidBot.getInstance().setRaidLeaderRole(e.getMember().getGuild().getId(), raidLeaderRole);
-                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event leader role updated to: " + raidLeaderRole).queue());
+                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event manager role updated to: " + raidLeaderRole).queue());
                 e.getMessage().delete().queue();
             }
         }
