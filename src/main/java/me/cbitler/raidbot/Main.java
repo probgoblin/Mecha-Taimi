@@ -44,8 +44,9 @@ public class Main {
         File tokenFile = new File(tokenPath);
         // if token file does not exist in jar dir, try loading it from execution dir
         if(!tokenFile.exists()) tokenFile = new File("token");
-        BufferedReader br = new BufferedReader(
-                new FileReader(tokenFile));
-        return br.readLine();
+        BufferedReader br = new BufferedReader(new FileReader(tokenFile));
+        String outer = br.readLine();
+        br.close();
+        return outer;
     }
 }

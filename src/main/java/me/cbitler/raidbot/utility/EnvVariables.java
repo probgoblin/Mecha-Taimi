@@ -26,6 +26,7 @@ public class EnvVariables {
                 variables.put(name, value);
             }
         }
+        reader.close();
     }
 
     /**
