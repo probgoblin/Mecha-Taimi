@@ -1,9 +1,5 @@
 package me.cbitler.raidbot.creation;
 
-import me.cbitler.raidbot.RaidBot;
-import me.cbitler.raidbot.raids.PendingRaid;
-import me.cbitler.raidbot.raids.RaidRole;
-import me.cbitler.raidbot.selection.PickRoleStep;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
@@ -14,16 +10,13 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 public class RunRoleSetupStep implements CreationStep {
 
 	CreationStep nextStep;
-	
+
     /**
      * Handle user input.
      * @param e The direct message event
      * @return True if the user entered a valid choice, false otherwise
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-        RaidBot bot = RaidBot.getInstance();
-        PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
-
         try {
     		int choiceId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
     		if (choiceId == 0) { // role template

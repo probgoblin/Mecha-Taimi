@@ -7,15 +7,10 @@ import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.creation.RunNameStep;
 import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.edit.EditIdleStep;
-import me.cbitler.raidbot.logs.LogParser;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.utility.PermissionsUtil;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -90,11 +85,11 @@ public class ChannelMessageHandler extends ListenerAdapter {
                     if (raid != null && raid.getServerId().equalsIgnoreCase(e.getGuild().getId())) {
                         // check if this user is already editing or creating, or the raid is being edited by someone else
                     	if (bot.getCreationMap().get(e.getAuthor().getId()) != null) {
-                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You cannot edit an event while creating.").queue());                   			
+                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You cannot edit an event while creating.").queue());
                     	} else if (bot.getEditMap().get(e.getAuthor().getId()) != null) {
-                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You can only edit one event at a time.").queue());                   			
+                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You can only edit one event at a time.").queue());
                     	} else if (bot.getEditList().contains(messageId)) {
-                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The selected event is already being edited.").queue());                   			
+                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The selected event is already being edited.").queue());
                     	} else {
                     		// start editing process
                     		EditStep editIdleStep = new EditIdleStep(messageId);
@@ -109,7 +104,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 try {
                     e.getMessage().delete().queue();
                 } catch (Exception exception) {}
-            	
+
             }
         }
 

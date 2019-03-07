@@ -1,7 +1,6 @@
 package me.cbitler.raidbot.database;
 
 import java.sql.*;
-import java.util.List;
 
 /**
  * Class for managing the SQLite database for this bot

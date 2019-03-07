@@ -3,7 +3,6 @@ package me.cbitler.raidbot.creation;
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidRole;
-import me.cbitler.raidbot.selection.PickRoleStep;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
@@ -19,19 +18,19 @@ public class RunRoleSetupTemplateStep implements CreationStep {
 			new RaidRole(1, "Tank Chrono"),
 			new RaidRole(2, "Healer"),
 			new RaidRole(1, "BS"),
-			new RaidRole(5, "DPS")			
+			new RaidRole(5, "DPS")
 		},
 		{	new RaidRole(1, "Chrono"),
 			new RaidRole(1, "Healer"),
 			new RaidRole(1, "BS"),
 			new RaidRole(2, "DPS")
-		}			
+		}
 	};
-	private static String[] templateNames = { 
+	private static String[] templateNames = {
 			"default raid",
 			"default fractal"
 	};
-	
+
     /**
      * Handle user input.
      * @param e The direct message event
@@ -51,7 +50,7 @@ public class RunRoleSetupTemplateStep implements CreationStep {
                     raid.getRolesWithNumbers().add(templates[choiceId][r]);
     			}
     			return true;
-    		}    		
+    		}
     	} catch (Exception exp) {
             e.getChannel().sendMessage("Please choose a valid option.").queue();
             return false;
@@ -63,7 +62,7 @@ public class RunRoleSetupTemplateStep implements CreationStep {
      */
     public String getStepText() {
     	String message = "Choose from these available role templates or go back to manual role creation: \n";
-        
+
     	for (int i = 0; i < templateNames.length; i++) {
     		message += "`" + (i+1) + "` " + templateNames[i] + " (";
     		for (int r = 0; r < templates[i].length; r ++) {

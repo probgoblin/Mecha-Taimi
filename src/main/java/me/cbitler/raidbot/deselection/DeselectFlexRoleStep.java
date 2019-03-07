@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 import me.cbitler.raidbot.raids.FlexRole;
 import me.cbitler.raidbot.raids.Raid;
-import me.cbitler.raidbot.raids.RaidUser;
 import me.cbitler.raidbot.utility.Reactions;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.core.entities.*;

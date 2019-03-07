@@ -9,11 +9,8 @@ import me.cbitler.raidbot.selection.PickSpecStep;
 import me.cbitler.raidbot.selection.SelectionStep;
 import me.cbitler.raidbot.utility.Reactions;
 import net.dv8tion.jda.core.entities.Emote;
-import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-
-import java.util.function.Consumer;
 
 public class ReactionHandler extends ListenerAdapter {
     @Override
@@ -30,14 +27,14 @@ public class ReactionHandler extends ListenerAdapter {
                 if (bot.getRoleSelectionMap().get(e.getUser().getId()) == null) {
                 	// check if the user can select a role, i.e. not main + 2 flex roles yet
                 	if (raid.isUserInRaid(e.getUser().getId()) && raid.getUserNumFlexRoles(e.getUser().getId()) >= 2) {
-                		e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You have selected the maximum number of roles. Press the X reaction to re-select your roles.").queue());        		
+                		e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You have selected the maximum number of roles. Press the X reaction to re-select your roles.").queue());
                 	} else {
                 		SelectionStep step = new PickSpecStep(raid, e.getReactionEmote().getEmote().getName(), e.getUser());
                 		bot.getRoleSelectionMap().put(e.getUser().getId(), step);
                 		e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(step.getStepText()).queue());
-                	}	
+                	}
                 } else {
-                	e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are already selecting a role.").queue());                	
+                	e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are already selecting a role.").queue());
                 }
             } else if(emote != null && emote.getName().equalsIgnoreCase("X_")) {
             	if (raid.isUserInRaid(e.getUser().getId()) || raid.getUserNumFlexRoles(e.getUser().getId()) > 0) {

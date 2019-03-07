@@ -7,7 +7,6 @@ import me.cbitler.raidbot.utility.Reactions;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.*;
 
-import javax.imageio.stream.IIOByteBuffer;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;

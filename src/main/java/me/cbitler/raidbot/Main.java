@@ -1,7 +1,5 @@
 package me.cbitler.raidbot;
 
-import me.cbitler.raidbot.handlers.DMHandler;
-import me.cbitler.raidbot.utility.EnvVariables;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -27,7 +25,7 @@ public class Main {
         }
 
         JDA jda = new JDABuilder(AccountType.BOT).setToken(token).buildBlocking();
-        RaidBot bot = new RaidBot(jda);
+        new RaidBot(jda);
     }
 
     /**
