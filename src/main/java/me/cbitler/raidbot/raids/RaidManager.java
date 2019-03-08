@@ -15,6 +15,7 @@ import java.util.List;
 /**
  * Serves as a manager for all of the raids. This includes creating, loading, and deleting raids
  * @author Christopher Bitler
+ * @author Franziska Mueller
  */
 public class RaidManager {
 
@@ -41,9 +42,14 @@ public class RaidManager {
                         raids.add(newRaid);
                         newRaid.updateMessage();
 
-                        for (Emote emote : Reactions.getCoreClassEmotes()) {
+                        List<Emote> emoteList;
+                        if (newRaid.isOpenWorld)
+                        	emoteList = Reactions.getOpenWorldEmotes();
+                        else 
+                        	emoteList = Reactions.getCoreClassEmotes();
+                        
+                        for (Emote emote : emoteList)
                             message1.addReaction(emote).queue();
-                        }
                     } else {
                         message1.delete().queue();
                     }

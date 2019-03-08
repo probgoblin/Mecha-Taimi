@@ -126,6 +126,15 @@ public class Reactions {
     public static List<Emote> getCoreClassEmotes() {
         return new ArrayList<>(Arrays.asList(reactionsCore));
     }
+    
+    /**
+     * Get the list of open world emote objects
+     *
+     * @return The emotes
+     */
+    public static List<Emote> getOpenWorldEmotes() {
+        return new ArrayList<>(Arrays.asList(reactionsOpenWorld));
+    }
 
     public static Emote getEmoteByName(String name) {
         for (Emote emote : reactions) {
