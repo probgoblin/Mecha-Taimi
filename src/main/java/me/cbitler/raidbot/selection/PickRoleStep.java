@@ -1,7 +1,6 @@
 package me.cbitler.raidbot.selection;
 
 import me.cbitler.raidbot.raids.Raid;
-import me.cbitler.raidbot.raids.RaidUser;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
@@ -41,9 +40,9 @@ public class PickRoleStep implements SelectionStep {
     		String roleName = raid.getRoles().get(roleId).getName();
     		success = pickRole(e.getAuthor().getId(), e.getAuthor().getName(), roleName);
     	} catch (Exception exp) {
-    		success = false;	
+    		success = false;
     	}
-    	
+
         return success;
     }
 
@@ -70,7 +69,7 @@ public class PickRoleStep implements SelectionStep {
 
         return text;
     }
-    
+
     /**
      * adds the user as the specified role
      * @param userID the user's id
@@ -80,9 +79,9 @@ public class PickRoleStep implements SelectionStep {
      * */
     public boolean pickRole(String userID, String username, String roleName) {
     	boolean success = true;
-    	
+
     	if(raid.isValidRole(roleName)) {
-    		if (raid.isUserInRaid(userID) == false) { 
+    		if (raid.isUserInRaid(userID) == false) {
     			// check if we can add it as main role
     			if(raid.isValidNotFullRole(roleName)) {
     				raid.addUser(userID, username, spec, roleName, true, true);
@@ -100,8 +99,8 @@ public class PickRoleStep implements SelectionStep {
     							+ "Please choose a non-full role or write *cancel* to quit selection.").queue());
     				}
     			}
-    		} else { 
-    			// user has a main role already, 
+    		} else {
+    			// user has a main role already,
     			// i.e., there has to be a flex role slot available
     			// since we checked this in the ReactionHandler
     			raid.addUserFlexRole(userID, username, spec, roleName, true, true);
@@ -111,7 +110,7 @@ public class PickRoleStep implements SelectionStep {
     		success = false;
     		user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Please choose a valid role.").queue());
     	}
-    	
+
     	return success;
     }
 }

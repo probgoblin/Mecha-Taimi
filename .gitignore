@@ -2,7 +2,8 @@
 target/*
 *.iml
 *.db
-token
+token*
+Reactions
 dependency-reduced-pom.xml
 discord_bots_token
 .env

@@ -85,6 +85,11 @@ public class Reactions {
             getEmoji("548530947591634944") // X_
     };
 
+    static Emote[] reactionsOpenWorld = {
+            getEmoji("553296724584562688"), // Check
+            getEmoji("548530947591634944")  // X_
+    };
+
     /**
      * Get an emoji from it's emote ID via JDA
      *

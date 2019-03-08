@@ -1,7 +1,5 @@
 package me.cbitler.raidbot.edit;
 
-import me.cbitler.raidbot.RaidBot;
-import me.cbitler.raidbot.raids.PendingRaid;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
@@ -12,11 +10,11 @@ public class EditIdleStep implements EditStep {
 
 	private String messageID;
 	private EditStep nextStep;
-	
+
 	public EditIdleStep(String messageId) {
 		this.messageID = messageId;
 	}
-	
+
     /**
      * Idle step in editing process
      * @param e The direct message event
@@ -30,7 +28,7 @@ public class EditIdleStep implements EditStep {
         	// try to parse an integer
         	try {
         		int choiceId = Integer.parseInt(e.getMessage().getRawContent());
-        		if (choiceId == 1) // time     			
+        		if (choiceId == 1) // time
         			nextStep = new EditTimeStep(messageID);
         		else if (choiceId == 2) // date
         			nextStep = new EditDateStep(messageID);
@@ -40,13 +38,13 @@ public class EditIdleStep implements EditStep {
         			nextStep = new EditDescriptionStep(messageID);
         		else if (choiceId == 5) // leader
         			nextStep = new EditLeaderStep(messageID);
-        		else 
+        		else
         			valid = false;
         	} catch (Exception excp) {
         		valid = false;
         	}
         }
-    	
+
     	if (valid == false) {
     		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Try again.").queue());
     	}

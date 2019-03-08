@@ -1,7 +1,5 @@
 package me.cbitler.raidbot;
 
-import me.cbitler.raidbot.handlers.DMHandler;
-import me.cbitler.raidbot.utility.EnvVariables;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -27,7 +25,7 @@ public class Main {
         }
 
         JDA jda = new JDABuilder(AccountType.BOT).setToken(token).buildBlocking();
-        RaidBot bot = new RaidBot(jda);
+        new RaidBot(jda);
     }
 
     /**
@@ -46,8 +44,9 @@ public class Main {
         File tokenFile = new File(tokenPath);
         // if token file does not exist in jar dir, try loading it from execution dir
         if(!tokenFile.exists()) tokenFile = new File("token");
-        BufferedReader br = new BufferedReader(
-                new FileReader(tokenFile));
-        return br.readLine();
+        BufferedReader br = new BufferedReader(new FileReader(tokenFile));
+        String outer = br.readLine();
+        br.close();
+        return outer;
     }
 }

@@ -10,7 +10,6 @@ import me.cbitler.raidbot.handlers.ChannelMessageHandler;
 import me.cbitler.raidbot.handlers.DMHandler;
 import me.cbitler.raidbot.handlers.ReactionHandler;
 import me.cbitler.raidbot.raids.PendingRaid;
-import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.selection.SelectionStep;
 import me.cbitler.raidbot.utility.GuildCountUtil;
@@ -41,7 +40,7 @@ public class RaidBot {
     HashMap<String, PendingRaid> pendingRaids = new HashMap<String, PendingRaid>();
     HashMap<String, SelectionStep> roleSelection = new HashMap<String, SelectionStep>();
     HashMap<String, DeselectionStep> roleDeselection = new HashMap<String, DeselectionStep>();
-    
+
     Set<String> editList = new HashSet<String>();
 
     //TODO: This should be moved to it's own settings thing
@@ -61,7 +60,7 @@ public class RaidBot {
         db = new Database("events.db");
         db.connect();
         RaidManager.loadRaids();
-        
+
         CommandRegistry.addCommand("help", new HelpCommand());
         CommandRegistry.addCommand("info", new InfoCommand());
         CommandRegistry.addCommand("endEvent", new EndRaidCommand());
@@ -89,7 +88,7 @@ public class RaidBot {
     public HashMap<String, CreationStep> getCreationMap() {
         return creation;
     }
-    
+
     /**
      * Map of UserId -> edit step for raids in the edit process
      * @return The map of UserId -> edit step for raids in the edit process
@@ -105,7 +104,7 @@ public class RaidBot {
     public HashMap<String, SelectionStep> getRoleSelectionMap() {
         return roleSelection;
     }
-    
+
     /**
      * Map of the UserId -> roleDeselection step for people in the role deselection process
      * @return The map of the UserId -> roleDeselection step for people in the role deselection process
@@ -121,7 +120,7 @@ public class RaidBot {
     public HashMap<String, PendingRaid> getPendingRaids() {
         return pendingRaids;
     }
-    
+
     /**
      * List of messageIDs for raids in the edit process
      * @return List of messageIDs for raids in the edit process
