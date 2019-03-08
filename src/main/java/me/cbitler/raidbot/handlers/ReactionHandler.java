@@ -52,10 +52,16 @@ public class ReactionHandler extends ListenerAdapter {
         				if (raid.isUserInRaid(e.getUser().getId()) || raid.getUserNumFlexRoles(e.getUser().getId()) > 0) { // already signed up
         					e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are already signed up for this event.").queue());                 	       
         				} else {
-        					// TODO
+        					if (raid.addUserOpenWorld(e.getUser().getId(), e.getUser().getName())) 
+        						e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully signed up for the event.").queue());                 	       
+        					else 
+        						e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Sign-up failed.").queue());                 	                     		
         				}
-        			} else if(emote.getName().equalsIgnoreCase("X_")) {
-                		raid.removeUser(e.getUser().getId());
+        			} else if (emote.getName().equalsIgnoreCase("X_")) {
+        				if (raid.removeUser(e.getUser().getId())) 
+        					e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully removed from event.").queue());                 	       
+            			else
+        					e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for this event.").queue());                 	       	
         			}
         		}
             }

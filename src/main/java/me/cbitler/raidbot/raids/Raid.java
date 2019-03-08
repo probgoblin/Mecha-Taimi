@@ -47,6 +47,15 @@ public class Raid {
         this.time = time;
         this.isOpenWorld = isOpenWorld;
     }
+    
+    /**
+     * The open world flag for this event
+     *
+     * @return open world flag for this event
+     */
+    public boolean isOpenWorld() {
+		return isOpenWorld;
+	}
 
     /**
      * Get the message ID for this raid
@@ -396,6 +405,24 @@ public class Raid {
         }
         return true;
     }
+    
+    /**
+     * Add a user to this open world event with the default role
+     *
+     * @param id        The id of the user
+     * @param name      The name of the user
+     * @return true if the user was added, false otherwise
+     */
+    public boolean addUserOpenWorld(String id, String name) {
+		boolean success = false;
+		
+    	if (isValidNotFullRole(roles.get(0).getName())) // there is still space
+    		success = addUser(id, name, "", "", true, true);
+    	else
+    		success = addUserFlexRole(id, name, "", "", true, true);
+		
+		return success;
+	}
 
     /**
      * Check if a specific user is in this raid (main roles)
@@ -418,28 +445,26 @@ public class Raid {
      *
      * @param id The user's id
      */
-    public void removeUser(String id) {
-    	boolean foundMain = false;
+    public boolean removeUser(String id) {
+    	boolean found = false;
         Iterator<Map.Entry<RaidUser, String>> users = userToRole.entrySet().iterator();
         while (users.hasNext()) {
             Map.Entry<RaidUser, String> user = users.next();
             if (user.getKey().getId().equalsIgnoreCase(id)) {
                 users.remove();
-                usersToFlexRoles.remove(user.getKey());
-                foundMain = true;
+                found = true;
             }
         }
 
-        if (foundMain == false) { // in this case, we need to iterate over flex roles as well
-        	Iterator<Map.Entry<RaidUser, List<FlexRole>>> usersFlex = usersToFlexRoles.entrySet().iterator();
-        	while (usersFlex.hasNext()) {
-        		Map.Entry<RaidUser, List<FlexRole>> userFlex = usersFlex.next();
-        		if (userFlex.getKey().getId().equalsIgnoreCase(id)) {
-        			usersFlex.remove();
-        		}
+        Iterator<Map.Entry<RaidUser, List<FlexRole>>> usersFlex = usersToFlexRoles.entrySet().iterator();
+        while (usersFlex.hasNext()) {
+        	Map.Entry<RaidUser, List<FlexRole>> userFlex = usersFlex.next();
+        	if (userFlex.getKey().getId().equalsIgnoreCase(id)) {
+        		usersFlex.remove();
+        		found = true;
         	}
         }
-
+        
         try {
             RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsers` WHERE `userId` = ? AND `raidId` = ?",
                     new String[] { id, getMessageId() });
@@ -450,7 +475,10 @@ public class Raid {
             e.printStackTrace();
         }
 
-        updateMessage();
+        if (found)
+        	updateMessage();
+        
+        return found;
     }
 
     /**
@@ -519,11 +547,15 @@ public class Raid {
         for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
             if (flex.getKey() != null) {
                 for (FlexRole frole : flex.getValue()) {
-                    Emote userEmote = Reactions.getEmoteByName(frole.spec);
-                    if(userEmote == null)
-                        text += ("- " + flex.getKey().getName() + " (" + frole.spec + "/" + frole.role + ")\n");
-                    else
-                        text += ("<:"+userEmote.getName()+":"+userEmote.getId()+"> " + flex.getKey().getName() + " (" + frole.spec + "/" + frole.role + ")\n");
+                	if (isOpenWorld) {
+                		text += ("- " + flex.getKey().getName() + ")\n");
+                	} else {
+                        Emote userEmote = Reactions.getEmoteByName(frole.spec);
+                        if(userEmote == null)
+                            text += ("- " + flex.getKey().getName() + " (" + frole.spec + "/" + frole.role + ")\n");
+                        else
+                            text += ("<:"+userEmote.getName()+":"+userEmote.getId()+"> " + flex.getKey().getName() + " (" + frole.spec + "/" + frole.role + ")\n");
+                	}
                 }
             }
         }
@@ -542,11 +574,15 @@ public class Raid {
             List<RaidUser> raidUsersInRole = getUsersInRole(role.name);
             text += ("**" + role.name + " ( " + raidUsersInRole.size() + " / " + role.amount + " ):** \n");
             for (RaidUser user : raidUsersInRole) {
-                Emote userEmote = Reactions.getEmoteByName(user.spec);
-                if(userEmote == null)
-                    text += "   - " + user.name + " (" + user.spec + ")\n";
-                else
-                    text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + user.name + " (" + user.spec + ")\n";
+            	if (isOpenWorld) {
+            		text += ("- " + user.name + ")\n");
+            	} else {
+                    Emote userEmote = Reactions.getEmoteByName(user.spec);
+                    if(userEmote == null)
+                        text += "   - " + user.name + " (" + user.spec + ")\n";
+                    else
+                        text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + user.name + " (" + user.spec + ")\n";         
+            	}
             }
             text += "\n";
         }
