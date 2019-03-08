@@ -17,6 +17,7 @@ public class Database {
             + " raidId text PRIMARY KEY, \n"
             + " serverId text NOT NULL, \n"
             + " channelId text NOT NULL, \n"
+            + " isOpenWorld text NOT NULL, \n"
             + " leader text NOT NULL, \n"
             + " `name` text NOT NULL, \n"
             + " `description` text, \n"
@@ -122,6 +123,7 @@ public class Database {
         try {
             connection.createStatement().execute("ALTER TABLE raids ADD COLUMN leader text");
             connection.createStatement().execute("ALTER TABLE raids ADD COLUMN `description` text");
+            connection.createStatement().execute("ALTER TABLE raids ADD COLUMN isOpenWorld text");
         } catch (Exception e) { }
     }
 }

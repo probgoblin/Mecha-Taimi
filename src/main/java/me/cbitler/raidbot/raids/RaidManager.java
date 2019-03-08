@@ -37,7 +37,7 @@ public class RaidManager {
                 channels.get(0).sendMessage(message).queue(message1 -> {
                     boolean inserted = insertToDatabase(raid, message1.getId(), message1.getGuild().getId(), message1.getChannel().getId());
                     if (inserted) {
-                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDescription(), raid.getDate(), raid.getTime());
+                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDescription(), raid.getDate(), raid.getTime(), raid.isOpenWorld());
                         newRaid.roles.addAll(raid.rolesWithNumbers);
                         raids.add(newRaid);
                         newRaid.updateMessage();
@@ -71,10 +71,11 @@ public class RaidManager {
         String roles = formatRolesForDatabase(raid.getRolesWithNumbers());
 
         try {
-            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `leader`, `name`, `description`, `date`, `time`, `roles`) VALUES (?,?,?,?,?,?,?,?,?)", new String[] {
+            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `isOpenWorld`, `leader`, `name`, `description`, `date`, `time`, `roles`) VALUES (?,?,?,?,?,?,?,?,?)", new String[] {
                     messageId,
                     serverId,
                     channelId,
+                    Boolean.toString(raid.isOpenWorld()),
                     raid.getLeaderName(),
                     raid.getName(),
                     raid.getDescription(),
@@ -119,8 +120,13 @@ public class RaidManager {
                 try {
                     leaderName = results.getResults().getString("leader");
                 } catch (Exception e) { }
-
-                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time);
+                
+                boolean isOpenWorld = false;
+                try {
+                    isOpenWorld = results.getResults().getString("isOpenWorld").equals("true");
+                } catch (Exception e) { }
+                
+                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time, isOpenWorld);
                 String[] roleSplit = rolesText.split(";");
                 for(String roleAndAmount : roleSplit) {
                     String[] parts = roleAndAmount.split(":");

@@ -18,6 +18,11 @@ public class Raid {
     List<RaidRole> roles = new ArrayList<RaidRole>();
     HashMap<RaidUser, String> userToRole = new HashMap<RaidUser, String>();
     HashMap<RaidUser, List<FlexRole>> usersToFlexRoles = new HashMap<>();
+    
+    /* *
+     * open world events only have a single role (Participants) and users sign up without any class
+     */
+    boolean isOpenWorld;
 
     /**
      * Create a new Raid with the specified data
@@ -31,7 +36,7 @@ public class Raid {
      * @param time           The time of the raid
      */
     public Raid(String messageId, String serverId, String channelId, String raidLeaderName, String name,
-            String description, String date, String time) {
+            String description, String date, String time, boolean isOpenWorld) {
         this.messageId = messageId;
         this.serverId = serverId;
         this.channelId = channelId;
@@ -40,6 +45,7 @@ public class Raid {
         this.description = description;
         this.date = date;
         this.time = time;
+        this.isOpenWorld = isOpenWorld;
     }
 
     /**

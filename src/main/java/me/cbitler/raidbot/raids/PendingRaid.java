@@ -11,6 +11,19 @@ import java.util.List;
 public class PendingRaid {
     String name, description, date, time, announcementChannel, serverId, leaderName;
     List<RaidRole> rolesWithNumbers = new ArrayList<RaidRole>();
+    
+    /* *
+     * open world events only have a single role (Participants) and users sign up without any class
+     */
+    boolean isOpenWorld;
+    
+    public boolean isOpenWorld() {
+    	return isOpenWorld;
+    }
+    
+    public void setOpenWorld(boolean isOpenWorld) {
+    	this.isOpenWorld = isOpenWorld;
+    }
 
     public String getName() {
         return name;
