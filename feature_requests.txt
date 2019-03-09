@@ -1,5 +1,1 @@
-- open world vs. instanced events: 
-* bei der Erstellung fragen wir am Anfang, ob es "open world" oder "instanced" ist.
-* bei open world, gibt es eine default Rolle "Participant" x50 (oder wollt ihr die Anzahl einstellen?)
-* bei open world wird es nur eine Anmelde- und eine Abmeldereaktion geben und Benutzer werden ohne Klasse zur Liste hinzugefügt (das wäre dann sogar ohne dass der Bot eine private Nachricht schreiben muss).
-* bei instanced bleibt alles gleich. Ich denke für Raids oder Fraktale könnte es nützlich sein, wenn Menschen sich mit Rolle und Klasse anmelden
+- better database structure
