@@ -120,9 +120,13 @@ public class Database {
         connection.createStatement().execute(botServerSettingsInit);
 
         try {
-            connection.createStatement().execute("ALTER TABLE raids ADD COLUMN leader text");
-            connection.createStatement().execute("ALTER TABLE raids ADD COLUMN `description` text");
-            connection.createStatement().execute("ALTER TABLE raids ADD COLUMN isOpenWorld text");
+        	connection.createStatement().execute("ALTER TABLE raids ADD COLUMN leader text");
+        } catch (Exception e) { }
+        try {
+        	connection.createStatement().execute("ALTER TABLE raids ADD COLUMN `description` text");
+        } catch (Exception e) { }
+        try {
+        	connection.createStatement().execute("ALTER TABLE raids ADD COLUMN isOpenWorld text");
         } catch (Exception e) { }
     }
 }

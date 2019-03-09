@@ -76,7 +76,7 @@ public class RaidManager {
         String roles = formatRolesForDatabase(raid.getRolesWithNumbers());
 
         try {
-            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `isOpenWorld`, `leader`, `name`, `description`, `date`, `time`, `roles`) VALUES (?,?,?,?,?,?,?,?,?)", new String[] {
+            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `isOpenWorld`, `leader`, `name`, `description`, `date`, `time`, `roles`) VALUES (?,?,?,?,?,?,?,?,?,?)", new String[] {
                     messageId,
                     serverId,
                     channelId,

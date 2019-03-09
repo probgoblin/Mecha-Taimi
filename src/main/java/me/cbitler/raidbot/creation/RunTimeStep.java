@@ -38,6 +38,6 @@ public class RunTimeStep implements CreationStep {
      * {@inheritDoc}
      */
     public CreationStep getNextStep() {
-        return new RunRoleSetupStep();
+        return new RunOpenWorldStep();
     }
 }

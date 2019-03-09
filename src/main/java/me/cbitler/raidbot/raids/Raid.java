@@ -416,10 +416,11 @@ public class Raid {
     public boolean addUserOpenWorld(String id, String name) {
 		boolean success = false;
 		
-    	if (isValidNotFullRole(roles.get(0).getName())) // there is still space
-    		success = addUser(id, name, "", "", true, true);
+		String roleName = roles.get(0).getName();
+    	if (isValidNotFullRole(roleName)) // there is still space
+    		success = addUser(id, name, "", roleName, true, true);
     	else
-    		success = addUserFlexRole(id, name, "", "", true, true);
+    		success = addUserFlexRole(id, name, "", roleName, true, true);
 		
 		return success;
 	}
