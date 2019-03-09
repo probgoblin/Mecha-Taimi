@@ -549,7 +549,7 @@ public class Raid {
             if (flex.getKey() != null) {
                 for (FlexRole frole : flex.getValue()) {
                 	if (isOpenWorld) {
-                		text += ("- " + flex.getKey().getName() + ")\n");
+                		text += ("- " + flex.getKey().getName() + "\n");
                 	} else {
                         Emote userEmote = Reactions.getEmoteByName(frole.spec);
                         if(userEmote == null)
@@ -576,7 +576,7 @@ public class Raid {
             text += ("**" + role.name + " ( " + raidUsersInRole.size() + " / " + role.amount + " ):** \n");
             for (RaidUser user : raidUsersInRole) {
             	if (isOpenWorld) {
-            		text += ("- " + user.name + ")\n");
+            		text += ("- " + user.name + "\n");
             	} else {
                     Emote userEmote = Reactions.getEmoteByName(user.spec);
                     if(userEmote == null)
