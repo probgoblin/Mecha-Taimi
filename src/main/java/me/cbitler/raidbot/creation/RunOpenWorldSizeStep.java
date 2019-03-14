@@ -2,15 +2,14 @@ package me.cbitler.raidbot.creation;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
+import me.cbitler.raidbot.raids.RaidRole;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
- * Step for choosing between structued or open world event.
+ * Step for choosing squad size for open world event.
  * @author Franziska Mueller
  */
-public class RunOpenWorldStep implements CreationStep {
-
-	CreationStep nextStep;
+public class RunOpenWorldSizeStep implements CreationStep {
 
     /**
      * Handle user input.
@@ -19,23 +18,14 @@ public class RunOpenWorldStep implements CreationStep {
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         try {
-    		int choiceId = Integer.parseInt(e.getMessage().getRawContent());
+    		int size = Integer.parseInt(e.getMessage().getRawContent());
     		RaidBot bot = RaidBot.getInstance();
             PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
             if (raid == null) {
                 return false;
             }
-    		if (choiceId == 1) { // open world
-    			raid.setOpenWorld(true);
-    			nextStep = new RunOpenWorldSizeStep();
-        		return true;
-    		} else if (choiceId == 2) { // structured
-    			nextStep = new RunRoleSetupStep();
-        		return true;
-    		} else {
-    			e.getChannel().sendMessage("Please choose a valid option.").queue();
-                return false;
-    		}
+            raid.getRolesWithNumbers().add(new RaidRole(size, "Participants"));
+        	return true;
     	} catch (Exception exp) {
             e.getChannel().sendMessage("Please choose a valid option.").queue();
             return false;
@@ -46,15 +36,13 @@ public class RunOpenWorldStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Choose if the event should be open world or structured:\n"
-        		+ "`1` **open world:** 1 default role, yes/no sign-up for users\n"
-        		+ "`2` **structured:** customizable role setup, class sign-up for users";
+        return "Enter the squad size for the open world event:";
     }
 
     /**
      * {@inheritDoc}
      */
     public CreationStep getNextStep() {
-        return nextStep;
+        return null;
     }
 }
