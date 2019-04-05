@@ -1,1 +1,5 @@
 - better database structure
+- edit roles:
+	* rename roles
+	* change amount of players for role (increase always possible; decrease only if new amount greater/equal than number of players signed up for that role (?))
+	* add roles
