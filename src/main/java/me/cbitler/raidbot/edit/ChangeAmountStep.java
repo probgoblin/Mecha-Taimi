@@ -27,7 +27,7 @@ public class ChangeAmountStep implements EditStep {
      * @return True if a amount is changed, false otherwise
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-    	boolean valid = true;
+    	boolean finished;
     	
     	int inputNumber;
     	// try to parse an integer
@@ -42,17 +42,17 @@ public class ChangeAmountStep implements EditStep {
     	List<RaidRole> roles = raid.getRoles();
     	if (roleID == -1) // no role chosen yet
     	{
+    		finished = false;
     		inputNumber -= 1;
-    		if (inputNumber >= 0 && inputNumber < roles.size())
+    		if (inputNumber >= 0 && inputNumber < roles.size()) {
     			roleID = inputNumber;
-    		else
-    		{
-    			valid = false;
-        		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid input. Try again.").queue());
-    		}
+    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Enter new amount for the role *" + roles.get(roleID).getName() + "*:").queue());	    	        
+    		} else
+        		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid input. Try again.").queue());	
     	}
     	else // message contains new amount
     	{
+    		finished = true; // we are done after we try to add
     		int out = raid.changeAmountRole(roleID, inputNumber);
     		if (out == 0) { // success
     			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully changed amount.").queue());
@@ -63,7 +63,7 @@ public class ChangeAmountStep implements EditStep {
     			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Amount could not be changed in database.").queue());		
     	}
 
-    	return valid;
+    	return finished;
     }
 
     /**
@@ -72,14 +72,9 @@ public class ChangeAmountStep implements EditStep {
     public String getStepText() {
         String stepText;
         List<RaidRole> roles = RaidManager.getRaid(messageID).getRoles();
-        if (roleID == -1) // no role chosen yet
-        {
-        	stepText = "For which role do you want to change the amount? \n";
-        	for (int r = 0; r < roles.size(); r++)
-        		stepText += "`" + (r+1) + "` " + roles.get(r).getName() + " \n";
-        }
-        else
-        	stepText = "Enter new amount for the role *" + roles.get(roleID).getName() + "*:";
+        stepText = "For which role do you want to change the amount? \n";
+        for (int r = 0; r < roles.size(); r++)
+        	stepText += "`" + (r+1) + "` " + roles.get(r).getName() + " \n";
         
         return stepText;
     }
