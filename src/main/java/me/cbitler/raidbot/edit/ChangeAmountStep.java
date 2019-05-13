@@ -54,9 +54,10 @@ public class ChangeAmountStep implements EditStep {
     	else // message contains new amount
     	{
     		int out = raid.changeAmountRole(roleID, inputNumber);
-    		if (out == 0) // success
+    		if (out == 0) { // success
     			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully changed amount.").queue());
-    		else if (out == 1)
+    			raid.updateMessage();
+    		} else if (out == 1)
     			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Amount could not be changed, number of users > new amount.").queue());	
     		else if (out == 2)
     			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Amount could not be changed in database.").queue());		

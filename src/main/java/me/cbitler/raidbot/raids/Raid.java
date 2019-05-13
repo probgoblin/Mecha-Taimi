@@ -341,6 +341,35 @@ public class Raid {
             return 2;
         }
     }
+    
+    
+    /**
+     * Delete a role from the event
+     * @param role id
+     * @return 0 success, 1 number of users > 0, 2 SQL error
+     */
+    public int deleteRole(int id) {
+    	String roleName = roles.get(id).getName();
+    	int numberUsers = getUserNumberInRole(roleName);
+    	int numberUsersFlex = getUserNumberInFlexRole(roleName);
+    	
+    	if (numberUsers > 0 || numberUsersFlex > 0)
+    		return 1;
+    	
+    	roles.remove(id);
+        
+        // delete in database
+        String rolesString = RaidManager.formatRolesForDatabase(roles);
+        try {
+        	Database db = RaidBot.getInstance().getDatabase();
+        	db.update("UPDATE `raids` SET `roles`=? WHERE `raidId`=?",
+                    new String[] { rolesString, messageId });	
+        	return 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 2;
+        }
+    }
 
 
     /**
@@ -401,6 +430,26 @@ public class Raid {
                 inRole += 1;
         }
 
+        return inRole;
+    }
+    
+    /**
+     * Get the number of users in a flex role
+     *
+     * @param role The name of the role
+     * @return The number of users in the role
+     */
+    private int getUserNumberInFlexRole(String role) {
+        int inRole = 0;
+        for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
+            if (flex.getKey() != null) {
+                for (FlexRole frole : flex.getValue()) {
+                	if (frole.getRole().equalsIgnoreCase(role))
+                		inRole += 1;
+                }
+            }
+        }
+        
         return inRole;
     }
 

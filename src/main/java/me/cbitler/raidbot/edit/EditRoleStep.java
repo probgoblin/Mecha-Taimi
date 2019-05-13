@@ -27,8 +27,8 @@ public class EditRoleStep implements EditStep {
         	int choiceId = Integer.parseInt(e.getMessage().getRawContent());
         	if (choiceId == 1) // add role
         		nextStep = new AddRoleStep(messageID);
-        	//else if (choiceId == 2) // remove role
-        	//	nextStep = new DeleteRoleStep(messageID);
+        	else if (choiceId == 2) // remove role
+        		nextStep = new DeleteRoleStep(messageID);
         	else if (choiceId == 3) // rename role
         		nextStep = new RenameRoleStep(messageID);
         	else if (choiceId == 4) // change amount
