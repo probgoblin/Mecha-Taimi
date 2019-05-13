@@ -302,10 +302,10 @@ public class Raid {
         	Database db = RaidBot.getInstance().getDatabase();
         	db.update("UPDATE `raids` SET `roles`=? WHERE `raidId`=?",
                     new String[] { rolesString, messageId });
-        	db.update("UPDATE `raidUsers` SET `role`=? WHERE `role`=?",
-                    new String[] { newname, oldName });
-        	db.update("UPDATE `raidUsersFlexRoles` SET `role`=? WHERE `role`=?",
-                    new String[] { newname, oldName });
+        	db.update("UPDATE `raidUsers` SET `role`=? WHERE `role`=? AND `raidId`=?",
+                    new String[] { newname, oldName, messageId });
+        	db.update("UPDATE `raidUsersFlexRoles` SET `role`=? WHERE `role`=? AND `raidId`=?",
+                    new String[] { newname, oldName, messageId });
         	
         	return true;
         } catch (SQLException e) {
@@ -498,7 +498,7 @@ public class Raid {
         }
 
         userToRole.put(user, role);
-        usersToFlexRoles.computeIfAbsent(new RaidUser(id, name, "", ""), k -> new ArrayList<>());
+        usersToFlexRoles.computeIfAbsent(new RaidUser(id, name, "", ""), k -> new ArrayList<FlexRole>());
 
         if (update_message) {
             updateMessage();
@@ -535,7 +535,7 @@ public class Raid {
         }
 
         if (usersToFlexRoles.get(user) == null) {
-            usersToFlexRoles.put(user, new ArrayList<>());
+            usersToFlexRoles.put(user, new ArrayList<FlexRole>());
         }
 
         usersToFlexRoles.get(user).add(frole);
@@ -684,20 +684,38 @@ public class Raid {
      */
     private String buildFlexRolesText() {
         String text = "";
-        for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
-            if (flex.getKey() != null) {
-                for (FlexRole frole : flex.getValue()) {
-                	if (isOpenWorld) {
-                		text += ("- " + flex.getKey().getName() + "\n");
-                	} else {
-                        Emote userEmote = Reactions.getEmoteByName(frole.spec);
+        if (isOpenWorld) {
+        	for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
+                if (flex.getKey() != null)
+                    text += ("- " + flex.getKey().getName() + "\n");
+        	}   
+        } else {
+        	// collect names and specializations for each role
+        	Map<String, List<RaidUser>> flexUsersByRole = new HashMap<String, List<RaidUser>>();
+        	for (int r = 0; r < roles.size(); r++) {
+        		flexUsersByRole.put(roles.get(r).getName(), new ArrayList<RaidUser>());
+        	}
+        	
+        	for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
+        		if (flex.getKey() != null) {
+        			for (FlexRole frole : flex.getValue()) {
+        				flexUsersByRole.get(frole.getRole()).add(new RaidUser(flex.getKey().id, flex.getKey().name, frole.spec, null));
+        			}
+        		}
+        	}
+        	for (int r = 0; r < roles.size(); r++) {
+        		String roleName = roles.get(r).getName();
+        		text += (roleName + ": \n");
+                
+        		for (RaidUser user : flexUsersByRole.get(roleName)) {
+        				Emote userEmote = Reactions.getEmoteByName(user.getSpec());
                         if(userEmote == null)
-                            text += ("- " + flex.getKey().getName() + " (" + frole.spec + "/" + frole.role + ")\n");
+                            text += ("- " + user.getName() + " (" + user.getSpec() + ")\n");
                         else
-                            text += ("<:"+userEmote.getName()+":"+userEmote.getId()+"> " + flex.getKey().getName() + " (" + frole.spec + "/" + frole.role + ")\n");
-                	}
-                }
-            }
+                            text += ("<:"+userEmote.getName()+":"+userEmote.getId()+"> " + user.getName() + " (" + user.getSpec() + ")\n");		
+        		}
+        		text += "\n";
+        	}
         }
 
         return text;

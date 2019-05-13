@@ -52,15 +52,20 @@ public class ChangeAmountStep implements EditStep {
     	}
     	else // message contains new amount
     	{
-    		finished = true; // we are done after we try to add
-    		int out = raid.changeAmountRole(roleID, inputNumber);
-    		if (out == 0) { // success
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully changed amount.").queue());
-    			raid.updateMessage();
-    		} else if (out == 1)
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Amount could not be changed, number of users > new amount.").queue());	
-    		else if (out == 2)
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Amount could not be changed in database.").queue());		
+    		if (inputNumber > 0) {
+	    		finished = true; // we are done after we try to add
+	    		int out = raid.changeAmountRole(roleID, inputNumber);
+	    		if (out == 0) { // success
+	    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully changed amount.").queue());
+	    			raid.updateMessage();
+	    		} else if (out == 1)
+	    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Amount could not be changed, number of users > new amount.").queue());	
+	    		else if (out == 2)
+	    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Amount could not be changed in database.").queue());		
+    		} else {
+    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid input, amount should be > 0. Try again.").queue());	
+    	    	finished = false;
+    		}
     	}
 
     	return finished;
