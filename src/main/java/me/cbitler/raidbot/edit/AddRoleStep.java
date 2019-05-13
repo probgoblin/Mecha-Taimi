@@ -36,8 +36,10 @@ public class AddRoleStep implements EditStep {
                 if(out == 0) {
                 	e.getChannel().sendMessage("Role added.").queue();
                 	raid.updateMessage();
-                } else if (out == 1)
-                	e.getChannel().sendMessage("A role with this name already exists.").queue();
+                } else if (out == 1) {
+                	valid = false;
+                	e.getChannel().sendMessage("A role with this name already exists. Choose a different name:").queue();
+                }
                 else if (out == 2)
                 	e.getChannel().sendMessage("New role could not be added to database.").queue();
             } catch (Exception ex) {

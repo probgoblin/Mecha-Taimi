@@ -283,9 +283,14 @@ public class Raid {
      * Rename a role of the event
      * @param role id
      * @param newname new name for the role
-     * @return true if role was successfully renamed, false otherwise
+     * @return 0 success, 1 role exists, 2 SQL error
      */
-    public boolean renameRole(int id, String newname) {
+    public int renameRole(int id, String newname) {
+    	for (RaidRole role : roles) {
+    		if (role.getName().equalsIgnoreCase(newname)) {
+    			return 1;
+    		}    			
+    	}
         String oldName = roles.get(id).getName();
     	roles.get(id).setName(newname);
         
@@ -312,10 +317,10 @@ public class Raid {
         	db.update("UPDATE `raidUsersFlexRoles` SET `role`=? WHERE `role`=? AND `raidId`=?",
                     new String[] { newname, oldName, messageId });
         	
-        	return true;
+        	return 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return 2;
         }
     }
     

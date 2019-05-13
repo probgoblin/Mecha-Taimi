@@ -49,13 +49,18 @@ public class RenameRoleStep implements EditStep {
     			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Enter a new name for the role *" + roles.get(roleID).getName() + "*:").queue());		
     	}
     	else { // message contains new name
-    		finished = true; // we are done after we try to rename
-    		if (raid.renameRole(roleID, e.getMessage().getRawContent())) {
+    		int out = raid.renameRole(roleID, e.getMessage().getRawContent());
+    		if (out == 0) {
     			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully renamed role.").queue());
     			raid.updateMessage();
-    		}
-    		else
+    			finished = true;
+    		} else if (out == 1) {
+    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("A role with this name already exists. Choose a different new name:").queue());	
+    	    	finished = false;
+    		} else {
     			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Role could not be updated in database.").queue());	
+    			finished = true;
+    		}
     	}
 
     	return finished;
