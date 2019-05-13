@@ -247,7 +247,7 @@ public class RaidManager {
      * @param rolesWithNumbers The roles and their amounts
      * @return The formatted string
      */
-    private static String formatRolesForDatabase(List<RaidRole> rolesWithNumbers) {
+    public static String formatRolesForDatabase(List<RaidRole> rolesWithNumbers) {
         String data = "";
 
         for (int i = 0; i < rolesWithNumbers.size(); i++) {

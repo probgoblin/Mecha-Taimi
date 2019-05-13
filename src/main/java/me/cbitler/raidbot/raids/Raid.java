@@ -252,6 +252,25 @@ public class Raid {
     public List<RaidRole> getRoles() {
         return roles;
     }
+    
+    /**
+     * Add a new role to the event
+     * @param newrole new raid role
+     * @return true if role was successfully added, false otherwise
+     */
+    public boolean addRole(RaidRole newrole) {
+        roles.add(newrole);
+        
+        String rolesString = RaidManager.formatRolesForDatabase(roles);
+        try {
+        	RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `roles`=? WHERE `raidId`=?",
+                    new String[] { rolesString, messageId });
+        	return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     /**
      * Check if a specific role is valid, and whether or not it's full
