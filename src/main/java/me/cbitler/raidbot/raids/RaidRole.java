@@ -33,4 +33,12 @@ public class RaidRole {
     public String getName() {
         return name;
     }
+    
+    /**
+     * Set the name of the role
+     * param newname The new name of the role
+     */
+    public void setName(String newname) {
+        name = newname;
+    }
 }

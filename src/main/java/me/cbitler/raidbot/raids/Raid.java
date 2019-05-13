@@ -1,6 +1,7 @@
 package me.cbitler.raidbot.raids;
 
 import me.cbitler.raidbot.RaidBot;
+import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.utility.Reactions;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Emote;
@@ -265,6 +266,46 @@ public class Raid {
         try {
         	RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `roles`=? WHERE `raidId`=?",
                     new String[] { rolesString, messageId });
+        	return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Rename a role of the event
+     * @param role id
+     * @param newname new name for the role
+     * @return true if role was successfully renamed, false otherwise
+     */
+    public boolean renameRole(int id, String newname) {
+        String oldName = roles.get(id).getName();
+    	roles.get(id).setName(newname);
+        
+        // iterate over users' roles and rename
+    	for (Map.Entry<RaidUser, String> user : userToRole.entrySet()) {
+            if (user.getValue().equals(oldName))
+            	user.setValue(newname);
+    	}
+    	for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
+    		for (FlexRole frole : flex.getValue()) {
+            	if (frole.getRole().equals(oldName))
+            		frole.setRole(newname);
+            }
+    	}
+        
+        // rename in database
+        String rolesString = RaidManager.formatRolesForDatabase(roles);
+        try {
+        	Database db = RaidBot.getInstance().getDatabase();
+        	db.update("UPDATE `raids` SET `roles`=? WHERE `raidId`=?",
+                    new String[] { rolesString, messageId });
+        	db.update("UPDATE `raidUsers` SET `role`=? WHERE `role`=?",
+                    new String[] { newname, oldName });
+        	db.update("UPDATE `raidUsersFlexRoles` SET `role`=? WHERE `role`=?",
+                    new String[] { newname, oldName });
+        	
         	return true;
         } catch (SQLException e) {
             e.printStackTrace();

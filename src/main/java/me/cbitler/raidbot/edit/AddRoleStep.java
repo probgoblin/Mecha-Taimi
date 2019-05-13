@@ -18,9 +18,9 @@ public class AddRoleStep implements EditStep {
 	}
 	
     /**
-     * Handle changing roles for the event
+     * Handle adding a role to the event
      * @param e The direct message event
-     * @return True if a role is changed, false otherwise
+     * @return True if a role is added, false otherwise
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
     	boolean valid = true;	
@@ -32,8 +32,10 @@ public class AddRoleStep implements EditStep {
                 int amnt = Integer.parseInt(parts[0]);
                 String roleName = parts[1];
                 Raid raid = RaidManager.getRaid(messageID);
-                if(raid.addRole(new RaidRole(amnt, roleName)))
+                if(raid.addRole(new RaidRole(amnt, roleName))) {
                 	e.getChannel().sendMessage("Role added.").queue();
+                	raid.updateMessage();
+                }
                 else
                 	e.getChannel().sendMessage("New role could not be added to database.").queue();
             } catch (Exception ex) {
@@ -45,6 +47,7 @@ public class AddRoleStep implements EditStep {
     	if (valid == false) {
     		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid input. Try again.").queue());
     	}
+    		
     	return valid;
     }
 
