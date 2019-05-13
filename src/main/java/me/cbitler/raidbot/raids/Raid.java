@@ -257,19 +257,24 @@ public class Raid {
     /**
      * Add a new role to the event
      * @param newrole new raid role
-     * @return true if role was successfully added, false otherwise
+     * @return 0 success, 1 role exists, 2 SQL error
      */
-    public boolean addRole(RaidRole newrole) {
+    public int addRole(RaidRole newrole) {
+    	for (RaidRole role : roles) {
+    		if (role.getName().equalsIgnoreCase(newrole.getName())) {
+    			return 1;
+    		}    			
+    	}
         roles.add(newrole);
         
         String rolesString = RaidManager.formatRolesForDatabase(roles);
         try {
         	RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `roles`=? WHERE `raidId`=?",
                     new String[] { rolesString, messageId });
-        	return true;
+        	return 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return 2;
         }
     }
     

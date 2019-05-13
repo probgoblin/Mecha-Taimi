@@ -32,11 +32,13 @@ public class AddRoleStep implements EditStep {
                 int amnt = Integer.parseInt(parts[0]);
                 String roleName = parts[1];
                 Raid raid = RaidManager.getRaid(messageID);
-                if(raid.addRole(new RaidRole(amnt, roleName))) {
+                int out = raid.addRole(new RaidRole(amnt, roleName));
+                if(out == 0) {
                 	e.getChannel().sendMessage("Role added.").queue();
                 	raid.updateMessage();
-                }
-                else
+                } else if (out == 1)
+                	e.getChannel().sendMessage("A role with this name already exists.").queue();
+                else if (out == 2)
                 	e.getChannel().sendMessage("New role could not be added to database.").queue();
             } catch (Exception ex) {
                 e.getChannel().sendMessage("Invalid input: Make sure it's in the format of [amount]:[role name], like 1:DPS").queue();

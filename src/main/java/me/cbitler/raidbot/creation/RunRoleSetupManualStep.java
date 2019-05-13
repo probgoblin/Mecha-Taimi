@@ -38,8 +38,14 @@ public class RunRoleSetupManualStep implements CreationStep {
                 try {
                     int amnt = Integer.parseInt(parts[0]);
                     String roleName = parts[1];
-                    raid.getRolesWithNumbers().add(new RaidRole(amnt, roleName));
-                    e.getChannel().sendMessage("Role added.").queue();
+                    if (raid.existsRole(roleName))
+                    	e.getChannel().sendMessage("A role with this name already exists.").queue();
+                    else if (amnt <= 0)
+                    	e.getChannel().sendMessage("Amount needs to be a positive number.").queue();
+                    else {
+                    	raid.getRolesWithNumbers().add(new RaidRole(amnt, roleName));
+                    	e.getChannel().sendMessage("Role added.").queue();
+                    }
                 } catch (Exception ex) {
                     e.getChannel().sendMessage("Invalid input: Make sure it's in the format of [amount]:[role name], like 1:DPS").queue();
                 }

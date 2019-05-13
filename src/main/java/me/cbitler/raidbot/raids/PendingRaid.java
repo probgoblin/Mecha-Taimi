@@ -84,4 +84,13 @@ public class PendingRaid {
     public void setDescription(String description) {
         this.description = description;
     }
+
+	public boolean existsRole(String roleName) {
+		for (RaidRole role : rolesWithNumbers) {
+			if (role.getName().equalsIgnoreCase(roleName)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
