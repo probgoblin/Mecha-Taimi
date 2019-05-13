@@ -273,6 +273,7 @@ public class Raid {
         }
     }
     
+    
     /**
      * Rename a role of the event
      * @param role id
@@ -312,6 +313,35 @@ public class Raid {
             return false;
         }
     }
+    
+    
+    /**
+     * Change amount for a role of the event
+     * @param role id
+     * @param newamount new amount for the role
+     * @return 0 success, 1 number of users > new amount, 2 SQL error
+     */
+    public int changeAmountRole(int id, int newamount) {
+    	String roleName = roles.get(id).getName();
+    	int numberUsers = getUserNumberInRole(roleName);
+    	if (newamount < numberUsers)
+    		return 1;
+    	
+    	roles.get(id).setAmount(newamount);
+        
+        // rename in database
+        String rolesString = RaidManager.formatRolesForDatabase(roles);
+        try {
+        	Database db = RaidBot.getInstance().getDatabase();
+        	db.update("UPDATE `raids` SET `roles`=? WHERE `raidId`=?",
+                    new String[] { rolesString, messageId });	
+        	return 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 2;
+        }
+    }
+
 
     /**
      * Check if a specific role is valid, and whether or not it's full

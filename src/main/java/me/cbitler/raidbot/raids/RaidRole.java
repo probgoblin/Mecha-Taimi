@@ -35,8 +35,16 @@ public class RaidRole {
     }
     
     /**
+     * Set the amount of the role
+     * @param newamount The new amount of the role
+     */
+    public void setAmount(int newamount) {
+        amount = newamount;
+    }
+    
+    /**
      * Set the name of the role
-     * param newname The new name of the role
+     * @param newname The new name of the role
      */
     public void setName(String newname) {
         name = newname;

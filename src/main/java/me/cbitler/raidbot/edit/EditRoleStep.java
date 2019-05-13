@@ -28,11 +28,11 @@ public class EditRoleStep implements EditStep {
         	if (choiceId == 1) // add role
         		nextStep = new AddRoleStep(messageID);
         	//else if (choiceId == 2) // remove role
-        	//	nextStep = new RemoveRoleStep(messageID);
-        	//else if (choiceId == 3) // rename role
-        	//	nextStep = new RenameRoleStep(messageID);
-        	//else if (choiceId == 4) // change amount
-        	//	nextStep = new ChangeAmountStep(messageID);
+        	//	nextStep = new DeleteRoleStep(messageID);
+        	else if (choiceId == 3) // rename role
+        		nextStep = new RenameRoleStep(messageID);
+        	else if (choiceId == 4) // change amount
+        		nextStep = new ChangeAmountStep(messageID);
         	else
         		valid = false;
         } catch (Exception excp) {
