@@ -50,10 +50,19 @@ public class ChannelMessageHandler extends ListenerAdapter {
 
         if (PermissionsUtil.hasRaidLeaderRole(e.getMember())) {
             if (e.getMessage().getRawContent().equalsIgnoreCase("!createEvent")) {
-                CreationStep runNameStep = new RunNameStep(e.getMessage().getGuild().getId());
-                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(runNameStep.getStepText()).queue());
-                bot.getCreationMap().put(e.getAuthor().getId(), runNameStep);
-                e.getMessage().delete().queue();
+            	// check if this user is already editing or creating
+            	if (bot.getCreationMap().get(e.getAuthor().getId()) != null) {
+            		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You cannot create two events at the same time. Finish the creation process first.").queue());
+            	} else if (bot.getEditMap().get(e.getAuthor().getId()) != null) {
+            		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You cannot create an event while editing. Finish editing the event first.").queue());
+            	} else {
+            		CreationStep runNameStep = new RunNameStep(e.getMessage().getGuild().getId());
+            		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(runNameStep.getStepText()).queue());
+            		bot.getCreationMap().put(e.getAuthor().getId(), runNameStep);
+            	}
+            	try {
+                    e.getMessage().delete().queue();
+                } catch (Exception exception) {}
             } else if (e.getMessage().getRawContent().toLowerCase().startsWith("!removefromevent")) {
                 String[] split = e.getMessage().getRawContent().split(" ");
                 if(split.length < 3) {

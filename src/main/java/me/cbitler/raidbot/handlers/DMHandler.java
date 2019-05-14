@@ -95,15 +95,15 @@ public class DMHandler extends ListenerAdapter {
 
         } else if (bot.getEditMap().containsKey(author.getId())) {
         	if(e.getMessage().getRawContent().equalsIgnoreCase("cancel")) {
+                bot.getEditList().remove(bot.getEditMap().get(author.getId()).getMessageID());
                 bot.getEditMap().remove(author.getId());
-
+                
                 e.getChannel().sendMessage("Event editing cancelled.").queue();
                 return;
             }
         	
             EditStep step = bot.getEditMap().get(author.getId());
             boolean done = step.handleDM(e);
-            String messageId = step.getMessageID();
 
             // If this step is done, move onto the next one or finish
             if (done) {
@@ -113,6 +113,7 @@ public class DMHandler extends ListenerAdapter {
                     e.getChannel().sendMessage(nextStep.getStepText()).queue();
                 } else {
                     // finish editing
+                    String messageId = step.getMessageID();
                     bot.getEditMap().remove(author.getId());
                     bot.getEditList().remove(messageId);
                     e.getChannel().sendMessage("Finished editing event.").queue();
