@@ -14,8 +14,8 @@ public class RunRoleSetupTemplateStep implements CreationStep {
 
 	CreationStep nextStep;
 	private static RaidRole[][] templates =
-	{ 	{	new RaidRole(1, "Supp Chrono"),
-			new RaidRole(1, "Tank Chrono"),
+	{ 	{	new RaidRole(1, "Tank Chrono"),
+			new RaidRole(1, "Supp Chrono"),
 			new RaidRole(2, "Healer"),
 			new RaidRole(1, "BS"),
 			new RaidRole(5, "DPS")
