@@ -57,7 +57,8 @@ public class EditIdleStep implements EditStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Choose which property you want to change:\n"
+        return "NOTE: You can type *cancel* at any point during this process to stop editing.\n\n"
+        		+ "Choose which property you want to change:\n"
         		+ "`1` time \n"
         		+ "`2` date \n"
         		+ "`3` name \n"

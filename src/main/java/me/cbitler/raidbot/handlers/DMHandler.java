@@ -94,6 +94,13 @@ public class DMHandler extends ListenerAdapter {
             }
 
         } else if (bot.getEditMap().containsKey(author.getId())) {
+        	if(e.getMessage().getRawContent().equalsIgnoreCase("cancel")) {
+                bot.getEditMap().remove(author.getId());
+
+                e.getChannel().sendMessage("Event editing cancelled.").queue();
+                return;
+            }
+        	
             EditStep step = bot.getEditMap().get(author.getId());
             boolean done = step.handleDM(e);
             String messageId = step.getMessageID();
