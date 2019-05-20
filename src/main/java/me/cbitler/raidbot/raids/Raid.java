@@ -733,7 +733,7 @@ public class Raid {
     private String buildFlexRolesText() {
         String text = "";
         if (isOpenWorld) {
-        	for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
+            for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
                 if (flex.getKey() != null && flex.getValue().isEmpty() == false)
                     text += ("- " + flex.getKey().getName() + "\n");
             }
