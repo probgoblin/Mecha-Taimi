@@ -11,12 +11,12 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
  * Change the amount for a role of the event
  * @author Franziska Mueller
  */
-public class ChangeAmountStep implements EditStep {
+public class ChangeFlexOnlyStep implements EditStep {
 
     private String messageID;
     private int roleID;
 
-    public ChangeAmountStep(String messageId) {
+    public ChangeFlexOnlyStep(String messageId) {
         this.messageID = messageId;
         this.roleID = -1;
     }
@@ -46,24 +46,25 @@ public class ChangeAmountStep implements EditStep {
             inputNumber -= 1;
             if (inputNumber >= 0 && inputNumber < roles.size()) {
                 roleID = inputNumber;
-                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Enter new amount for the role *" + roles.get(roleID).getName() + "*:").queue());
+                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Set the `flex only` status on role *" + roles.get(roleID).getName() + "* by entering `1` to enable and `0` to disable it:").queue());
             } else
                 e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid input. Try again.").queue());
         }
-        else // message contains new amount
+        else // message contains new status
         {
-            if (inputNumber > 0) {
+            if (inputNumber == 0 || inputNumber == 1) {
                 finished = true; // we are done after we try to add
-                int out = raid.changeAmountRole(roleID, inputNumber);
+                boolean newStatus = false;
+                if(inputNumber==1) newStatus = true;
+                int out = raid.changeFlexOnlyRole(roleID, newStatus);
                 if (out == 0) { // success
-                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully changed amount.").queue());
+                    final String statusChange = newStatus ? "enabled" : "disabled";
+                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully *" + statusChange + "* `flex only` status.").queue());
                     raid.updateMessage();
                 } else if (out == 1)
-                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Amount could not be changed, number of users > new amount.").queue());
-                else if (out == 2)
-                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Amount could not be changed in database.").queue());
+                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Status could not be changed, there are users registered for this role (as main role).").queue());
             } else {
-                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid input, amount should be > 0. Try again.").queue());
+                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid input, should be `0` or `1`. Try again.").queue());
                 finished = false;
             }
         }
@@ -78,10 +79,8 @@ public class ChangeAmountStep implements EditStep {
         String stepText;
         List<RaidRole> roles = RaidManager.getRaid(messageID).getRoles();
         stepText = "For which role do you want to change the amount? \n";
-        for (int r = 0; r < roles.size(); r++){
-            if(roles.get(r).isFlexOnly()) continue;
+        for (int r = 0; r < roles.size(); r++)
             stepText += "`" + (r+1) + "` " + roles.get(r).getName() + " \n";
-        }
 
         return stepText;
     }

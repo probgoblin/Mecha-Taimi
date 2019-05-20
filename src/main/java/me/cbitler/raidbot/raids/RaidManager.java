@@ -44,10 +44,10 @@ public class RaidManager {
 
                         List<Emote> emoteList;
                         if (newRaid.isOpenWorld)
-                        	emoteList = Reactions.getOpenWorldEmotes();
-                        else 
-                        	emoteList = Reactions.getCoreClassEmotes();
-                        
+                            emoteList = Reactions.getOpenWorldEmotes();
+                        else
+                            emoteList = Reactions.getCoreClassEmotes();
+
                         for (Emote emote : emoteList)
                             message1.addReaction(emote).queue();
                     } else {
@@ -125,12 +125,12 @@ public class RaidManager {
                 try {
                     leaderName = results.getResults().getString("leader");
                 } catch (Exception e) { }
-                
+
                 boolean isOpenWorld = false;
                 try {
                     isOpenWorld = results.getResults().getString("isOpenWorld").equals("true");
                 } catch (Exception e) { }
-                
+
                 Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time, isOpenWorld);
                 String[] roleSplit = rolesText.split(";");
                 for(String roleAndAmount : roleSplit) {
@@ -252,10 +252,12 @@ public class RaidManager {
 
         for (int i = 0; i < rolesWithNumbers.size(); i++) {
             RaidRole role = rolesWithNumbers.get(i);
+            String roleName = role.name;
+            if(role.isFlexOnly()) roleName = "!"+roleName;
             if(i == rolesWithNumbers.size() - 1) {
-                data += (role.amount + ":" + role.name);
+                data += (role.amount + ":" + roleName);
             } else {
-                data += (role.amount + ":" + role.name + ";");
+                data += (role.amount + ":" + roleName + ";");
             }
         }
 
@@ -293,7 +295,8 @@ public class RaidManager {
     private static String buildRolesText(PendingRaid raid) {
         String text = "";
         for(RaidRole role : raid.getRolesWithNumbers()) {
-            text += ("**" + role.name + " (" + role.amount + "):** \n");
+            if(role.isFlexOnly()) continue;
+            text += ("**" + role.name + ":**\n");
         }
         return text;
     }
@@ -304,6 +307,10 @@ public class RaidManager {
      * @return The flex roles text (blank here)
      */
     private static String buildFlexRolesText(PendingRaid raid) {
-        return "";
+        String text = "";
+        for(RaidRole role : raid.getRolesWithNumbers()) {
+            if(role.isFlexOnly()) text += ("**" + role.name + " (" + role.amount + "):**\n");
+        }
+        return text;
     }
 }

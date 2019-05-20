@@ -33,21 +33,21 @@ public class RunRoleSetupManualStep implements CreationStep {
         } else {
             String[] parts = e.getMessage().getRawContent().split(":");
             if(parts.length < 2) {
-                e.getChannel().sendMessage("You need to specify the role in the format [amount]:[role name]").queue();
+                e.getChannel().sendMessage("You need to specify the role in the format `[amount]:[role name]`.\nMake the role `flex only` by prepending its name with an exclamation mark (`!`) or by setting the amount to `0`.").queue();
             } else {
                 try {
                     int amnt = Integer.parseInt(parts[0]);
                     String roleName = parts[1];
                     if (raid.existsRole(roleName))
-                    	e.getChannel().sendMessage("A role with this name already exists.").queue();
-                    else if (amnt <= 0)
-                    	e.getChannel().sendMessage("Amount needs to be a positive number.").queue();
+                        e.getChannel().sendMessage("A role with this name already exists.").queue();
+                    else if (amnt < 0)
+                        e.getChannel().sendMessage("Amount needs to be a positive number.").queue();
                     else {
-                    	raid.getRolesWithNumbers().add(new RaidRole(amnt, roleName));
-                    	e.getChannel().sendMessage("Role added.").queue();
+                        raid.getRolesWithNumbers().add(new RaidRole(amnt, roleName));
+                        e.getChannel().sendMessage("Role added.").queue();
                     }
                 } catch (Exception ex) {
-                    e.getChannel().sendMessage("Invalid input: Make sure it's in the format of [amount]:[role name], like 1:DPS").queue();
+                    e.getChannel().sendMessage("Invalid input: Make sure it's in the format of `[amount]:[role name]`, like `1:DPS`.").queue();
                 }
             }
             return false;
@@ -58,7 +58,7 @@ public class RunRoleSetupManualStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the roles for the event (format: [amount]:[role name], e.g. 1:DPS). Type done to finish entering roles:";
+        return "Enter the roles for the event (format: [amount]:[role name], e.g. 1:DPS).\nMake the role `flex only` by prepending its name with an exclamation mark (`!`) or by setting the amount to `0`.\nType done to finish entering roles:";
     }
 
     /**
