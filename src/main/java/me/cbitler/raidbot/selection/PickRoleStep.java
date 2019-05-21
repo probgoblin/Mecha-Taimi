@@ -87,7 +87,7 @@ public class PickRoleStep implements SelectionStep {
                 // there are no spots for the role to be a main role, so it can only be added as flex!
                 raid.addUserFlexRole(userID, username, spec, roleName, true, true);
                 user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster as flex role.").queue());
-            } if (raid.isUserInRaid(userID) == false) {
+            } else if (raid.isUserInRaid(userID) == false) {
                 // check if we can add it as main role
                 if(raid.isValidNotFullRole(roleName)) {
                     raid.addUser(userID, username, spec, roleName, true, true);
