@@ -51,11 +51,11 @@ public class EditRoleStep implements EditStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "How do you want to change the roles? \n"
-                + "`1` add role \n"
-                + "`2` delete role \n"
-                + "`3` rename role \n"
-                + "`4` change amount of a role"
+        return "How do you want to change the roles?\n"
+                + "`1` add role\n"
+                + "`2` delete role\n"
+                + "`3` rename role\n"
+                + "`4` change amount of a role\n"
                 + "`5` set `flex only` flag of a role";
     }
 

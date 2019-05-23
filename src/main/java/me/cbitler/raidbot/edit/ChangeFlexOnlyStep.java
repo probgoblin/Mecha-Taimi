@@ -78,7 +78,7 @@ public class ChangeFlexOnlyStep implements EditStep {
     public String getStepText() {
         String stepText;
         List<RaidRole> roles = RaidManager.getRaid(messageID).getRoles();
-        stepText = "For which role do you want to change the amount? \n";
+        stepText = "For which role do you want to change the `flex only` flag? \n";
         for (int r = 0; r < roles.size(); r++)
             stepText += "`" + (r+1) + "` " + roles.get(r).getName() + " \n";
 
