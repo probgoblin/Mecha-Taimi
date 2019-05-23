@@ -89,6 +89,8 @@ public class ChangeFlexOnlyStep implements EditStep {
      * {@inheritDoc}
      */
     public EditStep getNextStep() {
+        RaidRole role = RaidManager.getRaid(messageID).getRoles().get(roleID);
+        if(role.isFlexOnly() && role.getAmount()==0) return new ChangeAmountStep(messageID);
         return new EditIdleStep(messageID);
     }
 
