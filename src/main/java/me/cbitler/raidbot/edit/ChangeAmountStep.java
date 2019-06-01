@@ -21,6 +21,11 @@ public class ChangeAmountStep implements EditStep {
         this.roleID = -1;
     }
 
+    public ChangeAmountStep(String messageId, int roleId) {
+        this.messageID = messageId;
+        this.roleID = roleId;
+    }
+
     /**
      * Handle changing the amount for a role of the event
      * @param e The direct message event
