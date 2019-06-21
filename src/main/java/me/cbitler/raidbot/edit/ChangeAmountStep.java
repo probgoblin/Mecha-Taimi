@@ -51,7 +51,7 @@ public class ChangeAmountStep implements EditStep {
             inputNumber -= 1;
             if (inputNumber >= 0 && inputNumber < roles.size()) {
                 roleID = inputNumber;
-                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Enter new amount for the role *" + roles.get(roleID).getName() + "*:").queue());
+                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(getStepText()).queue());
             } else
                 e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid input. Try again.").queue());
         }
@@ -82,12 +82,15 @@ public class ChangeAmountStep implements EditStep {
     public String getStepText() {
         String stepText;
         List<RaidRole> roles = RaidManager.getRaid(messageID).getRoles();
-        stepText = "For which role do you want to change the amount? \n";
-        for (int r = 0; r < roles.size(); r++){
-            if(roles.get(r).isFlexOnly()) continue;
-            stepText += "`" + (r+1) + "` " + roles.get(r).getName() + " \n";
+        if(roleID == -1){
+            stepText = "For which role do you want to change the amount? \n";
+            for (int r = 0; r < roles.size(); r++){
+                if(roles.get(r).isFlexOnly()) continue;
+                stepText += "`" + (r+1) + "` " + roles.get(r).getName() + " \n";
+            }
+        }else{
+            stepText = "Enter new amount for the role *" + roles.get(roleID).getName() + "*:";
         }
-
         return stepText;
     }
 
