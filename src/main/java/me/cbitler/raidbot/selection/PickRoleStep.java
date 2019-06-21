@@ -1,6 +1,7 @@
 package me.cbitler.raidbot.selection;
 
 import me.cbitler.raidbot.raids.Raid;
+import me.cbitler.raidbot.raids.RaidRole;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
@@ -34,14 +35,14 @@ public class PickRoleStep implements SelectionStep {
      */
     @Override
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-    	boolean success = true;
-    	try {
-    		int roleId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
-    		String roleName = raid.getRoles().get(roleId).getName();
-    		success = pickRole(e.getAuthor().getId(), e.getAuthor().getName(), roleName);
-    	} catch (Exception exp) {
-    		success = false;
-    	}
+        boolean success = true;
+        try {
+            int roleId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+            String roleName = raid.getRoles().get(roleId).getName();
+            success = pickRole(e.getAuthor().getId(), e.getAuthor().getName(), roleName);
+        } catch (Exception exp) {
+            success = false;
+        }
 
         return success;
     }
@@ -78,39 +79,44 @@ public class PickRoleStep implements SelectionStep {
      * @return true if role was added, false otherwise
      * */
     public boolean pickRole(String userID, String username, String roleName) {
-    	boolean success = true;
+        boolean success = true;
 
-    	if(raid.isValidRole(roleName)) {
-    		if (raid.isUserInRaid(userID) == false) {
-    			// check if we can add it as main role
-    			if(raid.isValidNotFullRole(roleName)) {
-    				raid.addUser(userID, username, spec, roleName, true, true);
-    				user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster.").queue());
-    			} else {
-    				// the role is already full
-    				// check if we can add as flex role
-    				if (raid.getUserNumFlexRoles(userID) < 2) {
-    					raid.addUserFlexRole(userID, username, spec, roleName, true, true);
-    					user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster as flex role since the role you selected is full.").queue());
-    				} else {
-    					// role is full and user already has 2 flex roles
-    					success = false;
-    					user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Could not add since the role you selected is full and you reached the maximum number of flex roles.\n"
-    							+ "Please choose a non-full role or write *cancel* to quit selection.").queue());
-    				}
-    			}
-    		} else {
-    			// user has a main role already,
-    			// i.e., there has to be a flex role slot available
-    			// since we checked this in the ReactionHandler
-    			raid.addUserFlexRole(userID, username, spec, roleName, true, true);
-    			user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster as flex role.").queue());
-    		}
-    	} else {
-    		success = false;
-    		user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Please choose a valid role.").queue());
-    	}
+        if(raid.isValidRole(roleName)) {
+            RaidRole role = raid.getRole(roleName);
+            if(role.isFlexOnly()){
+                // there are no spots for the role to be a main role, so it can only be added as flex!
+                raid.addUserFlexRole(userID, username, spec, roleName, true, true);
+                user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster as flex role.").queue());
+            } else if (raid.isUserInRaid(userID) == false) {
+                // check if we can add it as main role
+                if(raid.isValidNotFullRole(roleName)) {
+                    raid.addUser(userID, username, spec, roleName, true, true);
+                    user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster.").queue());
+                } else {
+                    // the role is already full
+                    // check if we can add as flex role
+                    if (raid.getUserNumFlexRoles(userID) < 2) {
+                        raid.addUserFlexRole(userID, username, spec, roleName, true, true);
+                        user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster as flex role since the role you selected is full.").queue());
+                    } else {
+                        // role is full and user already has 2 flex roles
+                        success = false;
+                        user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Could not add since the role you selected is full and you reached the maximum number of flex roles.\n"
+                                + "Please choose a non-full role or write *cancel* to quit selection.").queue());
+                    }
+                }
+            } else {
+                // user has a main role already,
+                // i.e., there has to be a flex role slot available
+                // since we checked this in the ReactionHandler
+                raid.addUserFlexRole(userID, username, spec, roleName, true, true);
+                user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster as flex role.").queue());
+            }
+        } else {
+            success = false;
+            user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Please choose a valid role.").queue());
+        }
 
-    	return success;
+        return success;
     }
 }

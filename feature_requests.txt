@@ -1,1 +1,2 @@
 - better database structure
+- move repeated and repeatable strings to resource

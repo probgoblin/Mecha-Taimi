@@ -1,12 +1,12 @@
 package me.cbitler.raidbot.utility;
 
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Guild;
+// import net.dv8tion.jda.core.entities.Guild;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
+// import java.net.HttpURLConnection;
+// import java.net.URL;
+// import java.net.URLConnection;
 
 public class GuildCountUtil {
     /**
@@ -16,7 +16,7 @@ public class GuildCountUtil {
      */
     public static void sendGuilds(JDA jda) throws IOException {
         /*
-    	String url = "https://discordbots.org/api/bots/" + jda.getSelfUser().getId() + "/stats";
+        String url = "https://discordbots.org/api/bots/" + jda.getSelfUser().getId() + "/stats";
         int serverCount = jda.getGuilds().size();
         //int shardId = jda.getShardInfo().getShardId();
         //int shardCount = jda.getShardInfo().getShardTotal();
