@@ -40,6 +40,18 @@ public class Reactions {
             "Mesmer", // 530541438769823747
             "Necromancer" // 530541439218876416
     };
+    
+    public static String[] coreClasses = {
+            "Guardian", // 530541438891589643
+            "Revenant", // 530541439751290901
+            "Warrior", // 530541440145555466
+            "Engineer", // 530541439172608062
+            "Ranger", // 530541439642501121
+            "Thief", // 530541439701221378
+            "Elementalist", // 530541438891589642
+            "Mesmer", // 530541438769823747
+            "Necromancer" // 530541439218876416
+    };
 
     static Emote[] reactions = {
             getEmoji("530541439180996638"), // Dragonhunter
@@ -69,7 +81,8 @@ public class Reactions {
             getEmoji("530541438891589642"), // Elementalist
             getEmoji("530541438769823747"), // Mesmer
             getEmoji("530541439218876416"), // Necromancer
-            getEmoji("548530947591634944") // X_
+            getEmoji("548530947591634944"), // X_
+            getEmoji("") // Flex
     };
 
     static Emote[] reactionsCore = {
@@ -82,7 +95,8 @@ public class Reactions {
             getEmoji("530541438891589642"), // Elementalist
             getEmoji("530541438769823747"), // Mesmer
             getEmoji("530541439218876416"), // Necromancer
-            getEmoji("548530947591634944") // X_
+            getEmoji("548530947591634944"), // X_
+            getEmoji("") // Flex
     };
 
     static Emote[] reactionsOpenWorld = {

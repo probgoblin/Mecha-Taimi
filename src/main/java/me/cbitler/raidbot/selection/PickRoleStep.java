@@ -13,6 +13,7 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 public class PickRoleStep implements SelectionStep {
     Raid raid;
     User user;
+    boolean forceFlex;
     String spec;
 
     /**
@@ -21,10 +22,11 @@ public class PickRoleStep implements SelectionStep {
      * @param raid The raid
      * @param spec The specialization that the user chose
      */
-    public PickRoleStep(Raid raid, String spec, User user) {
+    public PickRoleStep(Raid raid, String spec, User user, boolean forceFlex) {
         this.raid = raid;
         this.spec = spec;
         this.user = user;
+        this.forceFlex = forceFlex;
     }
 
     /**
@@ -83,8 +85,9 @@ public class PickRoleStep implements SelectionStep {
 
         if(raid.isValidRole(roleName)) {
             RaidRole role = raid.getRole(roleName);
-            if(role.isFlexOnly()){
-                // there are no spots for the role to be a main role, so it can only be added as flex!
+            if(role.isFlexOnly() || forceFlex) {
+                // case 1: there are no spots for the role to be a main role, so it can only be added as flex!
+            	// case 2: the user clicked the flex icon for sign up
                 raid.addUserFlexRole(userID, username, spec, roleName, true, true);
                 user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster as flex role.").queue());
             } else if (raid.isUserInRaid(userID) == false) {

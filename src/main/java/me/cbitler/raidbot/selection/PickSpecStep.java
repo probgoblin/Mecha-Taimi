@@ -13,19 +13,21 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 public class PickSpecStep implements SelectionStep {
     Raid raid;
     User user;
+    boolean forceFlex;
     String coreClass;
     SelectionStep nextStep;
     String[] allSpecs;
 
     /**
-     * Create a new step for this flex role selection with the specified raid and spec
+     * Create a new step for spec selection with the specified raid and core class
      * that the user chose
      * @param raid The raid
-     * @param spec The specialization that the user chose
+     * @param coreclass The core class that the user chose
      */
-    public PickSpecStep(Raid raid, String coreclass, User user) {
+    public PickSpecStep(Raid raid, String coreclass, User user, boolean forceFlex) {
         this.raid = raid;
         this.user = user;
+        this.forceFlex = forceFlex;
         this.coreClass = coreclass;
         this.nextStep = null;
     	this.allSpecs = ClassesSpecs.getSpecsForCore(coreClass);
@@ -43,12 +45,12 @@ public class PickSpecStep implements SelectionStep {
     		int specId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
     		String spec = allSpecs[specId];
     		if (raid.getRoles().size() == 1) { // if there is only one role, skip PickRoleStep
-    			PickRoleStep autoRoleStep = new PickRoleStep(raid, spec, user);
+    			PickRoleStep autoRoleStep = new PickRoleStep(raid, spec, user, forceFlex);
     			if (false == autoRoleStep.pickRole(e.getAuthor().getId(), e.getAuthor().getName(), raid.getRoles().get(0).getName())) {
     			    e.getChannel().sendMessage("Since there is only one role, selection was cancelled automatically.").queue();
     		    }
     		} else {
-    			nextStep = new PickRoleStep(raid, spec, user);
+    			nextStep = new PickRoleStep(raid, spec, user, forceFlex);
     		}
     		return true;
     	} catch (Exception exp) {

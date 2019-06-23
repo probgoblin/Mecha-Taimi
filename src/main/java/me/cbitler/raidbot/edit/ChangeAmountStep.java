@@ -82,13 +82,13 @@ public class ChangeAmountStep implements EditStep {
     public String getStepText() {
         String stepText;
         List<RaidRole> roles = RaidManager.getRaid(messageID).getRoles();
-        if(roleID == -1){
+        if(roleID == -1) {
             stepText = "For which role do you want to change the amount? \n";
             for (int r = 0; r < roles.size(); r++){
                 if(roles.get(r).isFlexOnly()) continue;
                 stepText += "`" + (r+1) + "` " + roles.get(r).getName() + " \n";
             }
-        }else{
+        } else {
             stepText = "Enter new amount for the role *" + roles.get(roleID).getName() + "*:";
         }
         return stepText;

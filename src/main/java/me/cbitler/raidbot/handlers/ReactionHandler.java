@@ -5,6 +5,7 @@ import me.cbitler.raidbot.deselection.DeselectIdleStep;
 import me.cbitler.raidbot.deselection.DeselectionStep;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
+import me.cbitler.raidbot.selection.PickClassStep;
 import me.cbitler.raidbot.selection.PickSpecStep;
 import me.cbitler.raidbot.selection.SelectionStep;
 import me.cbitler.raidbot.utility.Reactions;
@@ -23,17 +24,24 @@ public class ReactionHandler extends ListenerAdapter {
         	Emote emote = e.getReactionEmote().getEmote();
         	if (emote != null) {
         		if (raid.isOpenWorld() == false) {
-                    if (Reactions.getSpecs().contains(emote.getName())) {
+                    if (Reactions.getSpecs().contains(emote.getName()) || emote.getName().equalsIgnoreCase("Flex")) {
                         RaidBot bot = RaidBot.getInstance();
                         // check if the user is already selecting a role
                         if (bot.getRoleSelectionMap().get(e.getUser().getId()) == null) {
-                	        // check if the user can select a role, i.e. not main + 2 flex roles yet
-                	        if (raid.isUserInRaid(e.getUser().getId()) && raid.getUserNumFlexRoles(e.getUser().getId()) >= 2) {
+                	        // check if the user can select a role, i.e. not main + 2 flex roles or 3 flex roles yet
+                        	int numFlexRoles = raid.getUserNumFlexRoles(e.getUser().getId());
+                	        if ((raid.isUserInRaid(e.getUser().getId()) && numFlexRoles >= 2) || numFlexRoles >= 3) {
                 		        e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You have selected the maximum number of roles. Press the X reaction to re-select your roles.").queue());
                 	        } else {
-                		        SelectionStep step = new PickSpecStep(raid, e.getReactionEmote().getEmote().getName(), e.getUser());
-                		        bot.getRoleSelectionMap().put(e.getUser().getId(), step);
-                		        e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(step.getStepText()).queue());
+                	        	SelectionStep step;
+                	        	if (emote.getName().equalsIgnoreCase("Flex")) {
+                	        		step = new PickClassStep(raid, e.getUser(), true);
+                	        	} else {
+                	        		step = new PickSpecStep(raid, e.getReactionEmote().getEmote().getName(), e.getUser(), false);
+                	        	}
+                	        	bot.getRoleSelectionMap().put(e.getUser().getId(), step);
+                	        	e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(step.getStepText()).queue());
+                	   
                 	        }
                         } else {
                 	        e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are already selecting a role.").queue());
