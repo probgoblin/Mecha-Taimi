@@ -720,6 +720,14 @@ public class Raid {
         builder.addField("Flex Roles:", buildFlexRolesText(), true);
         builder.addBlankField(false);
         builder.addField("ID: ", messageId, false);
+        if (this.isOpenWorld == false) {
+        	builder.addBlankField(false);
+        	builder.addField("How to sign up:", 
+        		"- To choose a main role, click on the reaction of the class you want to play.\n"
+        		+ "- To sign up as a flex role, click on the flex reaction (Fx).\n"
+        		+ "- To remove one or all of your sign-ups, click the red X reaction."
+        		, false);
+        }
 
         return builder.build();
     }

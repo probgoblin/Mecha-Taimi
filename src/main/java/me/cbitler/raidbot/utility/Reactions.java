@@ -81,8 +81,8 @@ public class Reactions {
             getEmoji("530541438891589642"), // Elementalist
             getEmoji("530541438769823747"), // Mesmer
             getEmoji("530541439218876416"), // Necromancer
-            getEmoji("548530947591634944"), // X_
-            getEmoji("") // Flex
+            getEmoji("592463347291783168"), // Flex
+            getEmoji("548530947591634944") // X_
     };
 
     static Emote[] reactionsCore = {
@@ -95,8 +95,8 @@ public class Reactions {
             getEmoji("530541438891589642"), // Elementalist
             getEmoji("530541438769823747"), // Mesmer
             getEmoji("530541439218876416"), // Necromancer
-            getEmoji("548530947591634944"), // X_
-            getEmoji("") // Flex
+            getEmoji("592463347291783168"), // Flex
+            getEmoji("548530947591634944") // X_
     };
 
     static Emote[] reactionsOpenWorld = {
