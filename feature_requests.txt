@@ -1,2 +1,4 @@
 - better database structure
 - move repeated and repeatable strings to resource
+
+- short version of event message (especially for fractals)

@@ -24,8 +24,14 @@ public class ReactionHandler extends ListenerAdapter {
         	Emote emote = e.getReactionEmote().getEmote();
         	if (emote != null) {
         		if (raid.isOpenWorld() == false) {
+        			RaidBot bot = RaidBot.getInstance();
+        			int actvId = bot.userHasActiveChat(e.getUser().getId());
+        			if (actvId != 0) {
+        				RaidBot.writeNotificationActiveChat(e.getUser(), actvId);
+        				e.getReaction().removeReaction(e.getUser()).queue();
+        				return;
+        			}
                     if (Reactions.getSpecs().contains(emote.getName()) || emote.getName().equalsIgnoreCase("Flex")) {
-                        RaidBot bot = RaidBot.getInstance();
                         // check if the user is already selecting a role
                         if (bot.getRoleSelectionMap().get(e.getUser().getId()) == null) {
                 	        // check if the user can select a role, i.e. not main + 2 flex roles or 3 flex roles yet

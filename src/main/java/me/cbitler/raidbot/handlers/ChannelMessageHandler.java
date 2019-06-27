@@ -50,16 +50,18 @@ public class ChannelMessageHandler extends ListenerAdapter {
 
         if (PermissionsUtil.hasRaidLeaderRole(e.getMember())) {
             if (e.getMessage().getRawContent().equalsIgnoreCase("!createEvent")) {
-            	// check if this user is already editing or creating
-            	if (bot.getCreationMap().get(e.getAuthor().getId()) != null) {
-            		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You cannot create two events at the same time. Finish the creation process first.").queue());
-            	} else if (bot.getEditMap().get(e.getAuthor().getId()) != null) {
-            		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You cannot create an event while editing. Finish editing the event first.").queue());
-            	} else {
-            		CreationStep runNameStep = new RunNameStep(e.getMessage().getGuild().getId());
-            		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(runNameStep.getStepText()).queue());
-            		bot.getCreationMap().put(e.getAuthor().getId(), runNameStep);
-            	}
+            	// check if this user already has an active chat
+            	int actvId = bot.userHasActiveChat(e.getAuthor().getId());
+    			if (actvId != 0) {
+    				RaidBot.writeNotificationActiveChat(e.getAuthor(), actvId);
+    				try {
+                        e.getMessage().delete().queue();
+                    } catch (Exception exception) {}
+    				return;
+    			}
+            	CreationStep runNameStep = new RunNameStep(e.getMessage().getGuild().getId());
+            	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(runNameStep.getStepText()).queue());
+            	bot.getCreationMap().put(e.getAuthor().getId(), runNameStep);
             	try {
                     e.getMessage().delete().queue();
                 } catch (Exception exception) {}
@@ -92,12 +94,17 @@ public class ChannelMessageHandler extends ListenerAdapter {
                     Raid raid = RaidManager.getRaid(messageId);
 
                     if (raid != null && raid.getServerId().equalsIgnoreCase(e.getGuild().getId())) {
-                        // check if this user is already editing or creating, or the raid is being edited by someone else
-                    	if (bot.getCreationMap().get(e.getAuthor().getId()) != null) {
-                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You cannot edit an event while creating.").queue());
-                    	} else if (bot.getEditMap().get(e.getAuthor().getId()) != null) {
-                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You can only edit one event at a time.").queue());
-                    	} else if (bot.getEditList().contains(messageId)) {
+                    	// check if this user already has an active chat
+                    	int actvId = bot.userHasActiveChat(e.getAuthor().getId());
+            			if (actvId != 0) {
+            				RaidBot.writeNotificationActiveChat(e.getAuthor(), actvId);
+            				try {
+                                e.getMessage().delete().queue();
+                            } catch (Exception exception) {}
+            				return;
+            			}
+                    	// check if the raid is being edited by someone else
+                    	if (bot.getEditList().contains(messageId)) {
                     		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The selected event is already being edited.").queue());
                     	} else {
                     		// start editing process
@@ -113,7 +120,6 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 try {
                     e.getMessage().delete().queue();
                 } catch (Exception exception) {}
-
             }
         }
 

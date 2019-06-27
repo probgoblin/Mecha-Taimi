@@ -15,6 +15,7 @@ import me.cbitler.raidbot.selection.SelectionStep;
 import me.cbitler.raidbot.utility.GuildCountUtil;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.User;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -207,5 +208,36 @@ public class RaidBot {
     public static RaidBot getInstance() {
         return instance;
     }
+    
+    /**
+     * Writes a message to the user notifying them that they have an active chat already 
+     * @param user the user
+     * @param actvId the type of active acticity
+     */
+    public static void writeNotificationActiveChat(User user, int actvId) {
+    	String actvName;
+    	if (actvId == 1) actvName = "role selection";
+    	else if (actvId == 2) actvName = "role deselection";
+    	else if (actvId == 3) actvName = "create event";
+    	else if (actvId == 4) actvName = "edit event";
+    	else actvName = "";
+    	
+    	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You already have an active chat with me (" + actvName + "). Finish it first!").queue());
+    }
+
+    /**
+     * Determines whether the user has an active chat with the bot which is waiting for DM input
+     * @param id the user's id
+     * @return 0: no active chat, 1: role selection, 2: role deselection, 3: event creation, 4: event edit
+     */
+	public int userHasActiveChat(String id) {
+		int actvId = 0;
+		if (roleSelection.get(id) != null) actvId = 1;
+		else if (roleDeselection.get(id) != null) actvId = 2;
+		else if (creation.get(id) != null) actvId = 3;
+		else if (edits.get(id) != null) actvId = 4;
+		
+		return actvId;
+	}	
 
 }
