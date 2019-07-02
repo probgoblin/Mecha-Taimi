@@ -42,17 +42,19 @@ public class DMHandler extends ListenerAdapter {
 
         if (bot.getCreationMap().containsKey(author.getId())) {
             if(e.getMessage().getRawContent().equalsIgnoreCase("cancel")) {
-                bot.getCreationMap().remove(author.getId());
-
-                if(bot.getPendingRaids().get(author.getId()) != null) {
-                    bot.getPendingRaids().remove(author.getId());
-                }
-                e.getChannel().sendMessage("Event creation cancelled.").queue();
+                cancelCreation(author);
                 return;
             }
 
             CreationStep step = bot.getCreationMap().get(author.getId());
-            boolean done = step.handleDM(e);
+            boolean done = false;
+            try {
+            	done = step.handleDM(e);
+            } catch (RuntimeException excp) {
+            	e.getChannel().sendMessage("I could not find any pending event associated with you. I'm sorry.").queue();
+            	cancelCreation(author);
+            	return;
+            }
 
             // If this step is done, move onto the next one or finish
             if (done) {
@@ -92,13 +94,9 @@ public class DMHandler extends ListenerAdapter {
                     bot.getRoleSelectionMap().remove(author.getId());
                 }
             }
-
         } else if (bot.getEditMap().containsKey(author.getId())) {
         	if(e.getMessage().getRawContent().equalsIgnoreCase("cancel")) {
-                bot.getEditList().remove(bot.getEditMap().get(author.getId()).getMessageID());
-                bot.getEditMap().remove(author.getId());
-                
-                e.getChannel().sendMessage("Event editing cancelled.").queue();
+                cancelEdit(author);
                 return;
             }
         	
@@ -145,5 +143,30 @@ public class DMHandler extends ListenerAdapter {
                 }
             }
         }
+    }
+    
+    /**
+     * cancels event creation, i.e. removes the user from the creation map, removes pending event, and sends notification
+     * @param user the user who started the creation process
+     */
+    private void cancelCreation(User author) {
+    	bot.getCreationMap().remove(author.getId());
+
+        if(bot.getPendingRaids().get(author.getId()) != null) {
+            bot.getPendingRaids().remove(author.getId());
+        }
+        author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event creation cancelled.").queue());    	
+    }
+    
+    /**
+     * cancels event editing, i.e. removes the user from the edit map, removes event from the edit list, and sends notification
+     * @param user the user who started the editing process
+     */
+    private void cancelEdit(User author) {
+    	bot.getEditList().remove(bot.getEditMap().get(author.getId()).getMessageID());
+        bot.getEditMap().remove(author.getId());
+        
+        author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event editing cancelled.").queue());    	
+        
     }
 }

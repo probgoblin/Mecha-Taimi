@@ -63,8 +63,10 @@ public class RunChannelStep implements CreationStep {
     private boolean checkAndSetChannel(String authorId, String channelName) {
     	RaidBot bot = RaidBot.getInstance();
     	PendingRaid raid = bot.getPendingRaids().get(authorId);
-    	if (raid == null)
-    		return false;
+    	if (raid == null) {
+    		// this will be caught in the handler
+        	throw new RuntimeException();
+    	}
         
     	boolean validChannel = false;
         for (TextChannel channel : bot.getServer(raid.getServerId()).getTextChannels()) {

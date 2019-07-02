@@ -45,6 +45,10 @@ public class RunRoleSetupTemplateStep implements CreationStep {
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         RaidBot bot = RaidBot.getInstance();
         PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
+        if (raid == null) {
+        	// this will be caught in the handler
+        	throw new RuntimeException();
+        }
 
         try {
             int choiceId = Integer.parseInt(e.getMessage().getRawContent()) - 1;

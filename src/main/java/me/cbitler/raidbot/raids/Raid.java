@@ -781,7 +781,9 @@ public class Raid {
         for (int r = 0; r < textPerRole.size(); r++) {
         	builder.addField("", textPerRole.get(r), true);
         }
-        builder.addField("Flex Roles:", buildFlexRolesTextShort(), true);
+        String flexText = buildFlexRolesTextShort();
+        if (flexText.isEmpty() == false)
+        	builder.addField("Flex Roles:", flexText, true);
 
         return builder.build();
     }

@@ -33,7 +33,8 @@ public class RunDisplayStep implements CreationStep {
         RaidBot bot = RaidBot.getInstance();
         PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
         if (raid == null) {
-            return false;
+        	// this will be caught in the handler
+        	throw new RuntimeException();
         }
         raid.setDisplayShort(choiceID == 1);
 

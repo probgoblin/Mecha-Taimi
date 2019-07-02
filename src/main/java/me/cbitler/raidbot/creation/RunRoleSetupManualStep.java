@@ -22,6 +22,10 @@ public class RunRoleSetupManualStep implements CreationStep {
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         RaidBot bot = RaidBot.getInstance();
         PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
+        if (raid == null) {
+        	// this will be caught in the handler
+        	throw new RuntimeException();
+        }
 
         if(e.getMessage().getRawContent().equalsIgnoreCase("done")) {
             if(raid.getRolesWithNumbers().size() > 0) {
@@ -58,7 +62,7 @@ public class RunRoleSetupManualStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the roles for the event (format: [amount]:[role name], e.g. 1:DPS).\nMake the role `flex only` by prepending its name with an exclamation mark (`!`) or by setting the amount to `0`.\nType done to finish entering roles:";
+        return "Enter the roles for the event (format: [amount]:[role name], e.g. 1:DPS).\nMake the role `flex only` by prepending its name with an exclamation mark (`!`) or by setting the amount to `0`.\nType *done* to finish entering roles:";
     }
 
     /**
