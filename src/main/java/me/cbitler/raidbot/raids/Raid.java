@@ -5,6 +5,7 @@ import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.utility.Reactions;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Emote;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
 import java.sql.SQLException;
@@ -19,6 +20,7 @@ public class Raid {
     List<RaidRole> roles = new ArrayList<RaidRole>();
     HashMap<RaidUser, String> userToRole = new HashMap<RaidUser, String>();
     HashMap<RaidUser, List<FlexRole>> usersToFlexRoles = new HashMap<>();
+    HashMap<String, String> userIDsToNicknames = new HashMap<>();
 
     /* *
      * open world events only have a single role (Participants) and users sign up without any class
@@ -585,6 +587,14 @@ public class Raid {
 
         userToRole.put(user, role);
         usersToFlexRoles.computeIfAbsent(new RaidUser(id, name, "", ""), k -> new ArrayList<FlexRole>());
+        if (userIDsToNicknames.get(id) == null) {
+        	// get the server nickname for that user and save it
+        	Member member = RaidBot.getInstance().getServer(serverId).getMemberById(id);
+        	if (member != null) {
+        		String nickname = member.getNickname();
+        		userIDsToNicknames.put(id, nickname == null ? name : nickname);
+        	}
+        }
 
         if (update_message) {
             updateMessage();
@@ -622,6 +632,14 @@ public class Raid {
 
         if (usersToFlexRoles.get(user) == null) {
             usersToFlexRoles.put(user, new ArrayList<FlexRole>());
+        }
+        if (userIDsToNicknames.get(id) == null) {
+        	// get the server nickname for that user and save it
+        	Member member = RaidBot.getInstance().getServer(serverId).getMemberById(id);
+        	if (member != null) {
+        		String nickname = member.getNickname();
+        		userIDsToNicknames.put(id, nickname == null ? name : nickname);
+        	}
         }
 
         usersToFlexRoles.get(user).add(frole);
@@ -787,6 +805,27 @@ public class Raid {
 
         return builder.build();
     }
+    
+    /**
+     * collects a list of users for every role
+     * @return the map containing a list of users for each role
+     */
+    private Map<String, List<RaidUser>> collectFlexUsersByRole() {
+    	// collect names and specializations for each role
+        Map<String, List<RaidUser>> flexUsersByRole = new HashMap<String, List<RaidUser>>();
+        for (int r = 0; r < roles.size(); r++) {
+            flexUsersByRole.put(roles.get(r).getName(), new ArrayList<RaidUser>());
+        }
+
+        for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
+            if (flex.getKey() != null) {
+                for (FlexRole frole : flex.getValue()) {
+                    flexUsersByRole.get(frole.getRole()).add(new RaidUser(flex.getKey().id, flex.getKey().name, frole.spec, null));
+                }
+            }
+        }
+        return flexUsersByRole;
+    }
 
     /**
      * Build the flex roles text, which includes a list of flex roles users are
@@ -798,33 +837,29 @@ public class Raid {
         String text = "";
         if (isOpenWorld) {
             for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
-                if (flex.getKey() != null && flex.getValue().isEmpty() == false)
-                    text += ("- " + flex.getKey().getName() + "\n");
-            }
-        } else {
-            // collect names and specializations for each role
-            Map<String, List<RaidUser>> flexUsersByRole = new HashMap<String, List<RaidUser>>();
-            for (int r = 0; r < roles.size(); r++) {
-                flexUsersByRole.put(roles.get(r).getName(), new ArrayList<RaidUser>());
-            }
-
-            for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
-                if (flex.getKey() != null) {
-                    for (FlexRole frole : flex.getValue()) {
-                        flexUsersByRole.get(frole.getRole()).add(new RaidUser(flex.getKey().id, flex.getKey().name, frole.spec, null));
-                    }
+                if (flex.getKey() != null && flex.getValue().isEmpty() == false) {
+                	String username = userIDsToNicknames.get(flex.getKey().getId());
+                	if (username == null) 
+                		username = flex.getKey().getName();
+                    text += ("- " + username + "\n");
                 }
             }
+        } else {
+        	Map<String, List<RaidUser>> flexUsersByRole = collectFlexUsersByRole();
+            
             for (int r = 0; r < roles.size(); r++) {
                 String roleName = roles.get(r).getName();
                 text += (roleName + ": \n");
 
                 for (RaidUser user : flexUsersByRole.get(roleName)) {
-                        Emote userEmote = Reactions.getEmoteByName(user.getSpec());
-                        if(userEmote == null)
-                            text += ("- " + user.getName() + " (" + user.getSpec() + ")\n");
-                        else
-                            text += ("<:"+userEmote.getName()+":"+userEmote.getId()+"> " + user.getName() + " (" + user.getSpec() + ")\n");
+                	String username = userIDsToNicknames.get(user.getId());
+                	if (username == null) 
+                		username = user.getName();
+                    Emote userEmote = Reactions.getEmoteByName(user.getSpec());
+                    if(userEmote == null)
+                        text += ("- " + username + " (" + user.getSpec() + ")\n");
+                    else
+                        text += ("<:"+userEmote.getName()+":"+userEmote.getId()+"> " + username + " (" + user.getSpec() + ")\n");
                 }
                 text += "\n";
             }
@@ -846,22 +881,13 @@ public class Raid {
                 if (flex.getKey() != null && flex.getValue().isEmpty() == false)
                     if (text.isEmpty() == false)
                     	text += ", ";
-                	text += (flex.getKey().getName());
+                	String username = userIDsToNicknames.get(flex.getKey().getId());
+                	if (username == null) 
+                		username = flex.getKey().getName();
+                	text += username;
             }
         } else {
-            // collect names and specializations for each role
-            Map<String, List<RaidUser>> flexUsersByRole = new HashMap<String, List<RaidUser>>();
-            for (int r = 0; r < roles.size(); r++) {
-                flexUsersByRole.put(roles.get(r).getName(), new ArrayList<RaidUser>());
-            }
-
-            for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
-                if (flex.getKey() != null) {
-                    for (FlexRole frole : flex.getValue()) {
-                        flexUsersByRole.get(frole.getRole()).add(new RaidUser(flex.getKey().id, flex.getKey().name, frole.spec, null));
-                    }
-                }
-            }
+        	Map<String, List<RaidUser>> flexUsersByRole = collectFlexUsersByRole();
             for (int r = 0; r < roles.size(); r++) {
                 String roleName = roles.get(r).getName();
                 List<RaidUser> usersPerRole = flexUsersByRole.get(roleName);
@@ -872,7 +898,10 @@ public class Raid {
                 		RaidUser user = usersPerRole.get(u);
                 		if (u != 0)
                 			text += ", ";
-                		text += (user.getName());
+                		String username = userIDsToNicknames.get(user.getId());
+                    	if (username == null) 
+                    		username = user.getName();
+                		text += username;
                 	}
                 	text += " ] ";
                 }
@@ -894,14 +923,17 @@ public class Raid {
             List<RaidUser> raidUsersInRole = getUsersInRole(role.name);
             text += ("**" + role.name + " ( " + raidUsersInRole.size() + " / " + role.amount + " ):** \n");
             for (RaidUser user : raidUsersInRole) {
+            	String username = userIDsToNicknames.get(user.getId());
+            	if (username == null) 
+            		username = user.getName();
                 if (isOpenWorld) {
-                    text += ("- " + user.name + "\n");
+                    text += ("- " + username + "\n");
                 } else {
                     Emote userEmote = Reactions.getEmoteByName(user.spec);
                     if(userEmote == null)
-                        text += "   - " + user.name + " (" + user.spec + ")\n";
+                        text += "   - " + username + " (" + user.spec + ")\n";
                     else
-                        text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + user.name + " (" + user.spec + ")\n";
+                        text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + username + " (" + user.spec + ")\n";
                 }
             }
             text += "\n";
@@ -922,14 +954,17 @@ public class Raid {
             List<RaidUser> raidUsersInRole = getUsersInRole(role.name);
             text += ("**" + role.name + " ( " + raidUsersInRole.size() + " / " + role.amount + " ):** \n");
             for (RaidUser user : raidUsersInRole) {
+            	String username = userIDsToNicknames.get(user.getId());
+            	if (username == null) 
+            		username = user.getName();
                 if (isOpenWorld) {
-                    text += ("- " + user.name + "\n");
+                    text += ("- " + username + "\n");
                 } else {
                     Emote userEmote = Reactions.getEmoteByName(user.spec);
                     if(userEmote == null)
-                        text += "   - " + user.name + "\n";
+                        text += "   - " + username + "\n";
                     else
-                        text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + user.name + "\n";
+                        text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + username + "\n";
                 }
             }
             text += "\n";

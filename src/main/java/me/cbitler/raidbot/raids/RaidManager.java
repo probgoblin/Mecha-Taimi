@@ -47,9 +47,13 @@ public class RaidManager {
                             emoteList = Reactions.getOpenWorldEmotes();
                         else
                             emoteList = Reactions.getCoreClassEmotes();
-
-                        for (Emote emote : emoteList)
-                            message1.addReaction(emote).queue();
+                        
+                        try {
+                        	for (Emote emote : emoteList)
+                        		message1.addReaction(emote).queue();
+                        } catch (Exception excp) {
+                        	System.out.println("Could not add all reactions to the event message. At least one emoji was null.");
+                        }
                     } else {
                         message1.delete().queue();
                     }
