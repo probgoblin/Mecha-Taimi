@@ -24,11 +24,17 @@ public class RunRoleSetupTemplateStep implements CreationStep {
             new RaidRole(1, "Healer"),
             new RaidRole(1, "BS"),
             new RaidRole(2, "DPS")
+        },
+        {	new RaidRole(1, "Healbrand"),
+            new RaidRole(1, "Alacrigade"),
+            new RaidRole(1, "BS"),
+            new RaidRole(2, "DPS")
         }
     };
     private static String[] templateNames = {
             "default raid",
-            "default fractal"
+            "fractal (Chrono)",
+            "fractal (Firebrigade)"
     };
 
     /**

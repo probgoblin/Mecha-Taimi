@@ -37,7 +37,7 @@ public class RaidManager {
                 channels.get(0).sendMessage(message).queue(message1 -> {
                     boolean inserted = insertToDatabase(raid, message1.getId(), message1.getGuild().getId(), message1.getChannel().getId());
                     if (inserted) {
-                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDescription(), raid.getDate(), raid.getTime(), raid.isOpenWorld());
+                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDescription(), raid.getDate(), raid.getTime(), raid.isOpenWorld(), raid.isDisplayShort());
                         newRaid.roles.addAll(raid.rolesWithNumbers);
                         raids.add(newRaid);
                         newRaid.updateMessage();
@@ -76,10 +76,11 @@ public class RaidManager {
         String roles = formatRolesForDatabase(raid.getRolesWithNumbers());
 
         try {
-            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `isOpenWorld`, `leader`, `name`, `description`, `date`, `time`, `roles`) VALUES (?,?,?,?,?,?,?,?,?,?)", new String[] {
+            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `isDisplayShort`, `isOpenWorld`, `leader`, `name`, `description`, `date`, `time`, `roles`) VALUES (?,?,?,?,?,?,?,?,?,?,?)", new String[] {
                     messageId,
                     serverId,
                     channelId,
+                    Boolean.toString(raid.isDisplayShort()),
                     Boolean.toString(raid.isOpenWorld()),
                     raid.getLeaderName(),
                     raid.getName(),
@@ -130,8 +131,13 @@ public class RaidManager {
                 try {
                     isOpenWorld = results.getResults().getString("isOpenWorld").equals("true");
                 } catch (Exception e) { }
+                
+                boolean isDisplayShort = false;
+                try {
+                	isDisplayShort = results.getResults().getString("isDisplayShort").equals("true");
+                } catch (Exception e) { }
 
-                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time, isOpenWorld);
+                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time, isOpenWorld, isDisplayShort);
                 String[] roleSplit = rolesText.split(";");
                 for(String roleAndAmount : roleSplit) {
                     String[] parts = roleAndAmount.split(":");
@@ -281,36 +287,33 @@ public class RaidManager {
         builder.addField("Date: ", raid.getDate(), true);
         builder.addField("Time: ", raid.getTime(), true);
         builder.addBlankField(false);
-        builder.addField("Roles: ", buildRolesText(raid), true);
-        builder.addField("Flex Roles: ", buildFlexRolesText(raid), true);
-        builder.addBlankField(false);
         return builder.build();
     }
 
-    /**
-     * Builds the text to go into the roles field in the embedded message
-     * @param raid The raid object
-     * @return The role text
-     */
-    private static String buildRolesText(PendingRaid raid) {
-        String text = "";
-        for(RaidRole role : raid.getRolesWithNumbers()) {
-            if(role.isFlexOnly()) continue;
-            text += ("**" + role.name + ":**\n");
-        }
-        return text;
-    }
-
-    /**
-     * Build the flex role text. This is blank here as we have no flex roles at this point.
-     * @param raid
-     * @return The flex roles text (blank here)
-     */
-    private static String buildFlexRolesText(PendingRaid raid) {
-        String text = "";
-        for(RaidRole role : raid.getRolesWithNumbers()) {
-            if(role.isFlexOnly()) text += ("**" + role.name + " (" + role.amount + "):**\n");
-        }
-        return text;
-    }
+//    /**
+//     * Builds the text to go into the roles field in the embedded message
+//     * @param raid The raid object
+//     * @return The role text
+//     */
+//    private static String buildRolesText(PendingRaid raid) {
+//        String text = "";
+//        for(RaidRole role : raid.getRolesWithNumbers()) {
+//            if(role.isFlexOnly()) continue;
+//            text += ("**" + role.name + ":**\n");
+//        }
+//        return text;
+//    }
+//
+//    /**
+//     * Build the flex role text. This is blank here as we have no flex roles at this point.
+//     * @param raid
+//     * @return The flex roles text (blank here)
+//     */
+//    private static String buildFlexRolesText(PendingRaid raid) {
+//        String text = "";
+//        for(RaidRole role : raid.getRolesWithNumbers()) {
+//            if(role.isFlexOnly()) text += ("**" + role.name + " (" + role.amount + "):**\n");
+//        }
+//        return text;
+//    }
 }

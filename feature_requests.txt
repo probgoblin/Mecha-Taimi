@@ -1,4 +1,5 @@
 - better database structure
 - move repeated and repeatable strings to resource
 
-- short version of event message (especially for fractals)
+- while creation, cancel creation with proper message when PendingRaid object cannot be found
+- use server nicknames for displaying

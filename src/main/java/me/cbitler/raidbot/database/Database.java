@@ -16,6 +16,7 @@ public class Database {
             + " raidId text PRIMARY KEY, \n"
             + " serverId text NOT NULL, \n"
             + " channelId text NOT NULL, \n"
+            + " isDisplayShort text NOT NULL, \n"
             + " isOpenWorld text NOT NULL, \n"
             + " leader text NOT NULL, \n"
             + " `name` text NOT NULL, \n"
@@ -127,6 +128,9 @@ public class Database {
         } catch (Exception e) { }
         try {
         	connection.createStatement().execute("ALTER TABLE raids ADD COLUMN isOpenWorld text");
+        } catch (Exception e) { }
+        try {
+        	connection.createStatement().execute("ALTER TABLE raids ADD COLUMN isDisplayShort text");
         } catch (Exception e) { }
     }
 }

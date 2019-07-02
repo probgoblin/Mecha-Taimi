@@ -17,12 +17,25 @@ public class PendingRaid {
      */
     boolean isOpenWorld;
     
+    /* *
+     * whether to display the short version of the raid message
+     */
+    boolean isDisplayShort;
+    
     public boolean isOpenWorld() {
     	return isOpenWorld;
     }
     
     public void setOpenWorld(boolean isOpenWorld) {
     	this.isOpenWorld = isOpenWorld;
+    }
+    
+    public boolean isDisplayShort() {
+    	return isDisplayShort;
+    }
+    
+    public void setDisplayShort(boolean isDisplayShort) {
+    	this.isDisplayShort = isDisplayShort;
     }
 
     public String getName() {

@@ -40,6 +40,8 @@ public class EditIdleStep implements EditStep {
         			nextStep = new EditLeaderStep(messageID);
         		else if (choiceId == 6) // roles
         			nextStep = new EditRoleStep(messageID);
+        		else if (choiceId == 7) // display format
+        			nextStep = new EditDisplayStep(messageID);
         		else
         			valid = false;
         	} catch (Exception excp) {
@@ -65,6 +67,7 @@ public class EditIdleStep implements EditStep {
         		+ "`4` description \n"
         		+ "`5` leader \n"
         		+ "`6` roles \n"
+        		+ "`7` display format \n"
         		+ "or type *done* when you want to finish editing.";
     }
 

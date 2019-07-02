@@ -24,6 +24,11 @@ public class Raid {
      * open world events only have a single role (Participants) and users sign up without any class
      */
     boolean isOpenWorld;
+    
+    /* *
+     * whether to display the short version of the raid message
+     */
+    boolean isDisplayShort;
 
     /**
      * Create a new Raid with the specified data
@@ -37,7 +42,7 @@ public class Raid {
      * @param time           The time of the raid
      */
     public Raid(String messageId, String serverId, String channelId, String raidLeaderName, String name,
-            String description, String date, String time, boolean isOpenWorld) {
+            String description, String date, String time, boolean isOpenWorld, boolean isDisplayShort) {
         this.messageId = messageId;
         this.serverId = serverId;
         this.channelId = channelId;
@@ -47,6 +52,7 @@ public class Raid {
         this.date = date;
         this.time = time;
         this.isOpenWorld = isOpenWorld;
+        this.isDisplayShort = isDisplayShort;
     }
 
     /**
@@ -83,6 +89,38 @@ public class Raid {
      */
     public String getChannelId() {
         return channelId;
+    }
+    
+    /**
+     * The display-short-message flag for this event
+     *
+     * @return display-short-message flag for this event
+     */
+    public boolean isDisplayShort() {
+        return isDisplayShort;
+    }
+    
+    /**
+     * Sets the display-short-message flag for this event
+     *
+     * @param displayshort new display-short-message flag 
+     */
+    public void setDisplayShort(boolean displayshort) {
+        this.isDisplayShort = displayshort;
+    }
+    
+    /**
+     * Updates the display-short-message flag in the database
+     */
+    public boolean updateDisplayShortDB() {
+        try {
+            RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `isDisplayShort`=? WHERE `raidId`=?",
+                    new String[] { Boolean.toString(isDisplayShort), messageId });
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -691,7 +729,7 @@ public class Raid {
      * Update the embedded message for the raid
      */
     public void updateMessage() {
-        MessageEmbed embed = buildEmbed();
+        MessageEmbed embed = isDisplayShort ? buildEmbedShort() : buildEmbed();
         try {
             RaidBot.getInstance().getServer(getServerId()).getTextChannelById(getChannelId())
                     .editMessageById(getMessageId(), embed).queue();
@@ -706,7 +744,7 @@ public class Raid {
      */
     private MessageEmbed buildEmbed() {
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle(getName());
+        builder.setTitle(getName() + "\t ||ID: " + messageId + "||");
         builder.addField("Description:", getDescription(), false);
         builder.addBlankField(false);
         if (getRaidLeaderName() != null) {
@@ -718,8 +756,6 @@ public class Raid {
         builder.addBlankField(false);
         builder.addField("Roles:", buildRolesText(), true);
         builder.addField("Flex Roles:", buildFlexRolesText(), true);
-        builder.addBlankField(false);
-        builder.addField("ID: ", messageId, false);
         if (this.isOpenWorld == false) {
         	builder.addBlankField(false);
         	builder.addField("How to sign up:", 
@@ -728,6 +764,24 @@ public class Raid {
         		+ "- To remove one or all of your sign-ups, click the red X reaction."
         		, false);
         }
+
+        return builder.build();
+    }
+    
+    /**
+     * Build the short embedded message that shows the information about this raid
+     *
+     * @return The short embedded message representing this raid
+     */
+    private MessageEmbed buildEmbedShort() {
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setTitle(getName() + " " + getDescription() + " [" + getDate() + " " + getTime() + "]\t"
+        		+ "||ID: " + messageId + "||");
+        List<String> textPerRole = buildTextPerRole();
+        for (int r = 0; r < textPerRole.size(); r++) {
+        	builder.addField("", textPerRole.get(r), true);
+        }
+        builder.addField("Flex Roles:", buildFlexRolesTextShort(), true);
 
         return builder.build();
     }
@@ -776,6 +830,55 @@ public class Raid {
 
         return text;
     }
+    
+    /**
+     * Build the short flex roles text, which includes a list of flex roles users are
+     * playing and their specs
+     *
+     * @return The short flex role text
+     */
+    private String buildFlexRolesTextShort() {
+        String text = "";
+        if (isOpenWorld) {
+            for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
+                if (flex.getKey() != null && flex.getValue().isEmpty() == false)
+                    if (text.isEmpty() == false)
+                    	text += ", ";
+                	text += (flex.getKey().getName());
+            }
+        } else {
+            // collect names and specializations for each role
+            Map<String, List<RaidUser>> flexUsersByRole = new HashMap<String, List<RaidUser>>();
+            for (int r = 0; r < roles.size(); r++) {
+                flexUsersByRole.put(roles.get(r).getName(), new ArrayList<RaidUser>());
+            }
+
+            for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
+                if (flex.getKey() != null) {
+                    for (FlexRole frole : flex.getValue()) {
+                        flexUsersByRole.get(frole.getRole()).add(new RaidUser(flex.getKey().id, flex.getKey().name, frole.spec, null));
+                    }
+                }
+            }
+            for (int r = 0; r < roles.size(); r++) {
+                String roleName = roles.get(r).getName();
+                List<RaidUser> usersPerRole = flexUsersByRole.get(roleName);
+                if (usersPerRole.isEmpty() == false) {
+                	text += ("[ **" + roleName + "**: ");
+                
+                	for (int u = 0; u < usersPerRole.size(); u++) {
+                		RaidUser user = usersPerRole.get(u);
+                		if (u != 0)
+                			text += ", ";
+                		text += (user.getName());
+                	}
+                	text += " ] ";
+                }
+            }
+        }
+
+        return text;
+    }
 
     /**
      * Build the role text, which shows the roles users are playing in the raids
@@ -802,6 +905,35 @@ public class Raid {
             text += "\n";
         }
         return text;
+    }
+    
+    /**
+     * Build the text per role, which shows the roles users are playing in the raids
+     *
+     * @return The role text
+     */
+    private List<String> buildTextPerRole() {
+        List<String> texts = new ArrayList<String>();
+        for (RaidRole role : roles) {
+            if(role.isFlexOnly()) continue;
+            String text = "";
+            List<RaidUser> raidUsersInRole = getUsersInRole(role.name);
+            text += ("**" + role.name + " ( " + raidUsersInRole.size() + " / " + role.amount + " ):** \n");
+            for (RaidUser user : raidUsersInRole) {
+                if (isOpenWorld) {
+                    text += ("- " + user.name + "\n");
+                } else {
+                    Emote userEmote = Reactions.getEmoteByName(user.spec);
+                    if(userEmote == null)
+                        text += "   - " + user.name + "\n";
+                    else
+                        text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + user.name + "\n";
+                }
+            }
+            text += "\n";
+            texts.add(text);
+        }
+        return texts;
     }
 
     /**
