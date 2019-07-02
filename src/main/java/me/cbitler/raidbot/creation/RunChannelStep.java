@@ -8,9 +8,10 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 /**
  * Get the announcement channel for the event from the user
  * @author Christopher Bitler
+ * @author Franziska Mueller
  */
 public class RunChannelStep implements CreationStep {
-    static String[] defaultChannels = { "board-of-adventures", "gw2-raid-bot", "test" };
+    static String[] defaultChannels = { "board-of-adventures", "banner-of-tactics", "gw2-raid-bot", "test" };
 	boolean enterManually;
     
 	public RunChannelStep() {
