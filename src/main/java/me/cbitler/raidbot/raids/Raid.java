@@ -786,6 +786,26 @@ public class Raid {
         return builder.build();
     }
     
+//    /**
+//     * Build the short embedded message that shows the information about this raid
+//     *
+//     * @return The short embedded message representing this raid
+//     */
+//    private MessageEmbed buildEmbedShort() {
+//        EmbedBuilder builder = new EmbedBuilder();
+//        builder.setTitle(getName() + " " + getDescription() + " [" + getDate() + " " + getTime() + "]\t"
+//        		+ "||ID: " + messageId + "||");
+//        List<String> textPerRole = buildTextPerRole();
+//        for (int r = 0; r < textPerRole.size(); r++) {
+//        	builder.addField("", textPerRole.get(r), true);
+//        }
+//        String flexText = buildFlexRolesTextShort();
+//        if (flexText.isEmpty() == false)
+//        	builder.addField("", "Flex Roles:" + flexText, true);
+//
+//        return builder.build();
+//    }
+    
     /**
      * Build the short embedded message that shows the information about this raid
      *
@@ -795,13 +815,13 @@ public class Raid {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle(getName() + " " + getDescription() + " [" + getDate() + " " + getTime() + "]\t"
         		+ "||ID: " + messageId + "||");
-        List<String> textPerRole = buildTextPerRole();
-        for (int r = 0; r < textPerRole.size(); r++) {
-        	builder.addField("", textPerRole.get(r), true);
-        }
+        builder.addField("Roles:", buildRolesTextShort(), true);
+        
         String flexText = buildFlexRolesTextShort();
-        if (flexText.isEmpty() == false)
+        if (flexText.isEmpty() == false) {
+        	//builder.addBlankField(false);
         	builder.addField("Flex Roles:", flexText, true);
+        }
 
         return builder.build();
     }
@@ -878,13 +898,14 @@ public class Raid {
         String text = "";
         if (isOpenWorld) {
             for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
-                if (flex.getKey() != null && flex.getValue().isEmpty() == false)
-                    if (text.isEmpty() == false)
+                if (flex.getKey() != null && flex.getValue().isEmpty() == false) {
+                	if (text.isEmpty() == false)
                     	text += ", ";
                 	String username = userIDsToNicknames.get(flex.getKey().getId());
                 	if (username == null) 
                 		username = flex.getKey().getName();
                 	text += username;
+                }
             }
         } else {
         	Map<String, List<RaidUser>> flexUsersByRole = collectFlexUsersByRole();
@@ -942,36 +963,78 @@ public class Raid {
     }
     
     /**
-     * Build the text per role, which shows the roles users are playing in the raids
+     * Build the short role text, which shows the roles users are playing in the raids
      *
-     * @return The role text
+     * @return The short role text
      */
-    private List<String> buildTextPerRole() {
-        List<String> texts = new ArrayList<String>();
+    private String buildRolesTextShort() {
+        String text = "";
         for (RaidRole role : roles) {
             if(role.isFlexOnly()) continue;
-            String text = "";
-            List<RaidUser> raidUsersInRole = getUsersInRole(role.name);
-            text += ("**" + role.name + " ( " + raidUsersInRole.size() + " / " + role.amount + " ):** \n");
-            for (RaidUser user : raidUsersInRole) {
-            	String username = userIDsToNicknames.get(user.getId());
-            	if (username == null) 
-            		username = user.getName();
-                if (isOpenWorld) {
-                    text += ("- " + username + "\n");
-                } else {
-                    Emote userEmote = Reactions.getEmoteByName(user.spec);
-                    if(userEmote == null)
-                        text += "   - " + username + "\n";
-                    else
-                        text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + username + "\n";
+            List<RaidUser> raidUsersInRole = getUsersInRole(role.getName());
+            if (isOpenWorld) {
+            	text += ("**" + role.getName() + " ( " + raidUsersInRole.size() + " / " + role.getAmount() + " ):** \n");
+            	for (RaidUser user : raidUsersInRole) {
+                	String username = userIDsToNicknames.get(user.getId());
+                	if (username == null) 
+                		username = user.getName();
+                    text += ("- " + username + "\n");   
                 }
+                text += "\n";
+            } else {
+            	for (int s = 0; s < role.getAmount(); s++) {
+            		text += "[ **" + role.getName() + "** ] ";
+            		if (s < raidUsersInRole.size()) {
+            			RaidUser user = raidUsersInRole.get(s);
+            			String username = userIDsToNicknames.get(user.getId());
+                    	if (username == null) 
+                    		username = user.getName();
+                        
+                        Emote userEmote = Reactions.getEmoteByName(user.getSpec());
+                        if(userEmote == null)
+                            text += username;
+                        else
+                            text += "<:"+userEmote.getName()+":"+userEmote.getId()+"> " + username;   
+            		}
+            		text += "\n";
+            	}
             }
-            text += "\n";
-            texts.add(text);
         }
-        return texts;
+        text += "\n";
+        return text;
     }
+    
+//    /**
+//     * Build the text per role, which shows the roles users are playing in the raids
+//     *
+//     * @return The role text
+//     */
+//    private List<String> buildTextPerRole() {
+//        List<String> texts = new ArrayList<String>();
+//        for (RaidRole role : roles) {
+//            if(role.isFlexOnly()) continue;
+//            String text = "";
+//            List<RaidUser> raidUsersInRole = getUsersInRole(role.name);
+//            text += ("**" + role.name + " ( " + raidUsersInRole.size() + " / " + role.amount + " ):** \n");
+//            for (RaidUser user : raidUsersInRole) {
+//            	String username = userIDsToNicknames.get(user.getId());
+//            	if (username == null) 
+//            		username = user.getName();
+//                if (isOpenWorld) {
+//                    text += ("- " + username + "\n");
+//                } else {
+//                    Emote userEmote = Reactions.getEmoteByName(user.spec);
+//                    if(userEmote == null)
+//                        text += "   - " + username + "\n";
+//                    else
+//                        text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + username + "\n";
+//                }
+//            }
+//            text += "\n";
+//            texts.add(text);
+//        }
+//        return texts;
+//    }
 
     /**
      * Get a List of RaidUsers from main roles in this raid by their ID
