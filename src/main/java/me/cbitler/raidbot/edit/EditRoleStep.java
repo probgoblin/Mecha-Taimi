@@ -1,5 +1,7 @@
 package me.cbitler.raidbot.edit;
 
+import me.cbitler.raidbot.raids.Raid;
+import me.cbitler.raidbot.raids.RaidManager;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
@@ -22,19 +24,38 @@ public class EditRoleStep implements EditStep {
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         boolean valid = true;
+        Raid raid = RaidManager.getRaid(messageID);
         // try to parse an integer
         try {
             int choiceId = Integer.parseInt(e.getMessage().getRawContent());
-            if (choiceId == 1) // add role
-                nextStep = new AddRoleStep(messageID);
-            else if (choiceId == 2) // remove role
-                nextStep = new DeleteRoleStep(messageID);
+            if (choiceId == 1) { // add role
+            	if (raid.isOpenWorld()) {
+            		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("No roles can be added for open world events.").queue());
+            		valid = false;
+            	} else
+            		nextStep = new AddRoleStep(messageID);
+            }
+            else if (choiceId == 2) { // remove role
+            	if (raid.isOpenWorld()) {
+            		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("No roles can be removed for open world events.").queue());
+            		valid = false;
+            	} else if (raid.getRoles().size() <= 1) {
+            		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The event has only one role, it cannot be removed.").queue());
+            		valid = false;
+            	} else
+            		nextStep = new DeleteRoleStep(messageID);
+            }
             else if (choiceId == 3) // rename role
                 nextStep = new RenameRoleStep(messageID);
             else if (choiceId == 4) // change amount
                 nextStep = new ChangeAmountStep(messageID);
-            else if (choiceId == 5) // change flexOnly
-                nextStep = new ChangeFlexOnlyStep(messageID);
+            else if (choiceId == 5) { // change flexOnly
+            	if (raid.isOpenWorld()) {
+            		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Flex-only flags cannot be modified for open world events.").queue());
+            		valid = false;
+            	} else
+            		nextStep = new ChangeFlexOnlyStep(messageID);
+            }
             else
                 valid = false;
         } catch (Exception excp) {
