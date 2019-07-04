@@ -815,9 +815,11 @@ public class Raid {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle(getName() + " " + getDescription() + " [" + getDate() + " " + getTime() + "]\t"
         		+ "||ID: " + messageId + "||");
-        builder.addField("Roles:", buildRolesTextShort(), true);
+        Set<String> usersInMain = new HashSet<String>();
+        String rolesTxt = buildRolesTextShort(usersInMain);
+        builder.addField("Roles:", rolesTxt, true);
         
-        String flexText = buildFlexRolesTextShort();
+        String flexText = buildFlexRolesTextShort(usersInMain);
         if (flexText.isEmpty() == false) {
         	//builder.addBlankField(false);
         	builder.addField("Flex Roles:", flexText, true);
@@ -828,9 +830,10 @@ public class Raid {
     
     /**
      * collects a list of users for every role
+     * @param excludeUsers user ids to not include in the result, may be null
      * @return the map containing a list of users for each role
      */
-    private Map<String, List<RaidUser>> collectFlexUsersByRole() {
+    private Map<String, List<RaidUser>> collectFlexUsersByRole(Set<String> excludeUsers) {
     	// collect names and specializations for each role
         Map<String, List<RaidUser>> flexUsersByRole = new HashMap<String, List<RaidUser>>();
         for (int r = 0; r < roles.size(); r++) {
@@ -839,9 +842,11 @@ public class Raid {
 
         for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
             if (flex.getKey() != null) {
-                for (FlexRole frole : flex.getValue()) {
-                    flexUsersByRole.get(frole.getRole()).add(new RaidUser(flex.getKey().id, flex.getKey().name, frole.spec, null));
-                }
+            	if (excludeUsers == null || excludeUsers.contains(flex.getKey().getId()) == false) {
+            		for (FlexRole frole : flex.getValue()) {
+            			flexUsersByRole.get(frole.getRole()).add(new RaidUser(flex.getKey().id, flex.getKey().name, frole.spec, null));
+            		}
+            	}
             }
         }
         return flexUsersByRole;
@@ -865,7 +870,7 @@ public class Raid {
                 }
             }
         } else {
-        	Map<String, List<RaidUser>> flexUsersByRole = collectFlexUsersByRole();
+        	Map<String, List<RaidUser>> flexUsersByRole = collectFlexUsersByRole(null);
             
             for (int r = 0; r < roles.size(); r++) {
                 String roleName = roles.get(r).getName();
@@ -894,7 +899,7 @@ public class Raid {
      *
      * @return The short flex role text
      */
-    private String buildFlexRolesTextShort() {
+    private String buildFlexRolesTextShort(Set<String> excludeUsers) {
         String text = "";
         if (isOpenWorld) {
             for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
@@ -908,7 +913,7 @@ public class Raid {
                 }
             }
         } else {
-        	Map<String, List<RaidUser>> flexUsersByRole = collectFlexUsersByRole();
+        	Map<String, List<RaidUser>> flexUsersByRole = collectFlexUsersByRole(excludeUsers);
             for (int r = 0; r < roles.size(); r++) {
                 String roleName = roles.get(r).getName();
                 List<RaidUser> usersPerRole = flexUsersByRole.get(roleName);
@@ -967,7 +972,7 @@ public class Raid {
      *
      * @return The short role text
      */
-    private String buildRolesTextShort() {
+    private String buildRolesTextShort(Set<String> usersInMain) {
         String text = "";
         for (RaidRole role : roles) {
             if(role.isFlexOnly()) continue;
@@ -986,6 +991,8 @@ public class Raid {
             		text += "[ **" + role.getName() + "** ] ";
             		if (s < raidUsersInRole.size()) {
             			RaidUser user = raidUsersInRole.get(s);
+            			if (usersInMain != null)
+            				usersInMain.add(user.getId());
             			String username = userIDsToNicknames.get(user.getId());
                     	if (username == null) 
                     		username = user.getName();
@@ -994,7 +1001,18 @@ public class Raid {
                         if(userEmote == null)
                             text += username;
                         else
-                            text += "<:"+userEmote.getName()+":"+userEmote.getId()+"> " + username;   
+                            text += "<:"+userEmote.getName()+":"+userEmote.getId()+"> " + username;  
+                        
+                        // add flex roles for that user
+                        List<FlexRole> userFlexRoles = usersToFlexRoles.get(new RaidUser(user.getId(), user.getName(), "", ""));
+                        if (userFlexRoles.isEmpty() == false) {
+                        	text += "   (or ";
+                        	Set<String> uniqueFlexRoles = new HashSet<String>();
+                        	for (FlexRole frole : userFlexRoles) {
+                        		uniqueFlexRoles.add(frole.getRole());
+                        	}
+                        	text += uniqueFlexRoles.toString() + ")";
+                        }
             		}
             		text += "\n";
             	}
