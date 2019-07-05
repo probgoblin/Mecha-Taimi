@@ -46,6 +46,7 @@ public class RaidBot {
 
     //TODO: This should be moved to it's own settings thing
     HashMap<String, String> raidLeaderRoleCache = new HashMap<>();
+    HashMap<String, String> fractalCreatorRoleCache = new HashMap<>();
 
     Database db;
 
@@ -238,6 +239,52 @@ public class RaidBot {
 		else if (edits.get(id) != null) actvId = 4;
 		
 		return actvId;
-	}	
+	}
+	
+    /**
+     * Get the raid leader role for a specific server.
+     * This works by caching the role once it's retrieved once, and returning the default if a server hasn't set one.
+     * @param serverId the ID of the server
+     * @return The name of the role that is considered the raid leader for that server
+     */
+    public String getFractalCreatorRole(String serverId) {
+        if (fractalCreatorRoleCache.get(serverId) != null) {
+            return fractalCreatorRoleCache.get(serverId);
+        } else {
+            try {
+                QueryResult results = db.query("SELECT `fractal_creator_role` FROM `serverSettings` WHERE `serverId` = ?",
+                        new String[]{serverId});
+                if (results.getResults().next()) {
+                	fractalCreatorRoleCache.put(serverId, results.getResults().getString("fractal_creator_role"));
+                    return fractalCreatorRoleCache.get(serverId);
+                } else {
+                    return "Fractal Creator";
+                }
+            } catch (Exception e) {
+                return "Fractal Creator";
+            }
+        }
+    }
+
+    /**
+     * Set the raid leader role for a server. This also updates it in SQLite
+     * @param serverId The server ID
+     * @param role The role name
+     */
+    public void setFractalCreatorRole(String serverId, String role) {
+        fractalCreatorRoleCache.put(serverId, role);
+        try {
+            db.update("INSERT INTO `serverSettings` (`serverId`,`fractal_creator_role`) VALUES (?,?)",
+                    new String[] { serverId, role});
+        } catch (SQLException e) {
+            //TODO: There is probably a much better way of doing this
+            try {
+                db.update("UPDATE `serverSettings` SET `fractal_creator_role` = ? WHERE `serverId` = ?",
+                        new String[] { role, serverId });
+            } catch (SQLException e1) {
+                // Not much we can do if there is also an insert error
+            }
+        }
+    }
 
 }

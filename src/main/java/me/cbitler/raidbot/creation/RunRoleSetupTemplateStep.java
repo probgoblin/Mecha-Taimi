@@ -1,6 +1,10 @@
 package me.cbitler.raidbot.creation;
 
+import java.util.List;
+
 import me.cbitler.raidbot.RaidBot;
+import me.cbitler.raidbot.utility.RoleTemplates;
+
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidRole;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
@@ -13,29 +17,13 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 public class RunRoleSetupTemplateStep implements CreationStep {
 
     CreationStep nextStep;
-    private static RaidRole[][] templates =
-    { 	{	new RaidRole(1, "Tank"),
-            new RaidRole(1, "Supporter"),
-            new RaidRole(2, "Healer"),
-            new RaidRole(1, "BS"),
-            new RaidRole(5, "DPS")
-        },
-        {	new RaidRole(1, "Chrono"),
-            new RaidRole(1, "Healer"),
-            new RaidRole(1, "BS"),
-            new RaidRole(2, "DPS")
-        },
-        {	new RaidRole(1, "Healbrand"),
-            new RaidRole(1, "Alacrigade"),
-            new RaidRole(1, "BS"),
-            new RaidRole(2, "DPS")
-        }
-    };
-    private static String[] templateNames = {
-            "default raid",
-            "fractal (Chrono)",
-            "fractal (Firebrigade)"
-    };
+    List<RaidRole[]> templates;
+    List<String> templateNames;
+    
+    public RunRoleSetupTemplateStep() {
+		this.templates = RoleTemplates.getAllTemplates();
+		this.templateNames = RoleTemplates.getAllTemplateNames();
+	}
 
     /**
      * Handle user input.
@@ -52,12 +40,12 @@ public class RunRoleSetupTemplateStep implements CreationStep {
 
         try {
             int choiceId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
-            if (choiceId == templateNames.length) { // user chose to add roles manually
+            if (choiceId == templateNames.size()) { // user chose to add roles manually
                 nextStep = new RunRoleSetupManualStep();
                 return true;
             } else {
-                for (int r = 0; r < templates[choiceId].length; r++) {
-                	RaidRole role = templates[choiceId][r];
+                for (int r = 0; r < templates.get(choiceId).length; r++) {
+                	RaidRole role = templates.get(choiceId)[r];
                     raid.getRolesWithNumbers().add(new RaidRole(role.getAmount(), role.getName()));
                 }
                 return true;
@@ -74,17 +62,17 @@ public class RunRoleSetupTemplateStep implements CreationStep {
     public String getStepText() {
         String message = "Choose from these available role templates or go back to manual role creation: \n";
 
-        for (int i = 0; i < templateNames.length; i++) {
-            message += "`" + (i+1) + "` " + templateNames[i] + " (";
-            for (int r = 0; r < templates[i].length; r ++) {
-                message += templates[i][r].getAmount() + " x " + templates[i][r].getName();
-                if (r != templates[i].length - 1) {
+        for (int i = 0; i < templateNames.size(); i++) {
+            message += "`" + (i+1) + "` " + templateNames.get(i) + " (";
+            for (int r = 0; r < templates.get(i).length; r ++) {
+                message += templates.get(i)[r].getAmount() + " x " + templates.get(i)[r].getName();
+                if (r != templates.get(i).length - 1) {
                     message += ", ";
                 }
             }
             message += ") \n";
         }
-        return message + "`" + (templateNames.length+1) + "` add roles manually";
+        return message + "`" + (templateNames.size()+1) + "` add roles manually";
     }
 
     /**

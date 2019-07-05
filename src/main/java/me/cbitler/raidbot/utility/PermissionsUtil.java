@@ -23,4 +23,14 @@ public class PermissionsUtil {
         }
         return false;
     }
+
+	public static boolean hasFractalCreatorRole(Member member) {
+		String fractalCreatorRole = RaidBot.getInstance().getFractalCreatorRole(member.getGuild().getId());
+        for (Role role : member.getRoles()) {
+            if (role.getName().equalsIgnoreCase(fractalCreatorRole)) {
+                return true;
+            }
+        }
+        return false;
+	}
 }

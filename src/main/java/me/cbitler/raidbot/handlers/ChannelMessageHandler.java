@@ -10,6 +10,7 @@ import me.cbitler.raidbot.edit.EditIdleStep;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.utility.PermissionsUtil;
+import me.cbitler.raidbot.utility.RoleTemplates;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -47,7 +48,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 } catch (Exception exception) {}
             }
         }
-
+        
         if (PermissionsUtil.hasRaidLeaderRole(e.getMember())) {
             if (e.getMessage().getRawContent().equalsIgnoreCase("!createEvent")) {
             	// check if this user already has an active chat
@@ -124,12 +125,59 @@ public class ChannelMessageHandler extends ListenerAdapter {
         }
 
         if (e.getMember().getPermissions().contains(Permission.MANAGE_SERVER)) {
-            if(e.getMessage().getRawContent().toLowerCase().startsWith("!seteventmanagerrole")) {
+        	boolean setEventManager = e.getMessage().getRawContent().toLowerCase().startsWith("!seteventmanagerrole");
+        	boolean setFractalCreator = e.getMessage().getRawContent().toLowerCase().startsWith("!setfractalcreatorrole");
+            if (setEventManager || setFractalCreator) {
                 String[] commandParts = e.getMessage().getRawContent().split(" ");
-                String raidLeaderRole = combineArguments(commandParts,1);
-                RaidBot.getInstance().setRaidLeaderRole(e.getMember().getGuild().getId(), raidLeaderRole);
-                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event manager role updated to: " + raidLeaderRole).queue());
+                String specifiedRole = combineArguments(commandParts,1);
+                if (setEventManager) {
+                	RaidBot.getInstance().setRaidLeaderRole(e.getMember().getGuild().getId(), specifiedRole);
+                	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event manager role updated to: " + specifiedRole).queue());
+                } else if (setFractalCreator) {
+                	RaidBot.getInstance().setFractalCreatorRole(e.getMember().getGuild().getId(), specifiedRole);
+                	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Fractal creator role updated to: " + specifiedRole).queue());
+                }
                 e.getMessage().delete().queue();
+            }
+        }
+        
+        // new creation command for fractal event
+        if (PermissionsUtil.hasRaidLeaderRole(e.getMember()) || PermissionsUtil.hasFractalCreatorRole(e.getMember())) {
+        	String createFracCommand = "!createfractal";
+            if (e.getMessage().getRawContent().toLowerCase().startsWith(createFracCommand)) {
+            	String[] split = e.getMessage().getRawContent().substring(createFracCommand.length()).split(";");
+            	String helpMessage = "Correct format: !createFractal [name];[date];[time];[team comp id]\n"
+            			+ "Available team compositions:\n";
+            	for (int t = 0; t < RoleTemplates.getFractalTemplateNames().length; t++)
+            		helpMessage += "`" + (t+1) + "` " + RoleTemplates.getFractalTemplateNames()[t] + "\n";
+                if(split.length < 4) {
+            		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Incorrect number of arguments provided.").queue());
+                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(helpMessage).queue());
+                } else { 
+                	// check if the team comp is valid
+                	boolean validTeamComp = true;
+                	int teamCompId = -1;
+                	try {
+                		teamCompId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+                	} catch (Exception excp) {
+                		validTeamComp = false;
+                	}
+                	if (teamCompId < RoleTemplates.getFractalTemplateNames().length)
+                		validTeamComp = false;
+                	if (validTeamComp == false) {
+                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Provided team comp id is invalid.").queue());
+                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(helpMessage).queue());
+                	} else {
+                		String name = split[0];
+                		String date = split[1];
+                		String time = split[2];
+                		// create fractal event
+                		// TODO!
+                	}
+                }
+                try {
+                    e.getMessage().delete().queue();
+                } catch (Exception exception) {}
             }
         }
     }

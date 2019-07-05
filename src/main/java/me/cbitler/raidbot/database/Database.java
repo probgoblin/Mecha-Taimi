@@ -41,7 +41,8 @@ public class Database {
 
     String botServerSettingsInit = "CREATE TABLE IF NOT EXISTS serverSettings (\n"
             + " serverId text PRIMARY KEY, \n"
-            + " raid_leader_role text)";
+            + " raid_leader_role text, \n"
+            + " fractal_creator_role text)";
 
     /**
      * Create a new database with the specific filename
@@ -131,6 +132,9 @@ public class Database {
         } catch (Exception e) { }
         try {
         	connection.createStatement().execute("ALTER TABLE raids ADD COLUMN isDisplayShort text");
+        } catch (Exception e) { }
+        try {
+        	connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN fractal_creator_role text");
         } catch (Exception e) { }
     }
 }
