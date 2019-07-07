@@ -106,4 +106,11 @@ public class PendingRaid {
 		}
 		return false;
 	}
+
+	public void addTemplateRoles(RaidRole[] raidRoles) {
+		for (int r = 0; r < raidRoles.length; r++) {
+        	RaidRole role = raidRoles[r];
+            rolesWithNumbers.add(new RaidRole(role.getAmount(), role.getName()));
+        }
+	}
 }

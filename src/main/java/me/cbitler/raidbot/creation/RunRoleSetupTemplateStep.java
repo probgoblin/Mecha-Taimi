@@ -44,10 +44,7 @@ public class RunRoleSetupTemplateStep implements CreationStep {
                 nextStep = new RunRoleSetupManualStep();
                 return true;
             } else {
-                for (int r = 0; r < templates.get(choiceId).length; r++) {
-                	RaidRole role = templates.get(choiceId)[r];
-                    raid.getRolesWithNumbers().add(new RaidRole(role.getAmount(), role.getName()));
-                }
+            	raid.addTemplateRoles(templates.get(choiceId));
                 return true;
             }
         } catch (Exception exp) {

@@ -4,6 +4,7 @@ import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.database.QueryResult;
 import me.cbitler.raidbot.utility.Reactions;
+import me.cbitler.raidbot.utility.RoleTemplates;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.*;
 
@@ -65,6 +66,36 @@ public class RaidManager {
             }
         }
     }
+    
+    /**
+     * Create a fractal event
+     * @param name
+     * @param date
+     * @param time
+     * @param teamCompId
+     */
+    public static void createFractal(User author, String serverId, String name, String date, String time, int teamCompId) {
+		// TODO Auto-generated method stub
+		PendingRaid fractalEvent = new PendingRaid();
+		fractalEvent.setLeaderName(author.getName());
+        fractalEvent.setServerId(serverId);		
+        fractalEvent.setName(name);
+		fractalEvent.setDescription("-");
+		fractalEvent.setDate(date);
+		fractalEvent.setTime(time);
+		fractalEvent.setDisplayShort(true);
+		fractalEvent.addTemplateRoles(RoleTemplates.getFractalTemplates()[teamCompId]);
+		
+		String fractalChannel = RaidBot.getInstance().getFractalChannel(serverId);
+		if (RaidBot.getInstance().checkChannel(fractalEvent.getServerId(), fractalChannel)) {
+			fractalEvent.setAnnouncementChannel(fractalChannel);
+		} else {
+			author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The specified fractal channel is invalid. It needs to be set with !setFractalChannel [channelname without hash] by someone with MANAGE SERVER permissions.").queue());
+			return;
+		}
+		createRaid(fractalEvent);
+	}
+      
     /**
      * Insert a raid into the database
      * @param raid The raid to insert

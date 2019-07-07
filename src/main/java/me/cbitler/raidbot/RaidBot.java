@@ -15,6 +15,7 @@ import me.cbitler.raidbot.selection.SelectionStep;
 import me.cbitler.raidbot.utility.GuildCountUtil;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
 import java.io.IOException;
@@ -47,6 +48,7 @@ public class RaidBot {
     //TODO: This should be moved to it's own settings thing
     HashMap<String, String> raidLeaderRoleCache = new HashMap<>();
     HashMap<String, String> fractalCreatorRoleCache = new HashMap<>();
+    HashMap<String, String> fractalChannelCache = new HashMap<>();
 
     Database db;
 
@@ -242,10 +244,10 @@ public class RaidBot {
 	}
 	
     /**
-     * Get the raid leader role for a specific server.
+     * Get the fractal creator role for a specific server.
      * This works by caching the role once it's retrieved once, and returning the default if a server hasn't set one.
      * @param serverId the ID of the server
-     * @return The name of the role that is considered the raid leader for that server
+     * @return The name of the role that is considered the fractal creator for that server
      */
     public String getFractalCreatorRole(String serverId) {
         if (fractalCreatorRoleCache.get(serverId) != null) {
@@ -267,7 +269,7 @@ public class RaidBot {
     }
 
     /**
-     * Set the raid leader role for a server. This also updates it in SQLite
+     * Set the fractal creator role for a server. This also updates it in SQLite
      * @param serverId The server ID
      * @param role The role name
      */
@@ -285,6 +287,68 @@ public class RaidBot {
                 // Not much we can do if there is also an insert error
             }
         }
+    }
+    
+    /**
+     * Set the fractal announcement channel for a server. This also updates it in SQLite
+     * @param serverId The server ID
+     * @param channel The channel name
+     */
+    public void setFractalChannel(String serverId, String channel) {
+        fractalChannelCache.put(serverId, channel);
+        try {
+            db.update("INSERT INTO `serverSettings` (`serverId`,`fractal_channel`) VALUES (?,?)",
+                    new String[] { serverId, channel});
+        } catch (SQLException e) {
+            //TODO: There is probably a much better way of doing this
+            try {
+                db.update("UPDATE `serverSettings` SET `fractal_channel` = ? WHERE `serverId` = ?",
+                        new String[] { channel, serverId });
+            } catch (SQLException e1) {
+                // Not much we can do if there is also an insert error
+            }
+        }
+    }
+    
+    /**
+     * Get the fractal announcement channel role for a specific server.
+     * This works by caching the channel once it's retrieved once, and returning the default if a server hasn't set one.
+     * @param serverId the ID of the server
+     * @return The name of the channel that is considered the fractal announcement channel for that server
+     */
+    public String getFractalChannel(String serverId) {
+        if (fractalChannelCache.get(serverId) != null) {
+            return fractalChannelCache.get(serverId);
+        } else {
+            try {
+                QueryResult results = db.query("SELECT `fractal_channel` FROM `serverSettings` WHERE `serverId` = ?",
+                        new String[]{serverId});
+                if (results.getResults().next()) {
+                	fractalChannelCache.put(serverId, results.getResults().getString("fractal_channel"));
+                    return fractalChannelCache.get(serverId);
+                } else {
+                    return "fractal-runs";
+                }
+            } catch (Exception e) {
+                return "fractal-runs";
+            }
+        }
+    }
+    
+    /** 
+     * checks if a given channel exists
+     * @param serverId the id of the server to be checked 
+     * @param channelName the channel name
+     * @return true if channel is valid, false otherwise
+     */
+    public boolean checkChannel(String serverId, String channelName) {      
+    	boolean validChannel = false;
+    	for (TextChannel channel : getServer(serverId).getTextChannels()) {
+            if(channel.getName().replace("#","").equalsIgnoreCase(channelName)) {
+                validChannel = true;
+            }
+        }
+        return validChannel;
     }
 
 }

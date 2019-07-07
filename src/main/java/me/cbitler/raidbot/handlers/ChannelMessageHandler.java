@@ -127,17 +127,23 @@ public class ChannelMessageHandler extends ListenerAdapter {
         if (e.getMember().getPermissions().contains(Permission.MANAGE_SERVER)) {
         	boolean setEventManager = e.getMessage().getRawContent().toLowerCase().startsWith("!seteventmanagerrole");
         	boolean setFractalCreator = e.getMessage().getRawContent().toLowerCase().startsWith("!setfractalcreatorrole");
-            if (setEventManager || setFractalCreator) {
+        	boolean setFractalChannel = e.getMessage().getRawContent().toLowerCase().startsWith("!setfractalchannel");
+            if (setEventManager || setFractalCreator || setFractalChannel) {
                 String[] commandParts = e.getMessage().getRawContent().split(" ");
-                String specifiedRole = combineArguments(commandParts,1);
+                String specifiedName = combineArguments(commandParts,1);
                 if (setEventManager) {
-                	RaidBot.getInstance().setRaidLeaderRole(e.getMember().getGuild().getId(), specifiedRole);
-                	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event manager role updated to: " + specifiedRole).queue());
+                	RaidBot.getInstance().setRaidLeaderRole(e.getMember().getGuild().getId(), specifiedName);
+                	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event manager role updated to: " + specifiedName).queue());
                 } else if (setFractalCreator) {
-                	RaidBot.getInstance().setFractalCreatorRole(e.getMember().getGuild().getId(), specifiedRole);
-                	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Fractal creator role updated to: " + specifiedRole).queue());
+                	RaidBot.getInstance().setFractalCreatorRole(e.getMember().getGuild().getId(), specifiedName);
+                	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Fractal creator role updated to: " + specifiedName).queue());
+                } else if (setFractalChannel) {
+                	RaidBot.getInstance().setFractalChannel(e.getMember().getGuild().getId(), specifiedName);
+                	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Fractal announcement channel updated to: " + specifiedName).queue());
                 }
-                e.getMessage().delete().queue();
+                try {
+                    e.getMessage().delete().queue();
+                } catch (Exception exception) {}
             }
         }
         
@@ -145,11 +151,14 @@ public class ChannelMessageHandler extends ListenerAdapter {
         if (PermissionsUtil.hasRaidLeaderRole(e.getMember()) || PermissionsUtil.hasFractalCreatorRole(e.getMember())) {
         	String createFracCommand = "!createfractal";
             if (e.getMessage().getRawContent().toLowerCase().startsWith(createFracCommand)) {
-            	String[] split = e.getMessage().getRawContent().substring(createFracCommand.length()).split(";");
-            	String helpMessage = "Correct format: !createFractal [name];[date];[time];[team comp id]\n"
+            	String[] split = e.getMessage().getRawContent().substring(createFracCommand.length()+1).split(";");
+            	String helpMessageAccum = "Correct format: !createFractal [name];[date];[time];[team comp id]\n"
             			+ "Available team compositions:\n";
-            	for (int t = 0; t < RoleTemplates.getFractalTemplateNames().length; t++)
-            		helpMessage += "`" + (t+1) + "` " + RoleTemplates.getFractalTemplateNames()[t] + "\n";
+            	for (int t = 0; t < RoleTemplates.getFractalTemplateNames().length; t++) {
+            		helpMessageAccum += "`" + (t+1) + "` " + RoleTemplates.getFractalTemplateNames()[t] + "\n";
+            	}
+            	String helpMessage = helpMessageAccum; // otherwise the lambda for sending the message is unhappy because var not effectively final
+                
                 if(split.length < 4) {
             		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Incorrect number of arguments provided.").queue());
                     e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(helpMessage).queue());
@@ -172,7 +181,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 		String date = split[1];
                 		String time = split[2];
                 		// create fractal event
-                		// TODO!
+                		RaidManager.createFractal(e.getAuthor(), e.getGuild().getId(), name, date, time, teamCompId);
                 	}
                 }
                 try {

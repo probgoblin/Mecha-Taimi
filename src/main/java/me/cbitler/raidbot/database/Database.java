@@ -5,6 +5,7 @@ import java.sql.*;
 /**
  * Class for managing the SQLite database for this bot
  * @author Christopher Bitler
+ * @author Franziska Mueller
  */
 public class Database {
     String databaseName;
@@ -42,7 +43,8 @@ public class Database {
     String botServerSettingsInit = "CREATE TABLE IF NOT EXISTS serverSettings (\n"
             + " serverId text PRIMARY KEY, \n"
             + " raid_leader_role text, \n"
-            + " fractal_creator_role text)";
+            + " fractal_creator_role text, \n"
+            + " fractal_channel text)";
 
     /**
      * Create a new database with the specific filename
@@ -135,6 +137,9 @@ public class Database {
         } catch (Exception e) { }
         try {
         	connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN fractal_creator_role text");
+        } catch (Exception e) { }
+        try {
+        	connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN fractal_channel text");
         } catch (Exception e) { }
     }
 }

@@ -2,7 +2,6 @@ package me.cbitler.raidbot.creation;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
-import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
@@ -24,9 +23,18 @@ public class RunChannelStep implements CreationStep {
      * @return true if the announcement channel was set, false if it was not
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
+    	RaidBot bot = RaidBot.getInstance();
+    	PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
+    	if (raid == null) {
+    		// this will be caught in the handler
+        	throw new RuntimeException();
+    	}
+    	String serverId = raid.getServerId();
         if (enterManually) {
             String channelWithoutHash = e.getMessage().getRawContent().replace("#","");
-        	if (checkAndSetChannel(e.getAuthor().getId(), channelWithoutHash) == false) {
+        	if (bot.checkChannel(serverId, channelWithoutHash)) {
+        		raid.setAnnouncementChannel(channelWithoutHash);
+        	} else {
 				e.getChannel().sendMessage("Please choose a valid channel.").queue();
 				return false;
 			}
@@ -35,7 +43,9 @@ public class RunChannelStep implements CreationStep {
         	try {
         		int choiceId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
         		if (choiceId >= 0 && choiceId < defaultChannels.length) { // one of the default channels
-        			if (checkAndSetChannel(e.getAuthor().getId(), defaultChannels[choiceId]) == false) {
+        			if (bot.checkChannel(serverId, defaultChannels[choiceId])) {
+                		raid.setAnnouncementChannel(defaultChannels[choiceId]);
+                	} else {
         				e.getChannel().sendMessage("Please choose a valid channel.").queue();
         				return false;
         			}
@@ -53,33 +63,6 @@ public class RunChannelStep implements CreationStep {
         		return false;
         	}
         }
-    }
-    
-    /** 
-     * checks if a given channel exists and if yes, sets this channel as announcement channel
-     * @param authorId the user creating the current raid
-     * @param channelName the channel name chosen by the user
-     * @return true if channel is valid, false otherwise
-     */
-    private boolean checkAndSetChannel(String authorId, String channelName) {
-    	RaidBot bot = RaidBot.getInstance();
-    	PendingRaid raid = bot.getPendingRaids().get(authorId);
-    	if (raid == null) {
-    		// this will be caught in the handler
-        	throw new RuntimeException();
-    	}
-        
-    	boolean validChannel = false;
-        for (TextChannel channel : bot.getServer(raid.getServerId()).getTextChannels()) {
-            if(channel.getName().replace("#","").equalsIgnoreCase(channelName)) {
-                validChannel = true;
-            }
-        }
-        
-        if (validChannel)
-        	raid.setAnnouncementChannel(channelName);
-
-        return validChannel;
     }
 
     /**
