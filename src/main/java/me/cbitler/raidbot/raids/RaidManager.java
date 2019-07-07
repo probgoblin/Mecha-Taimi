@@ -176,9 +176,13 @@ public class RaidManager {
                 String[] roleSplit = rolesText.split(";");
                 for(String roleAndAmount : roleSplit) {
                     String[] parts = roleAndAmount.split(":");
-                    int amnt = Integer.parseInt(parts[0]);
-                    String role = parts[1];
-                    raid.roles.add(new RaidRole(amnt, role));
+                    try {
+                    	int amnt = Integer.parseInt(parts[0]);
+                    	String role = parts[1];
+                        raid.roles.add(new RaidRole(amnt, role));
+                    } catch (Exception excp) {
+                    	System.out.println("Invalid format for role with amount: " + roleAndAmount);
+                    }                    
                 }
                 raids.add(raid);
             }

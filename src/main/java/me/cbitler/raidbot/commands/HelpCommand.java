@@ -26,6 +26,6 @@ public class HelpCommand implements Command {
             " that they want.";
     @Override
     public void handleCommand(String command, String[] args, TextChannel channel, User author) {
-        channel.sendMessage(helpMessage).queue();
+    	channel.sendMessage(helpMessage).queue();
     }
 }

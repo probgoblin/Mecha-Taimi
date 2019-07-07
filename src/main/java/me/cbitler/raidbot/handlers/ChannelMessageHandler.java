@@ -151,11 +151,15 @@ public class ChannelMessageHandler extends ListenerAdapter {
         if (PermissionsUtil.hasRaidLeaderRole(e.getMember()) || PermissionsUtil.hasFractalCreatorRole(e.getMember())) {
         	String createFracCommand = "!createfractal";
             if (e.getMessage().getRawContent().toLowerCase().startsWith(createFracCommand)) {
-            	String[] split = e.getMessage().getRawContent().substring(createFracCommand.length()+1).split(";");
+            	String[] split = new String[0];
+            	try {
+            		split = e.getMessage().getRawContent().substring(createFracCommand.length()+1).split(";");
+            	} catch (Exception excp) { }
             	String helpMessageAccum = "Correct format: !createFractal [name];[date];[time];[team comp id]\n"
             			+ "Available team compositions:\n";
-            	for (int t = 0; t < RoleTemplates.getFractalTemplateNames().length; t++) {
-            		helpMessageAccum += "`" + (t+1) + "` " + RoleTemplates.getFractalTemplateNames()[t] + "\n";
+            	String[] templNames = RoleTemplates.getFractalTemplateNames();
+            	for (int t = 0; t < templNames.length; t++) {
+            		helpMessageAccum += "`" + (t+1) + "` " + RoleTemplates.templateToString(templNames[t], RoleTemplates.getFractalTemplates()[t]) + "\n";
             	}
             	String helpMessage = helpMessageAccum; // otherwise the lambda for sending the message is unhappy because var not effectively final
                 
@@ -163,15 +167,17 @@ public class ChannelMessageHandler extends ListenerAdapter {
             		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Incorrect number of arguments provided.").queue());
                     e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(helpMessage).queue());
                 } else { 
+                	for (int i = 0; i < split.length; i++)
+                		System.out.println("Split " + i + ": " + split[i]);
                 	// check if the team comp is valid
                 	boolean validTeamComp = true;
                 	int teamCompId = -1;
                 	try {
-                		teamCompId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+                		teamCompId = Integer.parseInt(split[3]) - 1;
                 	} catch (Exception excp) {
                 		validTeamComp = false;
                 	}
-                	if (teamCompId < RoleTemplates.getFractalTemplateNames().length)
+                	if (teamCompId >= RoleTemplates.getFractalTemplateNames().length)
                 		validTeamComp = false;
                 	if (validTeamComp == false) {
                 		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Provided team comp id is invalid.").queue());

@@ -58,17 +58,10 @@ public class RunRoleSetupTemplateStep implements CreationStep {
      */
     public String getStepText() {
         String message = "Choose from these available role templates or go back to manual role creation: \n";
-
         for (int i = 0; i < templateNames.size(); i++) {
-            message += "`" + (i+1) + "` " + templateNames.get(i) + " (";
-            for (int r = 0; r < templates.get(i).length; r ++) {
-                message += templates.get(i)[r].getAmount() + " x " + templates.get(i)[r].getName();
-                if (r != templates.get(i).length - 1) {
-                    message += ", ";
-                }
-            }
-            message += ") \n";
+        	message += "`" + (i+1) + "` " + RoleTemplates.templateToString(templateNames.get(i), templates.get(i)) + "\n";
         }
+        
         return message + "`" + (templateNames.size()+1) + "` add roles manually";
     }
 

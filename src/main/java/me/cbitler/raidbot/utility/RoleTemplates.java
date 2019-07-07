@@ -95,4 +95,23 @@ public class RoleTemplates {
     public static String[] getFractalTemplateNames() {
     	return fractalTemplateNames;
     }
+    
+    /**
+     * Converts a template to a string for e.g. printing / displaying
+     * @param name The name of the template
+     * @param template The template for which a string should be produced
+     * @return The string representation of the template
+     */
+    public static String templateToString(String name, RaidRole[] template) {
+    	String message = "";
+    	message += name + " (";
+        for (int r = 0; r < template.length; r ++) {
+            message += template[r].getAmount() + " x " + template[r].getName();
+            if (r != template.length - 1) {
+               message += ", ";
+            }
+        }
+        message += ")";
+    	return message;
+    }
 }
