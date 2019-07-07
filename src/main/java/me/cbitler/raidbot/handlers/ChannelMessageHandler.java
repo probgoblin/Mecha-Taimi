@@ -167,8 +167,6 @@ public class ChannelMessageHandler extends ListenerAdapter {
             		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Incorrect number of arguments provided.").queue());
                     e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(helpMessage).queue());
                 } else { 
-                	for (int i = 0; i < split.length; i++)
-                		System.out.println("Split " + i + ": " + split[i]);
                 	// check if the team comp is valid
                 	boolean validTeamComp = true;
                 	int teamCompId = -1;
