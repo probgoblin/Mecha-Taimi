@@ -156,6 +156,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
             		split = e.getMessage().getRawContent().substring(createFracCommand.length()+1).split(";");
             	} catch (Exception excp) { }
             	String helpMessageAccum = "Correct format: !createFractal [name];[date];[time];[team comp id]\n"
+            			+ "Enter the information without brackets, for example: !createFractal CMs+T4;13.04.19;13:37 CEST;1\n"
             			+ "Available team compositions:\n";
             	String[] templNames = RoleTemplates.getFractalTemplateNames();
             	for (int t = 0; t < templNames.length; t++) {
