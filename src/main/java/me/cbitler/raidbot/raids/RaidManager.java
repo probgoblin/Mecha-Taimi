@@ -28,7 +28,7 @@ public class RaidManager {
      * @param raid The pending raid to create
      */
     public static void createRaid(PendingRaid raid) {
-        MessageEmbed message = buildEmbed(raid);
+        MessageEmbed message = raid.isDisplayShort() ? buildEmbedShort(raid) : buildEmbed(raid);
 
         Guild guild = RaidBot.getInstance().getServer(raid.getServerId());
         List<TextChannel> channels = guild.getTextChannelsByName(raid.getAnnouncementChannel(), true);
@@ -326,6 +326,18 @@ public class RaidManager {
         builder.addField("Date: ", raid.getDate(), true);
         builder.addField("Time: ", raid.getTime(), true);
         builder.addBlankField(false);
+        return builder.build();
+    }
+    
+    /**
+     * Create a short message embed to show the raid
+     * @param raid The raid object
+     * @return The embedded message
+     */
+    private static MessageEmbed buildEmbedShort(PendingRaid raid) {
+    	EmbedBuilder builder = new EmbedBuilder();
+        builder.setTitle(raid.getName() + " - [" + raid.getDate() + " " + raid.getTime() + "]");
+
         return builder.build();
     }
 

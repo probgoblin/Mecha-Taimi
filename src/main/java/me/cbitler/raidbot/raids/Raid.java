@@ -813,7 +813,7 @@ public class Raid {
      */
     private MessageEmbed buildEmbedShort() {
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle(getName() + " " + getDescription() + " [" + getDate() + " " + getTime() + "]\t"
+        builder.setTitle(getName() + " - [" + getDate() + " " + getTime() + "]\t"
         		+ "||ID: " + messageId + "||");
         Set<String> usersInMain = new HashSet<String>();
         String rolesTxt = buildRolesTextShort(usersInMain);
