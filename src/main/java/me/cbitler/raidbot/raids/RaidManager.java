@@ -285,6 +285,15 @@ public class RaidManager {
         }
         return null;
     }
+    
+    /**
+     * Get all raids
+     * @return The list of all raid objects.
+     */
+    public static List<Raid> getAllRaids()
+    {
+    	return raids;
+    }
 
     /**
      * Formats the roles associated with a raid in a form that can be inserted into a database row.

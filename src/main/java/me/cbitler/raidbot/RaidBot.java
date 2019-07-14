@@ -68,6 +68,7 @@ public class RaidBot {
         CommandRegistry.addCommand("help", new HelpCommand());
         CommandRegistry.addCommand("info", new InfoCommand());
         CommandRegistry.addCommand("endEvent", new EndRaidCommand());
+        CommandRegistry.addCommand("endAllEvents", new EndAllCommand());
 
         new Thread(() -> {
             while (true) {

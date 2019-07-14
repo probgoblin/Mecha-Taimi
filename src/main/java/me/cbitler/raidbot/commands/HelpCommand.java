@@ -7,8 +7,9 @@ public class HelpCommand implements Command {
     private final String helpMessage = "Riz-GW2-Event-Bot Help:\n" +
             "General commands:\n" +
             "**!createEvent** - Start the event creation process. Usable by people with the event manager role.\n" +
-            "**!endEvent [event id] [log link 1] [log link 2] ...** - End an event, removing the message and DM'ing the users in the event with log links. The log links are optional arguments.\n" +
             "**!editEvent [event id]** - Start the event edit process. Usable by people with then event manager role.\n" +
+            "**!endEvent [event id] [log link 1] [log link 2] ...** - End an event and DM the users in the event with log links. The log links are optional arguments.\n" +
+            "**!endAllEvents** - End all existing events. __Do not use this while any event is active__ since users will not be able to sign up for any existing event anymore! However, this should be done from time to time to free up memory.\n" +
             "**!removeFromEvent [event id] [name]** - Remove a player from an event. Only usable by people with the event manager role.\n" +
             "**!help** - You are looking at it.\n" +
             "**!info** - Information about the bot and it's authors.\n" +
