@@ -184,7 +184,18 @@ public class RaidManager {
                     	System.out.println("Invalid format for role with amount: " + roleAndAmount);
                     }                    
                 }
-                raids.add(raid);
+                if (raid.roles.size() > 0) // this should always be the case
+                	raids.add(raid);
+                else {
+                	// delete this raid from the database
+                	try {
+                		db.update("DELETE FROM `raids` WHERE `raidId` = ?", new String[]{ messageId });
+                		db.update("DELETE FROM `raidUsers` WHERE `raidId` = ?", new String[]{ messageId });
+                        db.update("DELETE FROM `raidUsersFlexRoles` WHERE `raidId` = ?", new String[]{messageId});
+                	} catch (Exception excp) {
+                		System.out.println("Could not delete raid without roles from database.");
+                	}
+                }
             }
             results.getResults().close();
             results.getStmt().close();

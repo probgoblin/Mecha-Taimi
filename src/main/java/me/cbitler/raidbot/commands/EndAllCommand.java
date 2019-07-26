@@ -18,7 +18,7 @@ public class EndAllCommand implements Command {
             List<Raid> allEvents = RaidManager.getAllRaids();
             int numEvents = allEvents.size();
             List<String> notDeleted = new ArrayList<String>();
-            for (int ev = 0; ev < numEvents; ev++) {
+            for (int ev = numEvents-1; ev >= 0; ev--) {
             	Raid raid = allEvents.get(ev);
                 if (raid != null && raid.getServerId().equalsIgnoreCase(channel.getGuild().getId())) {
                 	String name = raid.getName();
