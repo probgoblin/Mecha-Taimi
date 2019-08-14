@@ -557,6 +557,26 @@ public class Raid {
 
         return users;
     }
+    
+    /**
+     * Returns the nickname of the user on a server. If no nickname is set, it returns the username instead
+     * @param userId the ID of the user
+     * @param userName the username as fallback option
+     * @param serverId the server ID
+     * @return the user's server nickname
+     */
+    private String getNicknameOnServer(String userId, String userName, String serverId) {
+    	Member member = RaidBot.getInstance().getServer(serverId).getMemberById(userId);
+    	if (member != null) {
+    		String nickname = member.getNickname();
+    		if (nickname == null)
+    			nickname = userName;
+    		// escape _ in the user names (this will lead to markdown formatting otherwise)
+    		nickname = nickname.replace("_", "\\_");
+    		return nickname;
+    	} else 
+    		return null;
+    }
 
     /**
      * Add a user to this raid. This first creates the user and attempts to insert
@@ -589,11 +609,9 @@ public class Raid {
         usersToFlexRoles.computeIfAbsent(new RaidUser(id, name, "", ""), k -> new ArrayList<FlexRole>());
         if (userIDsToNicknames.get(id) == null) {
         	// get the server nickname for that user and save it
-        	Member member = RaidBot.getInstance().getServer(serverId).getMemberById(id);
-        	if (member != null) {
-        		String nickname = member.getNickname();
-        		userIDsToNicknames.put(id, nickname == null ? name : nickname);
-        	}
+        	String nickname = getNicknameOnServer(id, name, serverId);
+        	if (nickname != null)
+        		userIDsToNicknames.put(id, nickname);
         }
 
         if (update_message) {
@@ -635,11 +653,9 @@ public class Raid {
         }
         if (userIDsToNicknames.get(id) == null) {
         	// get the server nickname for that user and save it
-        	Member member = RaidBot.getInstance().getServer(serverId).getMemberById(id);
-        	if (member != null) {
-        		String nickname = member.getNickname();
-        		userIDsToNicknames.put(id, nickname == null ? name : nickname);
-        	}
+        	String nickname = getNicknameOnServer(id, name, serverId);
+        	if (nickname != null)
+        		userIDsToNicknames.put(id, nickname);
         }
 
         usersToFlexRoles.get(user).add(frole);
