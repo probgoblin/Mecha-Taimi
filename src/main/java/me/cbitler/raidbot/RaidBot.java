@@ -12,6 +12,7 @@ import me.cbitler.raidbot.handlers.ReactionHandler;
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.selection.SelectionStep;
+import me.cbitler.raidbot.swap.SwapStep;
 import me.cbitler.raidbot.utility.GuildCountUtil;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
@@ -42,6 +43,7 @@ public class RaidBot {
     HashMap<String, PendingRaid> pendingRaids = new HashMap<String, PendingRaid>();
     HashMap<String, SelectionStep> roleSelection = new HashMap<String, SelectionStep>();
     HashMap<String, DeselectionStep> roleDeselection = new HashMap<String, DeselectionStep>();
+    HashMap<String, SwapStep> roleSwap = new HashMap<String, SwapStep>();
 
     Set<String> editList = new HashSet<String>();
 
@@ -116,6 +118,14 @@ public class RaidBot {
      */
     public HashMap<String, DeselectionStep> getRoleDeselectionMap() {
         return roleDeselection;
+    }
+    
+    /**
+     * Map of the UserId -> roleSwap step for people in the role swapping process
+     * @return The map of the UserId -> roleSwap step for people in the role swapping process
+     */
+    public HashMap<String, SwapStep> getRoleSwapMap() {
+        return roleSwap;
     }
 
     /**
@@ -224,6 +234,7 @@ public class RaidBot {
     	else if (actvId == 2) actvName = "role deselection";
     	else if (actvId == 3) actvName = "create event";
     	else if (actvId == 4) actvName = "edit event";
+    	else if (actvId == 5) actvName = "swap role";
     	else actvName = "";
     	
     	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You already have an active chat with me (" + actvName + "). Finish it first!").queue());
@@ -240,6 +251,7 @@ public class RaidBot {
 		else if (roleDeselection.get(id) != null) actvId = 2;
 		else if (creation.get(id) != null) actvId = 3;
 		else if (edits.get(id) != null) actvId = 4;
+		else if (roleSwap.get(id) != null) actvId = 5;
 		
 		return actvId;
 	}

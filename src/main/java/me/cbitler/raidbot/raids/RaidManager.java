@@ -387,4 +387,12 @@ public class RaidManager {
 //        }
 //        return text;
 //    }
+    
+    /**
+     * Get the max number of roles per user
+     * @return the maximum number of roles per user
+     */
+    public static int getMaxNumRoles() {
+    	return 4;
+    }
 }

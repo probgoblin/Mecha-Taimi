@@ -795,7 +795,8 @@ public class Raid {
         	builder.addField("How to sign up:", 
         		"- To choose a main role, click on the reaction of the class you want to play.\n"
         		+ "- To sign up as a flex role, click on the flex reaction (Fx).\n"
-        		+ "- To remove one or all of your sign-ups, click the red X reaction."
+        		+ "- To remove one or all of your sign-ups, click the red X reaction.\n"
+        		+ "- To swap your main and flex roles, click the yellow swap reaction."
         		, false);
         }
 
