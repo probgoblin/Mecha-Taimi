@@ -71,10 +71,10 @@ public class ReactionHandler extends ListenerAdapter {
             		        e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for this event.").queue());
             	        } else if(raid.isUserInRaid(userId) && numFlexRoles == 0) {
             	        	// user only has a main role, make it flex
-            	        	SwapUtil.moveMainToFlex(raid, userId);
+            	        	SwapUtil.moveMainToFlex(raid, userId, true);
             	        } else if(raid.isUserInRaid(userId) == false && numFlexRoles == 1) {
             	        	// user has exactly one flex roles, try to make it main (only possible if there are free spots)
-            	        	if(SwapUtil.moveFlexToMain(raid, userId, 0) == false) {
+            	        	if(SwapUtil.moveFlexToMain(raid, e.getUser(), 0) == false) {
             	        		e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("There are no free spots to make your flex a main role.").queue());
             	        	}
             	        } else {
@@ -85,7 +85,6 @@ public class ReactionHandler extends ListenerAdapter {
             	        	SwapStep step = new SwapStep(raid, e.getUser());
             	        	RaidBot.getInstance().getRoleSwapMap().put(userId, step);
             	        	e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(step.getStepText()).queue());
-                	        // TODO!
             	        }
                     }
         		} else { // open world event

@@ -82,6 +82,7 @@ public class Reactions {
             getEmoji("530541438769823747"), // Mesmer
             getEmoji("530541439218876416"), // Necromancer
             getEmoji("592463347291783168"), // Flex
+            getEmoji("614289684754857984"), // Swap
             getEmoji("548530947591634944") // X_
     };
 
@@ -96,6 +97,7 @@ public class Reactions {
             getEmoji("530541438769823747"), // Mesmer
             getEmoji("530541439218876416"), // Necromancer
             getEmoji("592463347291783168"), // Flex
+            getEmoji("614289684754857984"), // Swap
             getEmoji("548530947591634944") // X_
     };
 

@@ -8,6 +8,7 @@ import me.cbitler.raidbot.logs.LogParser;
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.selection.SelectionStep;
+import me.cbitler.raidbot.swap.SwapStep;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
@@ -132,6 +133,14 @@ public class DMHandler extends ListenerAdapter {
         			bot.getRoleDeselectionMap().remove(author.getId());
         			e.getChannel().sendMessage("Finished deselection.").queue();
         		}
+        	}
+        } else if (bot.getRoleSwapMap().containsKey(author.getId())) {
+        	SwapStep step = bot.getRoleSwapMap().get(author.getId());
+        	// the swap step does not have a next step
+        	if (step.handleDM(e)) {
+        		// finish role swap
+    			bot.getRoleSwapMap().remove(author.getId());
+    			e.getChannel().sendMessage("Finished role swap.").queue();
         	}
         }
 

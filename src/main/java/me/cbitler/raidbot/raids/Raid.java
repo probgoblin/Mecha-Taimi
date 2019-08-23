@@ -796,7 +796,7 @@ public class Raid {
         		"- To choose a main role, click on the reaction of the class you want to play.\n"
         		+ "- To sign up as a flex role, click on the flex reaction (Fx).\n"
         		+ "- To remove one or all of your sign-ups, click the red X reaction.\n"
-        		+ "- To swap your main and flex roles, click the yellow swap reaction."
+        		+ "- To swap your main and flex roles, click the swap reaction."
         		, false);
         }
 
@@ -1136,7 +1136,7 @@ public class Raid {
      *
      * @param id The id of the user being removed
      */
-    public void removeUserFromMainRoles(String id) {
+    public void removeUserFromMainRoles(String id, boolean update_message) {
         Iterator<Map.Entry<RaidUser, String>> users = userToRole.entrySet().iterator();
         while (users.hasNext()) {
             Map.Entry<RaidUser, String> user = users.next();
@@ -1152,19 +1152,20 @@ public class Raid {
             e.printStackTrace();
         }
 
-        updateMessage();
+        if (update_message)
+        	updateMessage();
     }
 
 
     /**
-     * Remove a user from their main role
+     * Remove a user from a flex role
      *
      * @param id The id of the user being removed
      * @param role The role that should be removed
      * @param spec The class specialization that should be removed
      * @return true if user was signed up for this role and class, false otherwise
      */
-    public boolean removeUserFromFlexRoles(String id, String role, String spec) {
+    public boolean removeUserFromFlexRoles(String id, String role, String spec, boolean update_message) {
         boolean found = false;
         Iterator<Map.Entry<RaidUser, List<FlexRole>>> users = usersToFlexRoles.entrySet().iterator();
         while (users.hasNext()) {
@@ -1188,8 +1189,9 @@ public class Raid {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        updateMessage();
+        
+        if (update_message)
+        	updateMessage();
         return found;
     }
 

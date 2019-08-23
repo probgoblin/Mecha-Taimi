@@ -17,6 +17,7 @@ import net.dv8tion.jda.core.entities.*;
 public class SwapStep {
     Raid raid;
     User user;
+    boolean userHasMain;
 
     /**
      * Create a new step for role swapping with the specified raid
@@ -25,6 +26,7 @@ public class SwapStep {
     public SwapStep(Raid raid, User user) {
         this.raid = raid;
         this.user = user;
+        this.userHasMain = raid.isUserInRaid(user.getId());
     }
 
     /**
@@ -35,74 +37,57 @@ public class SwapStep {
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         ArrayList<FlexRole> rRoles = this.raid.getRaidUsersFlexRolesById(this.user.getId());
         String msg = e.getMessage().getRawContent();
-        if(rRoles.size()==0){
-            // no roles
-            e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not registered for any flex roles.").queue());
-            return true;
-        } else if(msg.contentEquals("1")){
-            // remove all
-            ArrayList<String> removedRaidUsers = new ArrayList<String>();
-            for (FlexRole rRole : rRoles) {
-                if(raid.removeUserFromFlexRoles(e.getAuthor().getId(), rRole.getRole(), rRole.getSpec())){
-                    removedRaidUsers.add("\""+rRole.getSpec()+", "+rRole.getRole()+"\"");
-                }
-            }
-            if(removedRaidUsers.size()>0){
-                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Selected roles have been removed:\n"+String.join("\n", removedRaidUsers)).queue());
-                return true;
-            }
-        } else if(msg.contentEquals((rRoles.size()+2)+"")){
-            // cancel
-            return true;
-        } else {
-            // remove list
-            String[] roles = msg.split(",");
-            ArrayList<String> removedRaidUsers = new ArrayList<String>();
-            for (String role : roles) {
-            	try {
-            		int roleSelector = Integer.parseInt(role) - 2;
-            		if(roleSelector >= 0 && roleSelector < rRoles.size()){
-            			FlexRole raidRole = rRoles.get(roleSelector);
-            			if(raid.removeUserFromFlexRoles(e.getAuthor().getId(), raidRole.getRole(), raidRole.getSpec())){
-            				removedRaidUsers.add("\""+raidRole.getSpec()+", "+raidRole.getRole()+"\"");
-            			}
-            		}
-            	} catch (Exception excp) { }
-            }
-            if(removedRaidUsers.size()>0){
-                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Selected flex roles have been removed:\n"+String.join("\n", removedRaidUsers)).queue());
-                return true;
-            }
+        int choiceId = -1;
+        boolean valid = true;
+        try {
+    		choiceId = Integer.parseInt(msg) - 1;
+    	} catch (Exception excp) { valid = false; }
+        if(choiceId < 0 || choiceId >= (rRoles.size() + 1 + (userHasMain ? 1 : 0)))
+			valid = false;
+	
+        if (valid == false) {
+    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Try again.").queue());
+    	}
+        
+        if (userHasMain) {
+        	if (choiceId == 0) {
+        		SwapUtil.moveMainToFlex(raid, user.getId(), true);
+        		return true;
+        	} else
+        		choiceId -= 1; // decrease by 1 to get the chosen flex role id
         }
-        // Send new message because there was no valid selection
-        e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid selection.\n\n"+buildSelectionText(rRoles)).queue());
-        return false;
-    }
-
-    /**
-     * Get the next step - no next step here as this is a one step process
-     * @return null
-     */
-    public SwapStep getNextStep() {
-        return null;
+        if (choiceId < rRoles.size()) {
+        	if (SwapUtil.moveFlexToMain(raid, user, choiceId)) {
+        		return true;
+        	} else {
+        		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Your chosen role does not have a free spot in the main squad. Try again.").queue());           	
+        		return false;
+        	}
+        } else {
+        	// user chose cancel
+        	return true;
+        }
     }
 
     private String buildSelectionText(ArrayList<FlexRole> raidUsers){
         int counter = 0;
         String outer = "";
-        outer += "`"+(++counter)+"` all\n";
+        if (userHasMain)
+        	outer += "`"+(++counter)+"` move main role to flex\n";
+        outer += "Choose a flex role to be converted to your main role:\n";
         for (FlexRole rUser : raidUsers) {
             Emote userEmote = Reactions.getEmoteByName(rUser.getSpec());
-            if(userEmote!=null){
+            if (userEmote!=null) {
                 outer += "`"+(++counter)+"` <:"+userEmote.getName()+":"+userEmote.getId()+"> "+rUser.getSpec()+", "+rUser.getRole()+"\n";
-            }else{
+            } else {
                 outer += "`"+(++counter)+"`     "+rUser.getSpec()+", "+rUser.getRole()+"\n";
             }
         }
+        outer += "or \n";
         outer += "`"+(++counter)+"` cancel";
-        return "Choose the specification you want to remove from sign-ups:\n"+outer+"\n"+
-                        "alternatively to repeating this step, you may specify a comma-separated list (e.g. 2,3,4) that should not include `all` or `cancel`.";
+        return "What do you want to do?\n"+outer+"\n";
     }
+    
     /**
      * The step text changes the text based on the available roles.
      * @return The step text

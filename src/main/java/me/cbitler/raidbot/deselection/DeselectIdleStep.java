@@ -37,7 +37,7 @@ public class DeselectIdleStep implements DeselectionStep {
     		if (choiceId == 0) { // main
         		// check if this user has a main role
         		if (raid.isUserInRaid(e.getAuthor().getId())) {
-        			raid.removeUserFromMainRoles(e.getAuthor().getId());
+        			raid.removeUserFromMainRoles(e.getAuthor().getId(), true);
         			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Removed from main role. You can choose another type or write *done*.").queue());
         			return false;
         		}
