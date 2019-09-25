@@ -51,7 +51,7 @@ public class RaidManager {
                         
                         try {
                         	for (Emote emote : emoteList)
-                        		message1.addReaction(emote).queue();
+                        		message1.addReaction(emote).complete(); // complete will block until the reaction was added -> reactions are always in same order
                         } catch (Exception excp) {
                         	System.out.println("Could not add all reactions to the event message. At least one emoji was null.");
                         }

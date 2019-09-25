@@ -24,7 +24,7 @@ public class HelpCommand implements Command {
             "Help information:\n" +
             "To use this bot, set the event manager role, and then anyone with that role can use !createEvent. This will take them through" +
             " an event setup process with the bot prompting them for information. After that, it will create the event in the channel specified." +
-            " Once that is there, people can join it by clicking on the reaction for their specialization, and then responding to the bot with the role" +
+            " Once that is there, people can join it by clicking on the reaction for their class, and then responding to the bot with the role" +
             " that they want.";
     @Override
     public void handleCommand(String command, String[] args, TextChannel channel, User author) {
