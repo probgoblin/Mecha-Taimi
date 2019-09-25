@@ -128,7 +128,8 @@ public class ChannelMessageHandler extends ListenerAdapter {
         	boolean setEventManager = e.getMessage().getRawContent().toLowerCase().startsWith("!seteventmanagerrole");
         	boolean setFractalCreator = e.getMessage().getRawContent().toLowerCase().startsWith("!setfractalcreatorrole");
         	boolean setFractalChannel = e.getMessage().getRawContent().toLowerCase().startsWith("!setfractalchannel");
-            if (setEventManager || setFractalCreator || setFractalChannel) {
+        	boolean setArchiveChannel = e.getMessage().getRawContent().toLowerCase().startsWith("!setarchivechannel");
+            if (setEventManager || setFractalCreator || setFractalChannel || setArchiveChannel) {
                 String[] commandParts = e.getMessage().getRawContent().split(" ");
                 String specifiedName = combineArguments(commandParts,1);
                 if (setEventManager) {
@@ -138,8 +139,17 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 	RaidBot.getInstance().setFractalCreatorRole(e.getMember().getGuild().getId(), specifiedName);
                 	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Fractal creator role updated to: " + specifiedName).queue());
                 } else if (setFractalChannel) {
-                	RaidBot.getInstance().setFractalChannel(e.getMember().getGuild().getId(), specifiedName);
-                	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Fractal announcement channel updated to: " + specifiedName).queue());
+                	if (RaidBot.getInstance().setFractalChannel(e.getMember().getGuild().getId(), specifiedName)) {
+                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Fractal announcement channel updated to: " + specifiedName).queue());
+                	} else {
+                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid channel name.").queue());
+                	}
+                } else if (setArchiveChannel) {
+                	if (RaidBot.getInstance().setArchiveChannel(e.getMember().getGuild().getId(), specifiedName)) {
+                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Archive channel updated to: " + specifiedName).queue());
+                	} else {
+                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid channel name.").queue());
+                	}
                 }
                 try {
                     e.getMessage().delete().queue();
@@ -199,7 +209,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
     @Override
     public void onGuildMessageDelete(GuildMessageDeleteEvent e) {
         if (RaidManager.getRaid(e.getMessageId()) != null) {
-            RaidManager.deleteRaid(e.getMessageId());
+            RaidManager.deleteRaid(e.getMessageId(), true);
         }
     }
 

@@ -1,5 +1,6 @@
 package me.cbitler.raidbot.commands;
 
+import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.utility.PermissionsUtil;
@@ -17,12 +18,29 @@ public class EndAllCommand implements Command {
         if (PermissionsUtil.hasRaidLeaderRole(member)) {
             List<Raid> allEvents = RaidManager.getAllRaids();
             int numEvents = allEvents.size();
+            
+            String serverId = channel.getGuild().getId();
+            ArrayList<Boolean> archived = new ArrayList<Boolean>();
+            boolean archiveAvail = RaidBot.getInstance().isArchiveAvailable(serverId);
+            if (archiveAvail) {
+            	for (int ev = 0; ev < numEvents; ev++) {
+                	Raid raid = allEvents.get(ev);
+                    if (raid != null && raid.getServerId().equalsIgnoreCase(serverId)) {
+                    	// post message in archive if available
+                        archived.add(raid.postToArchive());
+                    } else {
+                    	archived.add(false);
+                    }
+                }
+            }
+            
             List<String> notDeleted = new ArrayList<String>();
             for (int ev = numEvents-1; ev >= 0; ev--) {
             	Raid raid = allEvents.get(ev);
-                if (raid != null && raid.getServerId().equalsIgnoreCase(channel.getGuild().getId())) {
+                if (raid != null && raid.getServerId().equalsIgnoreCase(serverId)) {
                 	String name = raid.getName();
-                    boolean deleted = RaidManager.deleteRaid(raid.getMessageId());
+                	boolean delete_message = archiveAvail && archived.get(ev);
+                    boolean deleted = RaidManager.deleteRaid(raid.getMessageId(), delete_message);
                     if (deleted == false) {
                     	notDeleted.add(name);
                     }

@@ -28,16 +28,18 @@ public class EndRaidCommand implements Command {
 
                         raid.messagePlayersWithLogLinks(links);
                     }
+                    // post message in archive if available
+                    boolean delete_message = raid.postToArchive();
 
-                    boolean deleted = RaidManager.deleteRaid(raidId);
+                    boolean deleted = RaidManager.deleteRaid(raidId, delete_message);
 
                     if (deleted) {
-                        author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event ended").queue());
+                        author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event ended.").queue());
                     } else {
-                        author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("An error occured ending the event.").queue());
+                        author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("An error occured while ending the event.").queue());
                     }
                 } else {
-                    author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("That event doesn't exist on this server.").queue());
+                    author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("This event doesn't exist on this server.").queue());
                 }
             }
         }

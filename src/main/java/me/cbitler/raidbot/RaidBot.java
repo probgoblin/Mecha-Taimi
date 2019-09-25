@@ -51,6 +51,7 @@ public class RaidBot {
     HashMap<String, String> raidLeaderRoleCache = new HashMap<>();
     HashMap<String, String> fractalCreatorRoleCache = new HashMap<>();
     HashMap<String, String> fractalChannelCache = new HashMap<>();
+    HashMap<String, String> archiveChannelCache = new HashMap<>();
 
     Database db;
 
@@ -306,9 +307,13 @@ public class RaidBot {
      * Set the fractal announcement channel for a server. This also updates it in SQLite
      * @param serverId The server ID
      * @param channel The channel name
+     * @return whether the channel is valid
      */
-    public void setFractalChannel(String serverId, String channel) {
-        fractalChannelCache.put(serverId, channel);
+    public boolean setFractalChannel(String serverId, String channel) {
+    	if (checkChannel(serverId, channel) == false)
+    		return false;
+    	
+    	fractalChannelCache.put(serverId, channel);
         try {
             db.update("INSERT INTO `serverSettings` (`serverId`,`fractal_channel`) VALUES (?,?)",
                     new String[] { serverId, channel});
@@ -321,10 +326,11 @@ public class RaidBot {
                 // Not much we can do if there is also an insert error
             }
         }
+        return true;
     }
     
     /**
-     * Get the fractal announcement channel role for a specific server.
+     * Get the fractal announcement channel for a specific server.
      * This works by caching the channel once it's retrieved once, and returning the default if a server hasn't set one.
      * @param serverId the ID of the server
      * @return The name of the channel that is considered the fractal announcement channel for that server
@@ -348,6 +354,57 @@ public class RaidBot {
         }
     }
     
+    /**
+     * Set the archive channel for a server. This also updates it in SQLite
+     * @param serverId The server ID
+     * @param channel The channel name
+     * @return whether the channel is valid
+     */
+    public boolean setArchiveChannel(String serverId, String channel) {
+    	if (checkChannel(serverId, channel) == false)
+    		return false;
+    	
+        archiveChannelCache.put(serverId, channel);
+        try {
+            db.update("INSERT INTO `serverSettings` (`serverId`,`archive_channel`) VALUES (?,?)",
+                    new String[] { serverId, channel});
+        } catch (SQLException e) {
+            //TODO: There is probably a much better way of doing this
+            try {
+                db.update("UPDATE `serverSettings` SET `archive_channel` = ? WHERE `serverId` = ?",
+                        new String[] { channel, serverId });
+            } catch (SQLException e1) {
+                // Not much we can do if there is also an update error
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Get the archive channel for a specific server.
+     * This works by caching the channel once it's retrieved once, and returning the default if a server hasn't set one.
+     * @param serverId the ID of the server
+     * @return The name of the channel that is considered the archive channel for that server
+     */
+    public String getArchiveChannel(String serverId) {
+        if (archiveChannelCache.get(serverId) != null) {
+            return archiveChannelCache.get(serverId);
+        } else {
+            try {
+                QueryResult results = db.query("SELECT `archive_channel` FROM `serverSettings` WHERE `serverId` = ?",
+                        new String[]{serverId});
+                if (results.getResults().next()) {
+                	archiveChannelCache.put(serverId, results.getResults().getString("archive_channel"));
+                    return archiveChannelCache.get(serverId);
+                } else {
+                    return "archive-of-adventures";
+                }
+            } catch (Exception e) {
+                return "archive-of-adventures";
+            }
+        }
+    }
+    
     /** 
      * checks if a given channel exists
      * @param serverId the id of the server to be checked 
@@ -363,5 +420,15 @@ public class RaidBot {
         }
         return validChannel;
     }
+
+    /**
+     * checks if a valid archive channel is available for a server
+     *
+     * @param serverId 
+     * @return whether a valid archive channel is available
+     */
+	public boolean isArchiveAvailable(String serverId) {
+		return checkChannel(serverId, getArchiveChannel(serverId));
+	}
 
 }

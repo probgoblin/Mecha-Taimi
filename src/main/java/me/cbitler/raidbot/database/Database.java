@@ -44,7 +44,8 @@ public class Database {
             + " serverId text PRIMARY KEY, \n"
             + " raid_leader_role text, \n"
             + " fractal_creator_role text, \n"
-            + " fractal_channel text)";
+            + " fractal_channel text, \n"
+            + " archive_channel text)";
 
     /**
      * Create a new database with the specific filename
@@ -140,6 +141,9 @@ public class Database {
         } catch (Exception e) { }
         try {
         	connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN fractal_channel text");
+        } catch (Exception e) { }
+        try {
+        	connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN archive_channel text");
         } catch (Exception e) { }
     }
 }

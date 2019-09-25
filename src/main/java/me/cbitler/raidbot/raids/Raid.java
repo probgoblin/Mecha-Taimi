@@ -5,8 +5,10 @@ import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.utility.Reactions;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Emote;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -763,7 +765,7 @@ public class Raid {
      * Update the embedded message for the raid
      */
     public void updateMessage() {
-        MessageEmbed embed = isDisplayShort ? buildEmbedShort() : buildEmbed();
+        MessageEmbed embed = isDisplayShort ? buildEmbedShort(true) : buildEmbed(true);
         try {
             RaidBot.getInstance().getServer(getServerId()).getTextChannelById(getChannelId())
                     .editMessageById(getMessageId(), embed).queue();
@@ -774,9 +776,10 @@ public class Raid {
     /**
      * Build the embedded message that shows the information about this raid
      *
+     * @param provide_instr whether instructions should be provided
      * @return The embedded message representing this raid
      */
-    private MessageEmbed buildEmbed() {
+    private MessageEmbed buildEmbed(boolean provide_instr) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle(getName() + "\t ||ID: " + messageId + "||");
         builder.addField("Description:", getDescription(), false);
@@ -790,7 +793,7 @@ public class Raid {
         builder.addBlankField(false);
         builder.addField("Roles:", buildRolesText(), true);
         builder.addField("Flex Roles:", buildFlexRolesText(), true);
-        if (this.isOpenWorld == false) {
+        if (provide_instr && this.isOpenWorld == false) {
         	builder.addBlankField(false);
         	builder.addField("How to sign up:", 
         		"- To choose a main role, click on the reaction of the class you want to play.\n"
@@ -826,9 +829,10 @@ public class Raid {
     /**
      * Build the short embedded message that shows the information about this raid
      *
+     * @param provide_instr whether instructions should be provided
      * @return The short embedded message representing this raid
      */
-    private MessageEmbed buildEmbedShort() {
+    private MessageEmbed buildEmbedShort(boolean provide_instr) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle(getName() + " - [" + getDate() + " " + getTime() + "]\t"
         		+ "||ID: " + messageId + "||");
@@ -1213,4 +1217,29 @@ public class Raid {
         }
         return 0;
     }
+
+    /**
+     * Posts the latest event message to the archive channel 
+     * 
+     * @return whether the message was posted successfully
+     */
+	public boolean postToArchive() {
+		MessageEmbed message = isDisplayShort ? buildEmbedShort(false) : buildEmbed(false);
+
+        Guild guild = RaidBot.getInstance().getServer(serverId);
+        List<TextChannel> channels = guild.getTextChannelsByName(RaidBot.getInstance().getArchiveChannel(serverId), true);
+        if(channels.size() > 0) {
+            // We always go with the first channel if there is more than one
+            try {
+                channels.get(0).sendMessage(message).queue();
+            } catch (Exception ecxp) {
+            	return false;
+            }
+            
+            return true;
+        }
+        else {
+        	return false;
+        }
+	}
 }

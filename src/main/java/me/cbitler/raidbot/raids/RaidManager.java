@@ -243,17 +243,20 @@ public class RaidManager {
     /**
      * Delete the raid from the database and maps, and delete the message if it is still there
      * @param messageId The raid ID
+     * @param whether the original message should be deleted
      * @return true if deleted, false if not deleted
      */
-    public static boolean deleteRaid(String messageId) {
+    public static boolean deleteRaid(String messageId, boolean delete_message) {
         Raid r = getRaid(messageId);
         if (r != null) {
-            //try {
-            //    RaidBot.getInstance().getServer(r.getServerId())
-            //            .getTextChannelById(r.getChannelId()).getMessageById(messageId).queue(message -> message.delete().queue());
-            //} catch (Exception e) {
-            //    // Nothing, the message doesn't exist - it can happen
-            //}
+        	if (delete_message) {
+        		try {
+        			RaidBot.getInstance().getServer(r.getServerId())
+        			.getTextChannelById(r.getChannelId()).getMessageById(messageId).queue(message -> message.delete().queue());
+        		} catch (Exception e) {
+        			// Nothing, the message doesn't exist - it can happen
+        		}
+            }
 
             Iterator<Raid> raidIterator = raids.iterator();
             while (raidIterator.hasNext()) {
