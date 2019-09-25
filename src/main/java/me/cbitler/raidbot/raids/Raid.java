@@ -2,6 +2,7 @@ package me.cbitler.raidbot.raids;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.database.Database;
+import me.cbitler.raidbot.utility.PermissionsUtil;
 import me.cbitler.raidbot.utility.Reactions;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Emote;
@@ -23,6 +24,7 @@ public class Raid {
     HashMap<RaidUser, String> userToRole = new HashMap<RaidUser, String>();
     HashMap<RaidUser, List<FlexRole>> usersToFlexRoles = new HashMap<>();
     HashMap<String, String> userIDsToNicknames = new HashMap<>();
+    List<String> permittedDiscordRoles = new ArrayList<String>();
 
     /* *
      * open world events only have a single role (Participants) and users sign up without any class
@@ -33,6 +35,11 @@ public class Raid {
      * whether to display the short version of the raid message
      */
     boolean isDisplayShort;
+    
+    /* *
+     * whether the event is a fractal. Fractal events will not be archived and they can only be displayed as short message.
+     */
+    boolean isFractalEvent;
 
     /**
      * Create a new Raid with the specified data
@@ -44,9 +51,13 @@ public class Raid {
      * @param name           The name of the raid
      * @param date           The date of the raid
      * @param time           The time of the raid
+     * @param isOpenWorld    Open world event flag
+     * @param isDisplayShort Flag for short message 
+     * @param isFractalEvent Fractal event flag
      */
     public Raid(String messageId, String serverId, String channelId, String raidLeaderName, String name,
-            String description, String date, String time, boolean isOpenWorld, boolean isDisplayShort) {
+            String description, String date, String time, boolean isOpenWorld, boolean isDisplayShort, 
+            boolean isFractalEvent, List<String> permittedRoles) {
         this.messageId = messageId;
         this.serverId = serverId;
         this.channelId = channelId;
@@ -57,6 +68,8 @@ public class Raid {
         this.time = time;
         this.isOpenWorld = isOpenWorld;
         this.isDisplayShort = isDisplayShort;
+        this.isFractalEvent = isFractalEvent;
+        this.permittedDiscordRoles = permittedRoles;
     }
 
     /**
@@ -102,6 +115,15 @@ public class Raid {
      */
     public boolean isDisplayShort() {
         return isDisplayShort;
+    }
+    
+    /**
+     * The fractal flag for this event
+     *
+     * @return fractal flag for this event
+     */
+    public boolean isFractalEvent() {
+        return isFractalEvent;
     }
     
     /**
@@ -765,7 +787,7 @@ public class Raid {
      * Update the embedded message for the raid
      */
     public void updateMessage() {
-        MessageEmbed embed = isDisplayShort ? buildEmbedShort(true) : buildEmbed(true);
+        MessageEmbed embed = (isFractalEvent || isDisplayShort) ? buildEmbedShort(true) : buildEmbed(true);
         try {
             RaidBot.getInstance().getServer(getServerId()).getTextChannelById(getChannelId())
                     .editMessageById(getMessageId(), embed).queue();
@@ -1224,6 +1246,11 @@ public class Raid {
      * @return whether the message was posted successfully
      */
 	public boolean postToArchive() {
+		if (isFractalEvent) {
+			// fractal events are not archived
+			return false;
+		}
+		
 		MessageEmbed message = isDisplayShort ? buildEmbedShort(false) : buildEmbed(false);
 
         Guild guild = RaidBot.getInstance().getServer(serverId);
@@ -1241,5 +1268,28 @@ public class Raid {
         else {
         	return false;
         }
+	}
+	
+	/**
+	 * Checks whether the given user is permitted to sign up for this event
+	 * 
+	 * @param userId 
+	 * @return whether user has permission
+	 */
+	public boolean isUserPermitted(Member member) {
+		if (permittedDiscordRoles.isEmpty()) {
+			// if there are no restrictions, user has permission
+			return true; 
+		}
+		boolean match = false;
+		// iterate over permitted roles
+		for (String permRole : permittedDiscordRoles) {
+			// iterate over user discord roles
+			if (PermissionsUtil.hasRole(member, permRole)) {
+				match = true;
+				break;
+			}
+		}
+		return match;
 	}
 }

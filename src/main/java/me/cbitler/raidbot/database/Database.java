@@ -19,12 +19,14 @@ public class Database {
             + " channelId text NOT NULL, \n"
             + " isDisplayShort text NOT NULL, \n"
             + " isOpenWorld text NOT NULL, \n"
+            + " isFractalEvent text NOT NULL, \n"
             + " leader text NOT NULL, \n"
             + " `name` text NOT NULL, \n"
             + " `description` text, \n"
             + " `date` text NOT NULL, \n"
             + " `time` text NOT NULL, \n"
-            + " roles text NOT NULL);";
+            + " roles text NOT NULL, \n"
+            + " permittedRoles text);";
 
     String raidUsersTableInit = "CREATE TABLE IF NOT EXISTS raidUsers (\n"
             + " userId text, \n"
@@ -135,6 +137,12 @@ public class Database {
         } catch (Exception e) { }
         try {
         	connection.createStatement().execute("ALTER TABLE raids ADD COLUMN isDisplayShort text");
+        } catch (Exception e) { }
+        try {
+        	connection.createStatement().execute("ALTER TABLE raids ADD COLUMN isFractalEvent text");
+        } catch (Exception e) { }
+        try {
+        	connection.createStatement().execute("ALTER TABLE raids ADD COLUMN permittedRoles text");
         } catch (Exception e) { }
         try {
         	connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN fractal_creator_role text");

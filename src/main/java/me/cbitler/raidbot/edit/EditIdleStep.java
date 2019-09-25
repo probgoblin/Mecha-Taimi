@@ -1,5 +1,7 @@
 package me.cbitler.raidbot.edit;
 
+import me.cbitler.raidbot.raids.Raid;
+import me.cbitler.raidbot.raids.RaidManager;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
@@ -10,9 +12,12 @@ public class EditIdleStep implements EditStep {
 
 	private String messageID;
 	private EditStep nextStep;
+	private boolean isFractalEvent;
 
 	public EditIdleStep(String messageId) {
 		this.messageID = messageId;
+		Raid raid = RaidManager.getRaid(messageId);
+		this.isFractalEvent = raid.isFractalEvent();
 	}
 
     /**
@@ -34,16 +39,21 @@ public class EditIdleStep implements EditStep {
         			nextStep = new EditDateStep(messageID);
         		else if (choiceId == 3) // name
         			nextStep = new EditNameStep(messageID);
-        		else if (choiceId == 4) // description
-        			nextStep = new EditDescriptionStep(messageID);
-        		else if (choiceId == 5) // leader
-        			nextStep = new EditLeaderStep(messageID);
-        		else if (choiceId == 6) // roles
-        			nextStep = new EditRoleStep(messageID);
-        		else if (choiceId == 7) // display format
-        			nextStep = new EditDisplayStep(messageID);
-        		else
-        			valid = false;
+        		else {
+        			if (isFractalEvent == false) {
+        				if (choiceId == 4) // description
+        					nextStep = new EditDescriptionStep(messageID);
+        				else if (choiceId == 5) // leader
+        					nextStep = new EditLeaderStep(messageID);
+        				else if (choiceId == 6) // roles
+        					nextStep = new EditRoleStep(messageID);
+        				else if (choiceId == 7) // display format
+        					nextStep = new EditDisplayStep(messageID);
+        				else 
+        					valid = false;
+        			} else
+        				valid = false; 
+        		}
         	} catch (Exception excp) {
         		valid = false;
         	}
@@ -59,16 +69,19 @@ public class EditIdleStep implements EditStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "NOTE: You can type *cancel* at any point during this process to stop editing.\n\n"
+        String message = "NOTE: You can type *cancel* at any point during this process to stop editing.\n\n"
         		+ "Choose which property you want to change:\n"
         		+ "`1` time \n"
         		+ "`2` date \n"
-        		+ "`3` name \n"
-        		+ "`4` description \n"
+        		+ "`3` name \n";
+        if (isFractalEvent == false) {
+        	message += "`4` description \n"
         		+ "`5` leader \n"
         		+ "`6` roles \n"
-        		+ "`7` display format \n"
-        		+ "or type *done* when you want to finish editing.";
+        		+ "`7` display format \n";
+        }
+        message += "or type *done* when you want to finish editing.";
+        return message;
     }
 
     /**

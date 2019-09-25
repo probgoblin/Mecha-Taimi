@@ -10,27 +10,29 @@ import net.dv8tion.jda.core.entities.Role;
  */
 public class PermissionsUtil {
     /**
-     * Check to see if a member has the raid leader role
+     * Check to see if a member has a specific role
      * @param member The member to check
+     * @param 
      * @return True if they have the role, false if they don't
      */
-    public static boolean hasRaidLeaderRole(Member member) {
-        String raidLeaderRole = RaidBot.getInstance().getRaidLeaderRole(member.getGuild().getId());
+	public static boolean hasRole(Member member, String rolename) {
         for (Role role : member.getRoles()) {
-            if (role.getName().equalsIgnoreCase(raidLeaderRole)) {
+            if (role.getName().equalsIgnoreCase(rolename)) {
                 return true;
             }
         }
         return false;
+	}
+	
+	
+    public static boolean hasRaidLeaderRole(Member member) {
+        String raidLeaderRole = RaidBot.getInstance().getRaidLeaderRole(member.getGuild().getId());
+        return hasRole(member, raidLeaderRole);
     }
+    
 
 	public static boolean hasFractalCreatorRole(Member member) {
 		String fractalCreatorRole = RaidBot.getInstance().getFractalCreatorRole(member.getGuild().getId());
-        for (Role role : member.getRoles()) {
-            if (role.getName().equalsIgnoreCase(fractalCreatorRole)) {
-                return true;
-            }
-        }
-        return false;
+        return hasRole(member, fractalCreatorRole);
 	}
 }

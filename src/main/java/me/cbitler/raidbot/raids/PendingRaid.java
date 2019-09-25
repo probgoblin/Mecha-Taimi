@@ -11,6 +11,7 @@ import java.util.List;
 public class PendingRaid {
     String name, description, date, time, announcementChannel, serverId, leaderName;
     List<RaidRole> rolesWithNumbers = new ArrayList<RaidRole>();
+    List<String> permittedDiscordRoles = new ArrayList<String>();
     
     /* *
      * open world events only have a single role (Participants) and users sign up without any class
@@ -21,6 +22,15 @@ public class PendingRaid {
      * whether to display the short version of the raid message
      */
     boolean isDisplayShort;
+    
+    /* *
+     * whether the event is a fractal. Fractal events will not be archived and they can only be displayed as short message.
+     */
+    boolean isFractalEvent;
+    
+    public PendingRaid() {
+    	this.isFractalEvent = false;
+    }
     
     public boolean isOpenWorld() {
     	return isOpenWorld;
@@ -36,6 +46,14 @@ public class PendingRaid {
     
     public void setDisplayShort(boolean isDisplayShort) {
     	this.isDisplayShort = isDisplayShort;
+    }
+    
+    public boolean isFractalEvent() {
+    	return isFractalEvent;
+    }
+    
+    public void setFractalEvent(boolean isFractalEvent) {
+    	this.isFractalEvent = isFractalEvent;
     }
 
     public String getName() {
@@ -96,6 +114,10 @@ public class PendingRaid {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+    
+    public List<String> getPermittedDiscordRoles() {
+    	return permittedDiscordRoles;
     }
 
 	public boolean existsRole(String roleName) {

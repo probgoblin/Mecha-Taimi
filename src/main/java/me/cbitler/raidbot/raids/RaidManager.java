@@ -10,6 +10,7 @@ import net.dv8tion.jda.core.entities.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -38,7 +39,9 @@ public class RaidManager {
                 channels.get(0).sendMessage(message).queue(message1 -> {
                     boolean inserted = insertToDatabase(raid, message1.getId(), message1.getGuild().getId(), message1.getChannel().getId());
                     if (inserted) {
-                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDescription(), raid.getDate(), raid.getTime(), raid.isOpenWorld(), raid.isDisplayShort());
+                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(),
+                        		raid.getName(), raid.getDescription(), raid.getDate(), raid.getTime(), raid.isOpenWorld(), raid.isDisplayShort(),
+                        		raid.isFractalEvent(), raid.getPermittedDiscordRoles());
                         newRaid.roles.addAll(raid.rolesWithNumbers);
                         raids.add(newRaid);
                         newRaid.updateMessage();
@@ -84,6 +87,7 @@ public class RaidManager {
 		fractalEvent.setDate(date);
 		fractalEvent.setTime(time);
 		fractalEvent.setDisplayShort(true);
+		fractalEvent.setFractalEvent(true);
 		fractalEvent.addTemplateRoles(RoleTemplates.getFractalTemplates()[teamCompId]);
 		
 		String fractalChannel = RaidBot.getInstance().getFractalChannel(serverId);
@@ -109,20 +113,24 @@ public class RaidManager {
         Database db = bot.getDatabase();
 
         String roles = formatRolesForDatabase(raid.getRolesWithNumbers());
-
+        String permDiscRoles = formatStringListForDatabase(raid.getPermittedDiscordRoles());
         try {
-            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `isDisplayShort`, `isOpenWorld`, `leader`, `name`, `description`, `date`, `time`, `roles`) VALUES (?,?,?,?,?,?,?,?,?,?,?)", new String[] {
+            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `isDisplayShort`, `isOpenWorld`, `isFractalEvent`, "
+            		+ "`leader`, `name`, `description`, `date`, `time`, `roles`, `permittedRoles`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", 
+            		new String[] {
                     messageId,
                     serverId,
                     channelId,
                     Boolean.toString(raid.isDisplayShort()),
                     Boolean.toString(raid.isOpenWorld()),
+                    Boolean.toString(raid.isFractalEvent()),
                     raid.getLeaderName(),
                     raid.getName(),
                     raid.getDescription(),
                     raid.getDate(),
                     raid.getTime(),
-                    roles
+                    roles,
+                    permDiscRoles
             });
         } catch (SQLException e) {
             e.printStackTrace();
@@ -171,8 +179,19 @@ public class RaidManager {
                 try {
                 	isDisplayShort = results.getResults().getString("isDisplayShort").equals("true");
                 } catch (Exception e) { }
+                
+                boolean isFractalEvent = false;
+                try {
+                	isFractalEvent = results.getResults().getString("isFractalEvent").equals("true");
+                } catch (Exception e) { }
+                
+                List<String> permDiscRoles = new ArrayList<String>();
+                try {
+                	String permRolesText = results.getResults().getString("permittedRoles");
+                	permDiscRoles = new ArrayList<String>(Arrays.asList(permRolesText.split(",")));
+                } catch (Exception e) { }
 
-                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time, isOpenWorld, isDisplayShort);
+                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time, isOpenWorld, isDisplayShort, isFractalEvent, permDiscRoles);
                 String[] roleSplit = rolesText.split(";");
                 for(String roleAndAmount : roleSplit) {
                     String[] parts = roleAndAmount.split(":");
@@ -329,6 +348,24 @@ public class RaidManager {
             }
         }
 
+        return data;
+    }
+    
+    /**
+     * Formats the given String list in a form that can be inserted into a database row.
+     * @param stringList The list of Strings
+     * @return The formatted string
+     */
+    public static String formatStringListForDatabase(List<String> stringList) {
+        String data = "";
+
+        for (int i = 0; i < stringList.size(); i++) {
+        	data += stringList.get(i);
+            if (i != stringList.size() - 1) {
+            	// add a comma if it is not the last element
+                data += ",";
+            }
+        }
         return data;
     }
 
