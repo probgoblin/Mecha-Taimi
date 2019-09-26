@@ -9,7 +9,7 @@ import java.util.List;
  * @author Christopher Bitler
  */
 public class PendingRaid {
-    String name, description, date, time, announcementChannel, serverId, leaderName;
+    String name, description, date, time, announcementChannel, serverId, leaderId;
     List<RaidRole> rolesWithNumbers = new ArrayList<RaidRole>();
     List<String> permittedDiscordRoles = new ArrayList<String>();
     
@@ -96,12 +96,12 @@ public class PendingRaid {
         this.serverId = serverId;
     }
 
-    public String getLeaderName() {
-        return leaderName;
+    public String getLeaderId() {
+        return leaderId;
     }
 
-    public void setLeaderName(String leaderName) {
-        this.leaderName = leaderName;
+    public void setLeaderId(String leaderName) {
+        this.leaderId = leaderName;
     }
 
     public List<RaidRole> getRolesWithNumbers() {

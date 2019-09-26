@@ -30,7 +30,7 @@ public class RunNameStep implements CreationStep {
         PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
         if(raid == null) {
             raid = new PendingRaid();
-            raid.setLeaderName(e.getAuthor().getName());
+            raid.setLeaderId(e.getAuthor().getId());
             bot.getPendingRaids().put(e.getAuthor().getId(), raid);
         }
 

@@ -23,13 +23,21 @@ public class EditLeaderStep implements EditStep {
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         Raid raid = RaidManager.getRaid(messageID);
-        raid.setLeader(e.getMessage().getRawContent());
-        if (raid.updateLeaderDB()) {
-        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Leader successfully updated in database.").queue());
-        } else {
-        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Leader could not be updated in database.").queue());	
+        int res = raid.setLeader(e.getMessage().getRawContent());
+        if (res == 0) {
+        	if (raid.updateLeaderDB()) {
+        		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Leader successfully updated in database.").queue());
+        	} else {
+        		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Leader could not be updated in database.").queue());	
+        	}
+        	raid.updateMessage();
+        } else if (res == 1) {
+        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("No valid user found. Make sure to use the nickname or discord name of a guild member. Try again or type *cancel* to stop editing.").queue());
+        	return false;
+        } else if (res == 2) {
+        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("This nickname or discord name is not unique. Try again or type *cancel* to stop editing.").queue());
+        	return false;
         }
-        raid.updateMessage();
 
         return true;
     }
@@ -38,7 +46,7 @@ public class EditLeaderStep implements EditStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the new leader for the event:";
+        return "Enter the new leader for the event (preferably server nickname, discord name works as well):";
     }
 
     /**

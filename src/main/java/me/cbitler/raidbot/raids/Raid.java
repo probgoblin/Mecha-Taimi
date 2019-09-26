@@ -19,7 +19,7 @@ import java.util.*;
  * etc
  */
 public class Raid {
-    String messageId, name, description, date, time, serverId, channelId, raidLeaderName;
+    String messageId, name, description, date, time, serverId, channelId, raidLeaderId;
     List<RaidRole> roles = new ArrayList<RaidRole>();
     HashMap<RaidUser, String> userToRole = new HashMap<RaidUser, String>();
     HashMap<RaidUser, List<FlexRole>> usersToFlexRoles = new HashMap<>();
@@ -55,13 +55,13 @@ public class Raid {
      * @param isDisplayShort Flag for short message 
      * @param isFractalEvent Fractal event flag
      */
-    public Raid(String messageId, String serverId, String channelId, String raidLeaderName, String name,
+    public Raid(String messageId, String serverId, String channelId, String raidLeaderId, String name,
             String description, String date, String time, boolean isOpenWorld, boolean isDisplayShort, 
             boolean isFractalEvent, List<String> permittedRoles) {
         this.messageId = messageId;
         this.serverId = serverId;
         this.channelId = channelId;
-        this.raidLeaderName = raidLeaderName;
+        this.raidLeaderId = raidLeaderId;
         this.name = name;
         this.description = description;
         this.date = date;
@@ -70,6 +70,16 @@ public class Raid {
         this.isDisplayShort = isDisplayShort;
         this.isFractalEvent = isFractalEvent;
         this.permittedDiscordRoles = permittedRoles;
+        // add leadername to userIDsToNicknames
+        // --- for compatibility with old format (where leadername was saved in stead of id) ---
+        // check if provided leader id is a valid id and treat it as user name otherwise
+        try {
+        	RaidBot.getInstance().getJda().getUserById(raidLeaderId);
+        } catch (Exception excp) {
+        	setLeader(raidLeaderId);
+        }
+        // -------------------------------------
+        userIDsToNicknames.put(this.raidLeaderId, getNicknameOnServer(this.raidLeaderId, this.serverId));
     }
 
     /**
@@ -184,10 +194,26 @@ public class Raid {
     /**
      * Set the leader of the raid
      *
-     * @param leader The leader of the raid
+     * @param leader The leader of the raid (either server nickname or discord name)
+     * @return 0 if the provided new leader name is valid i.e. belongs to a unique existing user, 1 no user, 2 more than 1 user
      */
-    public void setLeader(String leader) {
-        this.raidLeaderName = leader;
+    public int setLeader(String leader) {
+    	Guild server = RaidBot.getInstance().getServer(serverId);
+    	// first search by nickname
+    	List<Member> memberList = server.getMembersByNickname(leader, false);
+    	if (memberList.isEmpty()) {
+    		// search discord names
+    		memberList = server.getMembersByName(leader, false);
+    	}
+    	if (memberList.isEmpty())
+    		return 1;
+    	else if (memberList.size() == 1) {
+    		this.raidLeaderId = memberList.get(0).getUser().getId();
+            userIDsToNicknames.put(this.raidLeaderId, getNicknameOnServer(this.raidLeaderId, this.serverId));    
+            return 0;
+    	} else { // more than 1
+    		return 2;
+    	} 
     }
 
     /**
@@ -196,7 +222,7 @@ public class Raid {
     public boolean updateLeaderDB() {
         try {
             RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `leader`=? WHERE `raidId`=?",
-                    new String[] { raidLeaderName, messageId });
+                    new String[] { raidLeaderId, messageId });
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -306,7 +332,7 @@ public class Raid {
      * @return The raid leader's name
      */
     public String getRaidLeaderName() {
-        return raidLeaderName;
+        return userIDsToNicknames.get(raidLeaderId);
     }
 
     /**
@@ -585,16 +611,15 @@ public class Raid {
     /**
      * Returns the nickname of the user on a server. If no nickname is set, it returns the username instead
      * @param userId the ID of the user
-     * @param userName the username as fallback option
      * @param serverId the server ID
      * @return the user's server nickname
      */
-    private String getNicknameOnServer(String userId, String userName, String serverId) {
+    private String getNicknameOnServer(String userId, String serverId) {
     	Member member = RaidBot.getInstance().getServer(serverId).getMemberById(userId);
     	if (member != null) {
     		String nickname = member.getNickname();
     		if (nickname == null)
-    			nickname = userName;
+    			nickname = member.getUser().getName();;
     		// escape _ in the user names (this will lead to markdown formatting otherwise)
     		nickname = nickname.replace("_", "\\_");
     		return nickname;
@@ -631,12 +656,8 @@ public class Raid {
 
         userToRole.put(user, role);
         usersToFlexRoles.computeIfAbsent(new RaidUser(id, name, "", ""), k -> new ArrayList<FlexRole>());
-        if (userIDsToNicknames.get(id) == null) {
-        	// get the server nickname for that user and save it
-        	String nickname = getNicknameOnServer(id, name, serverId);
-        	if (nickname != null)
-        		userIDsToNicknames.put(id, nickname);
-        }
+        if (userIDsToNicknames.get(id) == null)
+        	userIDsToNicknames.put(id, getNicknameOnServer(id, serverId));
 
         if (update_message) {
             updateMessage();
@@ -675,12 +696,8 @@ public class Raid {
         if (usersToFlexRoles.get(user) == null) {
             usersToFlexRoles.put(user, new ArrayList<FlexRole>());
         }
-        if (userIDsToNicknames.get(id) == null) {
-        	// get the server nickname for that user and save it
-        	String nickname = getNicknameOnServer(id, name, serverId);
-        	if (nickname != null)
-        		userIDsToNicknames.put(id, nickname);
-        }
+        if (userIDsToNicknames.get(id) == null)
+        	userIDsToNicknames.put(id, getNicknameOnServer(id, serverId));
 
         usersToFlexRoles.get(user).add(frole);
         if (update_message) {

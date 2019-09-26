@@ -39,7 +39,7 @@ public class RaidManager {
                 channels.get(0).sendMessage(message).queue(message1 -> {
                     boolean inserted = insertToDatabase(raid, message1.getId(), message1.getGuild().getId(), message1.getChannel().getId());
                     if (inserted) {
-                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(),
+                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderId(),
                         		raid.getName(), raid.getDescription(), raid.getDate(), raid.getTime(), raid.isOpenWorld(), raid.isDisplayShort(),
                         		raid.isFractalEvent(), raid.getPermittedDiscordRoles());
                         newRaid.roles.addAll(raid.rolesWithNumbers);
@@ -80,7 +80,7 @@ public class RaidManager {
     public static void createFractal(User author, String serverId, String name, String date, String time, int teamCompId) {
 		// TODO Auto-generated method stub
 		PendingRaid fractalEvent = new PendingRaid();
-		fractalEvent.setLeaderName(author.getName());
+		fractalEvent.setLeaderId(author.getId());
         fractalEvent.setServerId(serverId);		
         fractalEvent.setName(name);
 		fractalEvent.setDescription("-");
@@ -124,7 +124,7 @@ public class RaidManager {
                     Boolean.toString(raid.isDisplayShort()),
                     Boolean.toString(raid.isOpenWorld()),
                     Boolean.toString(raid.isFractalEvent()),
-                    raid.getLeaderName(),
+                    raid.getLeaderId(),
                     raid.getName(),
                     raid.getDescription(),
                     raid.getDate(),
@@ -379,9 +379,6 @@ public class RaidManager {
         builder.setTitle(raid.getName());
         builder.addField("Description:" , raid.getDescription(), false);
         builder.addBlankField(false);
-        if (raid.getLeaderName() != null) {
-            builder.addField("Leader: ", "**" + raid.getLeaderName() + "**", false);
-        }
         builder.addBlankField(false);
         builder.addField("Date: ", raid.getDate(), true);
         builder.addField("Time: ", raid.getTime(), true);
