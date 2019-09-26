@@ -33,6 +33,11 @@ public class ReactionHandler extends ListenerAdapter {
         				e.getReaction().removeReaction(e.getUser()).queue();
         				return;
         			}
+        			if (raid.isUserPermitted(e.getMember()) == false) {
+        				e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Sign-up for this event is currently only available for specific discord roles.").queue());
+        				e.getReaction().removeReaction(e.getUser()).queue();
+        				return;
+        			}
                     if (Reactions.getSpecs().contains(emote.getName()) || emote.getName().equalsIgnoreCase("Flex")) {
                         // check if the user is already selecting a role
                         if (bot.getRoleSelectionMap().get(e.getUser().getId()) == null) {
