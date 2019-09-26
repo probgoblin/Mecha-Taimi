@@ -394,8 +394,13 @@ public class RaidBot {
                 QueryResult results = db.query("SELECT `archive_channel` FROM `serverSettings` WHERE `serverId` = ?",
                         new String[]{serverId});
                 if (results.getResults().next()) {
-                	archiveChannelCache.put(serverId, results.getResults().getString("archive_channel"));
-                    return archiveChannelCache.get(serverId);
+                	String result = results.getResults().getString("archive_channel");
+                	if (result != null) {
+                		archiveChannelCache.put(serverId, result);
+                		return result; 
+                    }
+                	else 
+                		return "archive-of-adventures";
                 } else {
                     return "archive-of-adventures";
                 }
