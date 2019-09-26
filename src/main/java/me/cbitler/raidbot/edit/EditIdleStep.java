@@ -49,6 +49,8 @@ public class EditIdleStep implements EditStep {
         					nextStep = new EditRoleStep(messageID);
         				else if (choiceId == 7) // display format
         					nextStep = new EditDisplayStep(messageID);
+        				else if (choiceId == 8) // change permitted discord roles
+        					nextStep = new EditPermDiscRoleStep(messageID);
         				else 
         					valid = false;
         			} else
@@ -78,7 +80,8 @@ public class EditIdleStep implements EditStep {
         	message += "`4` description \n"
         		+ "`5` leader \n"
         		+ "`6` roles \n"
-        		+ "`7` display format \n";
+        		+ "`7` display format \n"
+        		+ "`8` permitted discord roles for sign-up \n";
         }
         message += "or type *done* when you want to finish editing.";
         return message;

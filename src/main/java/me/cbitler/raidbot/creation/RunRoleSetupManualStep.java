@@ -69,6 +69,6 @@ public class RunRoleSetupManualStep implements CreationStep {
      * {@inheritDoc}
      */
     public CreationStep getNextStep() {
-        return null;
+        return new RunPermDiscRoleSetupStep();
     }
 }

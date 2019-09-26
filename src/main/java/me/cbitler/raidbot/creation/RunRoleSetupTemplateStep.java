@@ -23,6 +23,7 @@ public class RunRoleSetupTemplateStep implements CreationStep {
     public RunRoleSetupTemplateStep() {
 		this.templates = RoleTemplates.getAllTemplates();
 		this.templateNames = RoleTemplates.getAllTemplateNames();
+		nextStep = new RunPermDiscRoleSetupStep();
 	}
 
     /**

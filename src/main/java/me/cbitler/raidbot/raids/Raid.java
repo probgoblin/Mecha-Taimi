@@ -1270,6 +1270,18 @@ public class Raid {
         }
 	}
 	
+	public List<String> getPermittedDiscordRoles() {
+		return permittedDiscordRoles;
+	}
+	
+	public void addPermittedDiscordRoles(String role) {
+		permittedDiscordRoles.add(role);
+	}
+
+	public void clearPermittedDiscordRoles() {
+		permittedDiscordRoles.clear();
+	}
+	
 	/**
 	 * Checks whether the given user is permitted to sign up for this event
 	 * 

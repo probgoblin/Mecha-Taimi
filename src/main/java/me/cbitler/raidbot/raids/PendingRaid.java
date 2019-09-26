@@ -135,4 +135,12 @@ public class PendingRaid {
             rolesWithNumbers.add(new RaidRole(role.getAmount(), role.getName()));
         }
 	}
+
+	public void addPermittedDiscordRoles(String role) {
+		permittedDiscordRoles.add(role);
+	}
+
+	public void clearPermittedDiscordRoles() {
+		permittedDiscordRoles.clear();
+	}
 }
