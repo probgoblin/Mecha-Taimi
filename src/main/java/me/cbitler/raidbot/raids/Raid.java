@@ -76,10 +76,16 @@ public class Raid {
         try {
         	RaidBot.getInstance().getJda().getUserById(raidLeaderId);
         } catch (Exception excp) {
-        	setLeader(raidLeaderId);
+        	if (setLeader(raidLeaderId) != 0) {
+        		// invalid user, set id to zero
+        		this.raidLeaderId = "";
+        	}
         }
         // -------------------------------------
-        userIDsToNicknames.put(this.raidLeaderId, getNicknameOnServer(this.raidLeaderId, this.serverId));
+        if (this.raidLeaderId.isEmpty())
+        	userIDsToNicknames.put(this.raidLeaderId, "unknown");
+        else
+        	userIDsToNicknames.put(this.raidLeaderId, getNicknameOnServer(this.raidLeaderId, this.serverId));
     }
 
     /**
