@@ -327,6 +327,15 @@ public class Raid {
     }
 
     /**
+     * Get the raid leader's id
+     *
+     * @return The raid leader's id
+     */
+    public String getRaidLeaderId() {
+        return raidLeaderId;
+    }
+    
+    /**
      * Get the raid leader's name
      *
      * @return The raid leader's name
@@ -1281,8 +1290,7 @@ public class Raid {
             }
             
             return true;
-        }
-        else {
+        } else {
         	return false;
         }
 	}

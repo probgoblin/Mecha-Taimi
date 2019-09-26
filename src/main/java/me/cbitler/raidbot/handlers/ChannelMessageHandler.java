@@ -85,16 +85,20 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 try {
                     e.getMessage().delete().queue();
                 } catch (Exception exception) {}
-            } else if (e.getMessage().getRawContent().toLowerCase().startsWith("!editevent")) {
-            	String[] split = e.getMessage().getRawContent().split(" ");
-                if(split.length < 2) {
-                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Format for !editEvent: !editEvent [event id]").queue());
-                } else {
-                    String messageId = split[1];
-
-                    Raid raid = RaidManager.getRaid(messageId);
-
-                    if (raid != null && raid.getServerId().equalsIgnoreCase(e.getGuild().getId())) {
+            } 
+        }
+        
+        // edit can be made by event managers or the leader of the event (enables fractal event editing)
+        if (e.getMessage().getRawContent().toLowerCase().startsWith("!editevent")) {
+           	String[] split = e.getMessage().getRawContent().split(" ");
+            if(split.length < 2) {
+                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Format for !editEvent: !editEvent [event id]").queue());
+            } else {
+                String messageId = split[1];
+                Raid raid = RaidManager.getRaid(messageId);
+                if (raid != null && raid.getServerId().equalsIgnoreCase(e.getGuild().getId())) {
+                	// check permissions here since raid leader should also be able to edit
+                    if (PermissionsUtil.hasRaidLeaderRole(e.getMember()) || e.getAuthor().getId().contentEquals(raid.getRaidLeaderId())) {
                     	// check if this user already has an active chat
                     	int actvId = bot.userHasActiveChat(e.getAuthor().getId());
             			if (actvId != 0) {
@@ -114,16 +118,17 @@ public class ChannelMessageHandler extends ListenerAdapter {
                     		bot.getEditMap().put(e.getAuthor().getId(), editIdleStep);
                     		bot.getEditList().add(messageId);
                     	}
-                    } else {
-                        e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Non-existant event.").queue());
-                    }
+                    } 
+                } else {
+                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Non-existant event.").queue());
                 }
-                try {
-                    e.getMessage().delete().queue();
-                } catch (Exception exception) {}
             }
+            try {
+                e.getMessage().delete().queue();
+            } catch (Exception exception) {}
         }
 
+        // all commands that require manage server permissions
         if (e.getMember().getPermissions().contains(Permission.MANAGE_SERVER)) {
         	boolean setEventManager = e.getMessage().getRawContent().toLowerCase().startsWith("!seteventmanagerrole");
         	boolean setFractalCreator = e.getMessage().getRawContent().toLowerCase().startsWith("!setfractalcreatorrole");
