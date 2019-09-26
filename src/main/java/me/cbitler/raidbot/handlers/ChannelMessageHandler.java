@@ -213,7 +213,9 @@ public class ChannelMessageHandler extends ListenerAdapter {
 
     @Override
     public void onGuildMessageDelete(GuildMessageDeleteEvent e) {
-        if (RaidManager.getRaid(e.getMessageId()) != null) {
+    	Raid raid = RaidManager.getRaid(e.getMessageId()); 
+        if (raid != null && raid.getServerId().equalsIgnoreCase(e.getGuild().getId())) {
+        	raid.postToArchive();
             RaidManager.deleteRaid(e.getMessageId(), true);
         }
     }
