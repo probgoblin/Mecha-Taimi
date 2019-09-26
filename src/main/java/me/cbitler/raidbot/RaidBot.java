@@ -343,8 +343,13 @@ public class RaidBot {
                 QueryResult results = db.query("SELECT `fractal_channel` FROM `serverSettings` WHERE `serverId` = ?",
                         new String[]{serverId});
                 if (results.getResults().next()) {
-                	fractalChannelCache.put(serverId, results.getResults().getString("fractal_channel"));
-                    return fractalChannelCache.get(serverId);
+                	String result = results.getResults().getString("fractal_channel");
+                	if (result != null) {
+                		fractalChannelCache.put(serverId, result);
+                		return result; 
+                    } else {
+                    	return "fractal-runs";
+                    }
                 } else {
                     return "fractal-runs";
                 }
