@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -363,11 +364,23 @@ public class RaidBot {
      * Set the archive channel for a server. This also updates it in SQLite
      * @param serverId The server ID
      * @param channel The channel name
-     * @return whether the channel is valid
+     * @return 0: valid channel, 1: no channel found, 2: cannot write in channel
      */
-    public boolean setArchiveChannel(String serverId, String channel) {
+    public int setArchiveChannel(String serverId, String channel) {
+    	// check if channel exists
     	if (checkChannel(serverId, channel) == false)
-    		return false;
+    		return 1;
+    	
+    	// check if a message can be written into the channel
+    	Guild guild = RaidBot.getInstance().getServer(serverId);
+        List<TextChannel> channels = guild.getTextChannelsByName(RaidBot.getInstance().getArchiveChannel(serverId), true);
+        if(channels.size() > 0) {
+            // We always go with the first channel if there is more than one
+            if (channels.get(0).canTalk() == false)
+            	return 2;
+            // TODO:
+            // check if we have "embed links" permission required to post embedded event messages
+        }
     	
         archiveChannelCache.put(serverId, channel);
         try {
@@ -382,7 +395,7 @@ public class RaidBot {
                 // Not much we can do if there is also an update error
             }
         }
-        return true;
+        return 0;
     }
     
     /**

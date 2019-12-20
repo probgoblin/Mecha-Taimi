@@ -150,10 +150,13 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid channel name.").queue());
                 	}
                 } else if (setArchiveChannel) {
-                	if (RaidBot.getInstance().setArchiveChannel(e.getMember().getGuild().getId(), specifiedName)) {
-                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Archive channel updated to: " + specifiedName).queue());
-                	} else {
-                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid channel name.").queue());
+                	int success = RaidBot.getInstance().setArchiveChannel(e.getMember().getGuild().getId(), specifiedName);
+                	if (success == 0) {
+                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Archive channel successfully updated to *" + specifiedName + "*.").queue());
+                	} else if (success == 1){
+                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The channel *" + specifiedName + "* does not exist on this server.").queue());
+                	} else if (success == 2) {
+                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("I do not have write permissions to the channel *" + specifiedName + "*.").queue());
                 	}
                 }
                 try {
