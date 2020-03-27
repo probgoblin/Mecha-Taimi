@@ -14,6 +14,8 @@ import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.selection.SelectionStep;
 import me.cbitler.raidbot.swap.SwapStep;
 import me.cbitler.raidbot.utility.GuildCountUtil;
+import me.cbitler.raidbot.utility.AutomatedTaskExecutor;
+import me.cbitler.raidbot.utility.EventCreator;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -55,6 +57,8 @@ public class RaidBot {
     HashMap<String, String> archiveChannelCache = new HashMap<>();
 
     Database db;
+    
+    AutomatedTaskExecutor autoEventCreator;
 
     /**
      * Create a new instance of the raid bot with the specified JDA api
@@ -73,6 +77,9 @@ public class RaidBot {
         CommandRegistry.addCommand("info", new InfoCommand());
         CommandRegistry.addCommand("endEvent", new EndRaidCommand());
         CommandRegistry.addCommand("endAllEvents", new EndAllCommand());
+        
+        autoEventCreator = new AutomatedTaskExecutor(new EventCreator());
+        autoEventCreator.startExecutionAt(0, 0, 0);
 
         new Thread(() -> {
             while (true) {
