@@ -134,7 +134,12 @@ public class ChannelMessageHandler extends ListenerAdapter {
         	boolean setFractalCreator = e.getMessage().getRawContent().toLowerCase().startsWith("!setfractalcreatorrole");
         	boolean setFractalChannel = e.getMessage().getRawContent().toLowerCase().startsWith("!setfractalchannel");
         	boolean setArchiveChannel = e.getMessage().getRawContent().toLowerCase().startsWith("!setarchivechannel");
-            if (setEventManager || setFractalCreator || setFractalChannel || setArchiveChannel) {
+            boolean setAutoEventChannel = e.getMessage().getRawContent().toLowerCase().startsWith("!setautoeventchannel");
+            boolean startAutoEvents = e.getMessage().getRawContent().toLowerCase().startsWith("!startautoevents");
+            boolean stopAutoEvents = e.getMessage().getRawContent().toLowerCase().startsWith("!stopautoevents");
+        	
+        	if (setEventManager || setFractalCreator || setFractalChannel || setArchiveChannel 
+            		|| setAutoEventChannel || startAutoEvents || stopAutoEvents) {
                 String[] commandParts = e.getMessage().getRawContent().split(" ");
                 String specifiedName = combineArguments(commandParts,1);
                 if (setEventManager) {
@@ -144,10 +149,13 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 	RaidBot.getInstance().setFractalCreatorRole(e.getMember().getGuild().getId(), specifiedName);
                 	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Fractal creator role updated to: " + specifiedName).queue());
                 } else if (setFractalChannel) {
-                	if (RaidBot.getInstance().setFractalChannel(e.getMember().getGuild().getId(), specifiedName)) {
-                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Fractal announcement channel updated to: " + specifiedName).queue());
-                	} else {
-                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid channel name.").queue());
+                	int success = RaidBot.getInstance().setFractalChannel(e.getMember().getGuild().getId(), specifiedName);
+                	if (success == 0) {
+                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Fractal channel successfully updated to *" + specifiedName + "*.").queue());
+                	} else if (success == 1){
+                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The channel *" + specifiedName + "* does not exist on this server.").queue());
+                	} else if (success == 2) {
+                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("I do not have write permissions to the channel *" + specifiedName + "*.").queue());
                 	}
                 } else if (setArchiveChannel) {
                 	int success = RaidBot.getInstance().setArchiveChannel(e.getMember().getGuild().getId(), specifiedName);

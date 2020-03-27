@@ -36,7 +36,7 @@ public class AutomatedTaskExecutor
             }
 
         };
-        long delay = 60; //computeNextDelay(targetHour, targetMin, targetSec);
+        long delay = 20; //computeNextDelay(targetHour, targetMin, targetSec);
         executorService.schedule(taskWrapper, delay, TimeUnit.SECONDS);
     }
 

@@ -40,6 +40,8 @@ import java.util.Set;
 public class RaidBot {
     private static RaidBot instance;
     private JDA jda;
+    
+    private enum ChannelType { ARCHIVE, FRACTALS, AUTOEVENTS };
 
     HashMap<String, CreationStep> creation = new HashMap<String, CreationStep>();
     HashMap<String, EditStep> edits = new HashMap<String, EditStep>();
@@ -311,76 +313,21 @@ public class RaidBot {
         }
     }
     
-    /**
-     * Set the fractal announcement channel for a server. This also updates it in SQLite
-     * @param serverId The server ID
-     * @param channel The channel name
-     * @return whether the channel is valid
-     */
-    public boolean setFractalChannel(String serverId, String channel) {
-    	if (checkChannel(serverId, channel) == false)
-    		return false;
-    	
-    	fractalChannelCache.put(serverId, channel);
-        try {
-            db.update("INSERT INTO `serverSettings` (`serverId`,`fractal_channel`) VALUES (?,?)",
-                    new String[] { serverId, channel});
-        } catch (SQLException e) {
-            //TODO: There is probably a much better way of doing this
-            try {
-                db.update("UPDATE `serverSettings` SET `fractal_channel` = ? WHERE `serverId` = ?",
-                        new String[] { channel, serverId });
-            } catch (SQLException e1) {
-                // Not much we can do if there is also an insert error
-            }
-        }
-        return true;
-    }
     
     /**
-     * Get the fractal announcement channel for a specific server.
-     * This works by caching the channel once it's retrieved once, and returning the default if a server hasn't set one.
-     * @param serverId the ID of the server
-     * @return The name of the channel that is considered the fractal announcement channel for that server
-     */
-    public String getFractalChannel(String serverId) {
-        if (fractalChannelCache.get(serverId) != null) {
-            return fractalChannelCache.get(serverId);
-        } else {
-            try {
-                QueryResult results = db.query("SELECT `fractal_channel` FROM `serverSettings` WHERE `serverId` = ?",
-                        new String[]{serverId});
-                if (results.getResults().next()) {
-                	String result = results.getResults().getString("fractal_channel");
-                	if (result != null) {
-                		fractalChannelCache.put(serverId, result);
-                		return result; 
-                    } else {
-                    	return "fractal-runs";
-                    }
-                } else {
-                    return "fractal-runs";
-                }
-            } catch (Exception e) {
-                return "fractal-runs";
-            }
-        }
-    }
-    
-    /**
-     * Set the archive channel for a server. This also updates it in SQLite
+     * Set a channel for a server. This also updates it in SQLite
      * @param serverId The server ID
      * @param channel The channel name
      * @return 0: valid channel, 1: no channel found, 2: cannot write in channel
      */
-    public int setArchiveChannel(String serverId, String channel) {
+    private int setChannel(String serverId, String channel, ChannelType type) {
     	// check if channel exists
     	if (checkChannel(serverId, channel) == false)
     		return 1;
     	
     	// check if a message can be written into the channel
     	Guild guild = RaidBot.getInstance().getServer(serverId);
-        List<TextChannel> channels = guild.getTextChannelsByName(RaidBot.getInstance().getArchiveChannel(serverId), true);
+        List<TextChannel> channels = guild.getTextChannelsByName(RaidBot.getInstance().getChannel(serverId, type), true);
         if(channels.size() > 0) {
             // We always go with the first channel if there is more than one
             if (channels.get(0).canTalk() == false)
@@ -389,14 +336,30 @@ public class RaidBot {
             // check if we have "embed links" permission required to post embedded event messages
         }
     	
-        archiveChannelCache.put(serverId, channel);
+        String dbField = "";
+        if (type == ChannelType.ARCHIVE)
+        {
+        	archiveChannelCache.put(serverId, channel);
+        	dbField = "archive_channel";
+        }
+        else if (type == ChannelType.FRACTALS)
+        {
+        	fractalChannelCache.put(serverId,  channel);
+        	dbField = "fractal_channel";
+        }
+        else if (type == ChannelType.AUTOEVENTS)
+        {
+        	
+        	
+        }        
+        
         try {
-            db.update("INSERT INTO `serverSettings` (`serverId`,`archive_channel`) VALUES (?,?)",
+            db.update("INSERT INTO `serverSettings` (`serverId`,`" + dbField + "`) VALUES (?,?)",
                     new String[] { serverId, channel});
         } catch (SQLException e) {
             //TODO: There is probably a much better way of doing this
             try {
-                db.update("UPDATE `serverSettings` SET `archive_channel` = ? WHERE `serverId` = ?",
+                db.update("UPDATE `serverSettings` SET `" + dbField + "` = ? WHERE `serverId` = ?",
                         new String[] { channel, serverId });
             } catch (SQLException e1) {
                 // Not much we can do if there is also an update error
@@ -406,33 +369,96 @@ public class RaidBot {
     }
     
     /**
+     * Get a channel for a specific server.
+     * This works by caching the channel once it's retrieved once, and returning the default if a server hasn't set one.
+     * @param serverId the ID of the server
+     * @return The name of the channel that is considered the archive channel for that server
+     */
+    private String getChannel(String serverId, ChannelType type) {
+        String cached = null;
+        String dbField = "";
+        if (type == ChannelType.ARCHIVE)
+        {
+        	cached = archiveChannelCache.get(serverId);
+        	dbField = "archive_channel";
+        }
+        else if (type == ChannelType.FRACTALS)
+        {
+        	cached = fractalChannelCache.get(serverId);
+        	dbField = "fractal_channel";
+        }
+        else if (type == ChannelType.AUTOEVENTS)
+        {
+        }    
+        
+    	if (cached != null) {
+            return cached;
+        } else {
+            try {
+                QueryResult results = db.query("SELECT `" + dbField + "` FROM `serverSettings` WHERE `serverId` = ?",
+                        new String[]{serverId});
+                if (results.getResults().next()) {
+                	String result = results.getResults().getString(dbField);
+                	if (result != null) {
+                		if (type == ChannelType.ARCHIVE)
+                			archiveChannelCache.put(serverId, result);
+                		else if (type == ChannelType.ARCHIVE)
+                			fractalChannelCache.put(serverId, result);
+                		else if (type == ChannelType.AUTOEVENTS)
+                		{
+                			
+                		}
+                		return result; 
+                    }
+                	else 
+                		return "dummy-channel";
+                } else {
+                    return "dummy-channel";
+                }
+            } catch (Exception e) {
+                return "dummy-channel";
+            }
+        }
+    }
+    
+    /**
+     * Set the fractal announcement channel for a server. This also updates it in SQLite
+     * @param serverId The server ID
+     * @param channel The channel name
+     * @return 0: valid channel, 1: no channel found, 2: cannot write in channel
+     */
+    public int setFractalChannel(String serverId, String channel) {
+    	return setChannel(serverId, channel, ChannelType.FRACTALS);
+    }
+    
+    /**
+     * Get the fractal announcement channel for a specific server.
+     * This works by caching the channel once it's retrieved once, and returning the default if a server hasn't set one.
+     * @param serverId the ID of the server
+     * @return The name of the channel that is considered the fractal announcement channel for that server
+     */
+    public String getFractalChannel(String serverId) {
+        return getChannel(serverId, ChannelType.FRACTALS);
+    }
+    
+    /**
+     * Set the archive channel for a server. This also updates it in SQLite
+     * @param serverId The server ID
+     * @param channel The channel name
+     * @return 0: valid channel, 1: no channel found, 2: cannot write in channel
+     */
+    public int setArchiveChannel(String serverId, String channel) {
+    	return setChannel(serverId, channel, ChannelType.ARCHIVE);
+    }
+    
+    /**
      * Get the archive channel for a specific server.
      * This works by caching the channel once it's retrieved once, and returning the default if a server hasn't set one.
      * @param serverId the ID of the server
      * @return The name of the channel that is considered the archive channel for that server
      */
     public String getArchiveChannel(String serverId) {
-        if (archiveChannelCache.get(serverId) != null) {
-            return archiveChannelCache.get(serverId);
-        } else {
-            try {
-                QueryResult results = db.query("SELECT `archive_channel` FROM `serverSettings` WHERE `serverId` = ?",
-                        new String[]{serverId});
-                if (results.getResults().next()) {
-                	String result = results.getResults().getString("archive_channel");
-                	if (result != null) {
-                		archiveChannelCache.put(serverId, result);
-                		return result; 
-                    }
-                	else 
-                		return "archive-of-adventures";
-                } else {
-                    return "archive-of-adventures";
-                }
-            } catch (Exception e) {
-                return "archive-of-adventures";
-            }
-        }
+        return getChannel(serverId, ChannelType.ARCHIVE);
     }
     
     /** 
