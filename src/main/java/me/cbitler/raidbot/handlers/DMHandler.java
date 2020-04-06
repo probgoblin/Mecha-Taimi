@@ -150,6 +150,7 @@ public class DMHandler extends ListenerAdapter {
                     try {
                     	success = bot.createAutoEvent(event);   
                     } catch (Exception exception) {
+                    	System.out.println("Exception caught: "+exception.getMessage());
                     	success = false;
                     }
                     if (success)

@@ -28,6 +28,7 @@ public class EventCreator implements ExecutableTask {
 		
 		// always take up-to-date channel
 		eventTemplate.setAnnouncementChannel(bot.getAutoEventsChannel(serverId));
+		eventTemplate.setDate("today");
 		
 		lastEventId = RaidManager.createRaid(eventTemplate);
 				

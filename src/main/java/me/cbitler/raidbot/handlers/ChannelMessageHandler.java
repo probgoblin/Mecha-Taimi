@@ -138,8 +138,8 @@ public class ChannelMessageHandler extends ListenerAdapter {
         	boolean setFractalChannel = e.getMessage().getRawContent().toLowerCase().startsWith("!setfractalchannel");
         	boolean setArchiveChannel = e.getMessage().getRawContent().toLowerCase().startsWith("!setarchivechannel");
             boolean setAutoEventChannel = e.getMessage().getRawContent().toLowerCase().startsWith("!setautoeventchannel");
-            boolean startAutoEvents = e.getMessage().getRawContent().toLowerCase().startsWith("!startautoevents");
-            boolean stopAutoEvents = e.getMessage().getRawContent().toLowerCase().startsWith("!stopautoevents");
+            boolean startAutoEvents = e.getMessage().getRawContent().toLowerCase().startsWith("!startautoevent");
+            boolean stopAutoEvents = e.getMessage().getRawContent().toLowerCase().startsWith("!stopautoevent");
         	
         	if (setEventManager || setFractalCreator || setFractalChannel || setArchiveChannel 
             		|| setAutoEventChannel || startAutoEvents || stopAutoEvents) {

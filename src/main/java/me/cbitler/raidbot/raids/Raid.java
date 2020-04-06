@@ -204,6 +204,8 @@ public class Raid {
      * @return 0 if the provided new leader name is valid i.e. belongs to a unique existing user, 1 no user, 2 more than 1 user
      */
     public int setLeader(String leader) {
+    	if (leader.isEmpty())
+    		return 1;
     	Guild server = RaidBot.getInstance().getServer(serverId);
     	// first search by nickname
     	List<Member> memberList = server.getMembersByNickname(leader, false);

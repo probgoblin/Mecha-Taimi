@@ -65,7 +65,7 @@ public class RaidBot {
 
     Database db;
     
-    HashMap<String, List<AutomatedTaskExecutor>> autoEventCreator;
+    HashMap<String, List<AutomatedTaskExecutor>> autoEventCreator = new HashMap<>();
 
     /**
      * Create a new instance of the raid bot with the specified JDA api
