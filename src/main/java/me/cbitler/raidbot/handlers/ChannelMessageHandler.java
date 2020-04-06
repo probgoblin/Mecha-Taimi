@@ -1,10 +1,13 @@
 package me.cbitler.raidbot.handlers;
 
 import me.cbitler.raidbot.RaidBot;
+import me.cbitler.raidbot.RaidBot.ChannelType;
 import me.cbitler.raidbot.commands.Command;
 import me.cbitler.raidbot.commands.CommandRegistry;
 import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.creation.RunNameStep;
+import me.cbitler.raidbot.creation_auto.AutoCreationStep;
+import me.cbitler.raidbot.creation_auto.AutoRunNameStep;
 import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.edit.EditIdleStep;
 import me.cbitler.raidbot.raids.Raid;
@@ -148,24 +151,29 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 } else if (setFractalCreator) {
                 	RaidBot.getInstance().setFractalCreatorRole(e.getMember().getGuild().getId(), specifiedName);
                 	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Fractal creator role updated to: " + specifiedName).queue());
-                } else if (setFractalChannel) {
-                	int success = RaidBot.getInstance().setFractalChannel(e.getMember().getGuild().getId(), specifiedName);
+                } else if (setFractalChannel || setArchiveChannel || setAutoEventChannel) {
+                	ChannelType channelType;
+                	if (setFractalChannel) channelType = ChannelType.FRACTALS;
+                	else if (setArchiveChannel) channelType = ChannelType.ARCHIVE;
+                	else channelType = ChannelType.AUTOEVENTS;
+                	int success = RaidBot.getInstance().setChannel(e.getMember().getGuild().getId(), specifiedName, channelType);
                 	if (success == 0) {
-                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Fractal channel successfully updated to *" + specifiedName + "*.").queue());
+                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Channel successfully updated to *" + specifiedName + "*.").queue());
                 	} else if (success == 1){
                 		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The channel *" + specifiedName + "* does not exist on this server.").queue());
                 	} else if (success == 2) {
                 		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("I do not have write permissions to the channel *" + specifiedName + "*.").queue());
                 	}
-                } else if (setArchiveChannel) {
-                	int success = RaidBot.getInstance().setArchiveChannel(e.getMember().getGuild().getId(), specifiedName);
-                	if (success == 0) {
-                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Archive channel successfully updated to *" + specifiedName + "*.").queue());
-                	} else if (success == 1){
-                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The channel *" + specifiedName + "* does not exist on this server.").queue());
-                	} else if (success == 2) {
-                		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("I do not have write permissions to the channel *" + specifiedName + "*.").queue());
-                	}
+                } else if (startAutoEvents) {
+                	// check if this user already has an active chat
+                	int actvId = bot.userHasActiveChat(e.getAuthor().getId());
+        			if (actvId != 0) {
+        				RaidBot.writeNotificationActiveChat(e.getAuthor(), actvId);
+        			} else {
+        				AutoCreationStep runNameStep = new AutoRunNameStep(e.getMessage().getGuild().getId());
+        				e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(runNameStep.getStepText()).queue());
+        				bot.getAutoCreationMap().put(e.getAuthor().getId(), runNameStep);
+        			}
                 }
                 try {
                     e.getMessage().delete().queue();

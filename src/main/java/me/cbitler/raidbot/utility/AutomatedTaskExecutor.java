@@ -59,7 +59,7 @@ public class AutomatedTaskExecutor
         try {
             executorService.awaitTermination(1, TimeUnit.DAYS);
         } catch (InterruptedException ex) {
-        	System.out.println("awaitTermination in AutomatedMessageWriter did not succeed.");
+        	System.out.println("awaitTermination in AutomatedTaskExecutor did not succeed.");
         }
     }
 }

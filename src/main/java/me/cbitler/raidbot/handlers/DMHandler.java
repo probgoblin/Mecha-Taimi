@@ -2,9 +2,11 @@ package me.cbitler.raidbot.handlers;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.creation.CreationStep;
+import me.cbitler.raidbot.creation_auto.AutoCreationStep;
 import me.cbitler.raidbot.deselection.DeselectionStep;
 import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.logs.LogParser;
+import me.cbitler.raidbot.raids.AutoPendingRaid;
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.selection.SelectionStep;
@@ -118,6 +120,45 @@ public class DMHandler extends ListenerAdapter {
                     e.getChannel().sendMessage("Finished editing event.").queue();
                 }
             }
+        } else if (bot.getAutoCreationMap().containsKey(author.getId())) {
+            if(e.getMessage().getRawContent().equalsIgnoreCase("cancel")) {
+                cancelAutoCreation(author);
+                return;
+            }
+
+            AutoCreationStep step = bot.getAutoCreationMap().get(author.getId());
+            boolean done = false;
+            try {
+            	done = step.handleDM(e);
+            } catch (RuntimeException excp) {
+            	e.getChannel().sendMessage("Something went wrong. I'm sorry.").queue();
+            	cancelAutoCreation(author);
+            	return;
+            }
+
+            // If this step is done, move onto the next one or finish
+            if (done) {
+                AutoCreationStep nextStep = step.getNextStep();
+                if(nextStep != null) {
+                    bot.getAutoCreationMap().put(author.getId(), nextStep);
+                    e.getChannel().sendMessage(nextStep.getStepText()).queue();
+                } else {
+                    // create automated task
+                	bot.getAutoCreationMap().remove(author.getId());
+                    AutoPendingRaid event = step.getEventTemplate();
+                    boolean success = true;
+                    try {
+                    	success = bot.createAutoEvent(event);   
+                    } catch (Exception exception) {
+                    	success = false;
+                    }
+                    if (success)
+                    	e.getChannel().sendMessage("Automated event successfully created.").queue();
+                    else
+                    	e.getChannel().sendMessage("Automated event could not be created. Make sure the maximum number of auto events is not reached yet.").queue();
+           
+                }
+            }
         } else if (bot.getRoleDeselectionMap().containsKey(author.getId())) {
         	DeselectionStep step = bot.getRoleDeselectionMap().get(author.getId());
         	boolean done = step.handleDM(e);
@@ -177,5 +218,15 @@ public class DMHandler extends ListenerAdapter {
         
         author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event editing cancelled.").queue());    	
         
+    }
+    
+    /**
+     * cancels auto event creation, i.e. removes the user from the auto creation map and sends notification
+     * @param user the user who started the auto creation process
+     */
+    private void cancelAutoCreation(User author) {
+    	bot.getAutoCreationMap().remove(author.getId());
+
+        author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Creation of automated event cancelled.").queue());    	
     }
 }

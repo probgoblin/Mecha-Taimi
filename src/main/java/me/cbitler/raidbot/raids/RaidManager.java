@@ -28,8 +28,9 @@ public class RaidManager {
      * It also sends the associated embedded message and adds the reactions for people to join to the embed
      * @param raid The pending raid to create
      */
-    public static void createRaid(PendingRaid raid) {
-        MessageEmbed message = raid.isDisplayShort() ? buildEmbedShort(raid) : buildEmbed(raid);
+    public static String createRaid(PendingRaid raid) {    	
+    	int numRaidsBefore = raids.size();
+    	MessageEmbed message = raid.isDisplayShort() ? buildEmbedShort(raid) : buildEmbed(raid);
 
         Guild guild = RaidBot.getInstance().getServer(raid.getServerId());
         List<TextChannel> channels = guild.getTextChannelsByName(raid.getAnnouncementChannel(), true);
@@ -68,6 +69,13 @@ public class RaidManager {
                 throw e;
             }
         }
+        
+        if (raids.size() == numRaidsBefore + 1)
+        {
+        	return raids.get(raids.size() - 1).getMessageId();
+        }
+        else
+        	return "";
     }
     
     /**

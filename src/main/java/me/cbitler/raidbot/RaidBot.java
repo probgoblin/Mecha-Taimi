@@ -2,6 +2,7 @@ package me.cbitler.raidbot;
 
 import me.cbitler.raidbot.commands.*;
 import me.cbitler.raidbot.creation.CreationStep;
+import me.cbitler.raidbot.creation_auto.AutoCreationStep;
 import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.database.QueryResult;
@@ -9,6 +10,7 @@ import me.cbitler.raidbot.deselection.DeselectionStep;
 import me.cbitler.raidbot.handlers.ChannelMessageHandler;
 import me.cbitler.raidbot.handlers.DMHandler;
 import me.cbitler.raidbot.handlers.ReactionHandler;
+import me.cbitler.raidbot.raids.AutoPendingRaid;
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.selection.SelectionStep;
@@ -23,6 +25,7 @@ import net.dv8tion.jda.core.entities.User;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,7 +44,7 @@ public class RaidBot {
     private static RaidBot instance;
     private JDA jda;
     
-    private enum ChannelType { ARCHIVE, FRACTALS, AUTOEVENTS };
+    public enum ChannelType { ARCHIVE, FRACTALS, AUTOEVENTS };
 
     HashMap<String, CreationStep> creation = new HashMap<String, CreationStep>();
     HashMap<String, EditStep> edits = new HashMap<String, EditStep>();
@@ -49,6 +52,7 @@ public class RaidBot {
     HashMap<String, SelectionStep> roleSelection = new HashMap<String, SelectionStep>();
     HashMap<String, DeselectionStep> roleDeselection = new HashMap<String, DeselectionStep>();
     HashMap<String, SwapStep> roleSwap = new HashMap<String, SwapStep>();
+    HashMap<String, AutoCreationStep> creationAuto = new HashMap<String, AutoCreationStep>();
 
     Set<String> editList = new HashSet<String>();
 
@@ -57,10 +61,11 @@ public class RaidBot {
     HashMap<String, String> fractalCreatorRoleCache = new HashMap<>();
     HashMap<String, String> fractalChannelCache = new HashMap<>();
     HashMap<String, String> archiveChannelCache = new HashMap<>();
+    HashMap<String, String> autoEventsChannelCache = new HashMap<>();
 
     Database db;
     
-    AutomatedTaskExecutor autoEventCreator;
+    HashMap<String, List<AutomatedTaskExecutor>> autoEventCreator;
 
     /**
      * Create a new instance of the raid bot with the specified JDA api
@@ -79,9 +84,6 @@ public class RaidBot {
         CommandRegistry.addCommand("info", new InfoCommand());
         CommandRegistry.addCommand("endEvent", new EndRaidCommand());
         CommandRegistry.addCommand("endAllEvents", new EndAllCommand());
-        
-        autoEventCreator = new AutomatedTaskExecutor(new EventCreator());
-        autoEventCreator.startExecutionAt(0, 0, 0);
 
         new Thread(() -> {
             while (true) {
@@ -137,6 +139,14 @@ public class RaidBot {
      */
     public HashMap<String, SwapStep> getRoleSwapMap() {
         return roleSwap;
+    }
+    
+    /**
+     * Map of UserId -> auto creation step for people in the creation process for auto events
+     * @return The map of UserId -> auto creation step for people in the creation process
+     */
+    public HashMap<String, AutoCreationStep> getAutoCreationMap() {
+        return creationAuto;
     }
 
     /**
@@ -246,6 +256,7 @@ public class RaidBot {
     	else if (actvId == 3) actvName = "create event";
     	else if (actvId == 4) actvName = "edit event";
     	else if (actvId == 5) actvName = "swap role";
+    	else if (actvId == 6) actvName = "create auto event";
     	else actvName = "";
     	
     	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You already have an active chat with me (" + actvName + "). Finish it first!").queue());
@@ -254,7 +265,14 @@ public class RaidBot {
     /**
      * Determines whether the user has an active chat with the bot which is waiting for DM input
      * @param id the user's id
-     * @return 0: no active chat, 1: role selection, 2: role deselection, 3: event creation, 4: event edit
+     * @return 
+     * 0: no active chat, 
+     * 1: role selection, 
+     * 2: role deselection, 
+     * 3: event creation, 
+     * 4: event edit,
+     * 5: swap roles,
+     * 6: create auto event
      */
 	public int userHasActiveChat(String id) {
 		int actvId = 0;
@@ -263,6 +281,7 @@ public class RaidBot {
 		else if (creation.get(id) != null) actvId = 3;
 		else if (edits.get(id) != null) actvId = 4;
 		else if (roleSwap.get(id) != null) actvId = 5;
+		else if (creationAuto.get(id) != null) actvId = 6;
 		
 		return actvId;
 	}
@@ -320,7 +339,7 @@ public class RaidBot {
      * @param channel The channel name
      * @return 0: valid channel, 1: no channel found, 2: cannot write in channel
      */
-    private int setChannel(String serverId, String channel, ChannelType type) {
+    public int setChannel(String serverId, String channel, ChannelType type) {
     	// check if channel exists
     	if (checkChannel(serverId, channel) == false)
     		return 1;
@@ -349,8 +368,8 @@ public class RaidBot {
         }
         else if (type == ChannelType.AUTOEVENTS)
         {
-        	
-        	
+        	autoEventsChannelCache.put(serverId,  channel);
+        	dbField = "auto_events_channel";        	
         }        
         
         try {
@@ -389,6 +408,8 @@ public class RaidBot {
         }
         else if (type == ChannelType.AUTOEVENTS)
         {
+        	autoEventsChannelCache.get(serverId);
+        	dbField = "auto_events_channel";  
         }    
         
     	if (cached != null) {
@@ -405,9 +426,7 @@ public class RaidBot {
                 		else if (type == ChannelType.ARCHIVE)
                 			fractalChannelCache.put(serverId, result);
                 		else if (type == ChannelType.AUTOEVENTS)
-                		{
-                			
-                		}
+                        	autoEventsChannelCache.get(serverId);
                 		return result; 
                     }
                 	else 
@@ -461,6 +480,16 @@ public class RaidBot {
         return getChannel(serverId, ChannelType.ARCHIVE);
     }
     
+    /**
+     * Get the auto events channel for a specific server.
+     * This works by caching the channel once it's retrieved once, and returning the default if a server hasn't set one.
+     * @param serverId the ID of the server
+     * @return The name of the channel that is considered the auto events channel for that server
+     */
+    public String getAutoEventsChannel(String serverId) {
+        return getChannel(serverId, ChannelType.AUTOEVENTS);
+    }
+    
     /** 
      * checks if a given channel exists
      * @param serverId the id of the server to be checked 
@@ -487,4 +516,20 @@ public class RaidBot {
 		return checkChannel(serverId, getArchiveChannel(serverId));
 	}
 
+	public boolean createAutoEvent(AutoPendingRaid event) {
+		// check if the maximum number of events is reached for this server
+		int maxNumAutoEvents = 3;
+		String serverId = event.getServerId();
+		List<AutomatedTaskExecutor> tasks = autoEventCreator.get(serverId);
+		if (tasks != null && tasks.size() >= maxNumAutoEvents)
+			return false;
+		if (tasks == null)
+			tasks = new ArrayList<AutomatedTaskExecutor>();
+		AutomatedTaskExecutor taskExec = new AutomatedTaskExecutor(new EventCreator(event));
+		tasks.add(taskExec);
+		autoEventCreator.put(serverId, tasks);
+		taskExec.startExecutionAt(event.getResetHour(), event.getResetMinutes(), 0);
+		
+		return true;
+	}
 }
