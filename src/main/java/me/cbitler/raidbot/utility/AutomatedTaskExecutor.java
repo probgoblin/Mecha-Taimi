@@ -23,6 +23,11 @@ public class AutomatedTaskExecutor
     {
         this.task = task;
     }
+    
+    public String getName()
+    {
+    	return task.getName();
+    }
 
     public void startExecutionAt(int targetHour, int targetMin, int targetSec)
     {
@@ -37,6 +42,7 @@ public class AutomatedTaskExecutor
 
         };
         long delay = computeNextDelay(targetHour, targetMin, targetSec);
+        System.out.println("Next task scheduled in "+Long.toString(delay)+" seconds.");
         executorService.schedule(taskWrapper, delay, TimeUnit.SECONDS);
     }
 
@@ -46,7 +52,7 @@ public class AutomatedTaskExecutor
         ZoneId currentZone = ZoneId.systemDefault();
         ZonedDateTime zonedNow = ZonedDateTime.of(localNow, currentZone);
         ZonedDateTime zonedNextTarget = zonedNow.withHour(targetHour).withMinute(targetMin).withSecond(targetSec);
-        if(zonedNow.compareTo(zonedNextTarget) > 0)
+        if(zonedNow.compareTo(zonedNextTarget) >= 0)
             zonedNextTarget = zonedNextTarget.plusDays(1);
 
         Duration duration = Duration.between(zonedNow, zonedNextTarget);

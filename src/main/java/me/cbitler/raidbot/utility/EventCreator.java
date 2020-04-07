@@ -17,6 +17,13 @@ public class EventCreator implements ExecutableTask {
 		lastEventId = "";
 	}
 	
+	
+	@Override
+	public String getName() {
+		return eventTemplate.getName() + " @ " + eventTemplate.getTime();
+	}
+	
+	
 	@Override
 	public void execute() {
 		RaidBot bot = RaidBot.getInstance();
@@ -30,7 +37,7 @@ public class EventCreator implements ExecutableTask {
 		eventTemplate.setAnnouncementChannel(bot.getAutoEventsChannel(serverId));
 		eventTemplate.setDate("today");
 		
-		lastEventId = RaidManager.createRaid(eventTemplate);
+		RaidManager.createRaid(eventTemplate);
 				
 		System.out.println("lastEventId is" + lastEventId);
 	}
