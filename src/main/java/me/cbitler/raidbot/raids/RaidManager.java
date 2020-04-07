@@ -11,6 +11,7 @@ import net.dv8tion.jda.core.entities.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,13 +23,15 @@ import java.util.List;
 public class RaidManager {
 
     static List<Raid> raids = new ArrayList<>();
+    static HashMap<String, String> autoCreatorToEventMap = new HashMap<>();
 
     /**
      * Create a raid. This turns a PendingRaid object into a Raid object and inserts it into the list of raids.
      * It also sends the associated embedded message and adds the reactions for people to join to the embed
      * @param raid The pending raid to create
+     * @param taskExecId unique identifier of the task executor, only non-empty for auto events 
      */
-    public static void createRaid(PendingRaid raid) {    	
+    public static void createRaid(PendingRaid raid, String taskExecId) {    	
     	MessageEmbed message = raid.isDisplayShort() ? buildEmbedShort(raid) : buildEmbed(raid);
 
         Guild guild = RaidBot.getInstance().getServer(raid.getServerId());
@@ -45,6 +48,11 @@ public class RaidManager {
                         newRaid.roles.addAll(raid.rolesWithNumbers);
                         raids.add(newRaid);
                         newRaid.updateMessage();
+                        
+                        if (taskExecId.isEmpty() == false)
+                        {
+                        	autoCreatorToEventMap.put(taskExecId, message1.getId());
+                        }
 
                         List<Emote> emoteList;
                         if (newRaid.isOpenWorld)
@@ -68,6 +76,16 @@ public class RaidManager {
                 throw e;
             }
         }
+    }
+    
+    
+    /**
+     * Create a raid. This turns a PendingRaid object into a Raid object and inserts it into the list of raids.
+     * It also sends the associated embedded message and adds the reactions for people to join to the embed
+     * @param raid The pending raid to create
+     */
+    public static void createRaid(PendingRaid raid) {
+    	createRaid(raid, "");
     }
     
     /**
@@ -326,6 +344,16 @@ public class RaidManager {
     public static List<Raid> getAllRaids()
     {
     	return raids;
+    }
+    
+    /**
+     * Get event id for the specified creator if it created an event before
+     * @param creatorId unique identifier of a creator task
+     * @return The event id of the last event created by this creator (can be null)
+     */
+    public static String getEventForAutoCreator(String creatorId)
+    {
+    	return autoCreatorToEventMap.get(creatorId);
     }
 
     /**

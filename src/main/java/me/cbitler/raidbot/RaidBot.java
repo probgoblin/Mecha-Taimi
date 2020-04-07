@@ -2,7 +2,8 @@ package me.cbitler.raidbot;
 
 import me.cbitler.raidbot.commands.*;
 import me.cbitler.raidbot.creation.CreationStep;
-import me.cbitler.raidbot.creation_auto.AutoCreationStep;
+import me.cbitler.raidbot.auto_events.AutoCreationStep;
+import me.cbitler.raidbot.auto_events.AutoStopStep;
 import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.database.QueryResult;
@@ -43,6 +44,7 @@ import java.util.Set;
 public class RaidBot {
     private static RaidBot instance;
     private JDA jda;
+    private int maxNumAutoEvents = 3;
     
     public enum ChannelType { ARCHIVE, FRACTALS, AUTOEVENTS };
 
@@ -53,6 +55,7 @@ public class RaidBot {
     HashMap<String, DeselectionStep> roleDeselection = new HashMap<String, DeselectionStep>();
     HashMap<String, SwapStep> roleSwap = new HashMap<String, SwapStep>();
     HashMap<String, AutoCreationStep> creationAuto = new HashMap<String, AutoCreationStep>();
+    HashMap<String, AutoStopStep> stopAuto = new HashMap<String, AutoStopStep>();
 
     Set<String> editList = new HashSet<String>();
 
@@ -147,6 +150,14 @@ public class RaidBot {
      */
     public HashMap<String, AutoCreationStep> getAutoCreationMap() {
         return creationAuto;
+    }
+    
+    /**
+     * Map of UserId -> auto stop step for people stopping auto events
+     * @return The map of UserId -> auto stop step
+     */
+    public HashMap<String, AutoStopStep> getAutoStopMap() {
+        return stopAuto;
     }
 
     /**
@@ -257,6 +268,7 @@ public class RaidBot {
     	else if (actvId == 4) actvName = "edit event";
     	else if (actvId == 5) actvName = "swap role";
     	else if (actvId == 6) actvName = "create auto event";
+    	else if (actvId == 7) actvName = "stop auto event";
     	else actvName = "";
     	
     	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You already have an active chat with me (" + actvName + "). Finish it first!").queue());
@@ -273,6 +285,7 @@ public class RaidBot {
      * 4: event edit,
      * 5: swap roles,
      * 6: create auto event
+     * 7: stop auto event
      */
 	public int userHasActiveChat(String id) {
 		int actvId = 0;
@@ -282,6 +295,7 @@ public class RaidBot {
 		else if (edits.get(id) != null) actvId = 4;
 		else if (roleSwap.get(id) != null) actvId = 5;
 		else if (creationAuto.get(id) != null) actvId = 6;
+		else if (stopAuto.get(id) != null) actvId = 7;
 		
 		return actvId;
 	}
@@ -515,21 +529,82 @@ public class RaidBot {
 	public boolean isArchiveAvailable(String serverId) {
 		return checkChannel(serverId, getArchiveChannel(serverId));
 	}
+	
+	
+	/**
+     * returns the maximum allowed number of auto events per server
+     *
+     * @return maximum allowed number of auto events per server
+     */
+	public int getMaxNumAutoEvents() {
+		return maxNumAutoEvents;
+	}
+	
+	
+	/**
+     * returns the number of currently active auto events for a server
+     *
+     * @param serverId 
+     * @return the number of auto events currently active for this server
+     */
+	public int getNumAutoEvents(String serverId) {
+		List<AutomatedTaskExecutor> tasks = autoEventCreator.get(serverId);
+		if (tasks == null)
+			return 0;
+		else
+			return tasks.size();
+	}
 
+	
+	/**
+     * creates an auto event 
+     *
+     * @param event The event template for the auto event 
+     * @return whether the auto event was successfully created
+     */
 	public boolean createAutoEvent(AutoPendingRaid event) {
 		// check if the maximum number of events is reached for this server
-		int maxNumAutoEvents = 3;
 		String serverId = event.getServerId();
 		List<AutomatedTaskExecutor> tasks = autoEventCreator.get(serverId);
 		if (tasks != null && tasks.size() >= maxNumAutoEvents)
 			return false;
 		if (tasks == null)
 			tasks = new ArrayList<AutomatedTaskExecutor>();
-		AutomatedTaskExecutor taskExec = new AutomatedTaskExecutor(new EventCreator(event));
+		AutomatedTaskExecutor taskExec = new AutomatedTaskExecutor(new EventCreator(event, tasks.size()));
 		tasks.add(taskExec);
 		autoEventCreator.put(serverId, tasks);
 		taskExec.startExecutionAt(event.getResetHour(), event.getResetMinutes(), 0);
 		
 		return true;
+	}
+	
+	
+	/**
+     * stops an auto event 
+     *
+     * @param serverId 
+     * @param taskId 
+     */
+	public void stopAutoEvent(String serverId, int taskId) {
+		List<AutomatedTaskExecutor> tasks = autoEventCreator.get(serverId);
+		if (tasks != null)
+		{
+			AutomatedTaskExecutor task = tasks.remove(taskId);
+			task.stop();
+		}
+	}
+	
+	
+	/**
+     * returns the list of automated tasks for a server
+     *
+     * @param serverId 
+     * @return list of automated tasks for this server (empty list if there are none)
+     */
+	public List<AutomatedTaskExecutor> getAutoTasks(String serverId) {
+		List<AutomatedTaskExecutor> result = autoEventCreator.get(serverId);
+		if (result == null)
+			result = new ArrayList<>();
+		return result;
 	}
 }

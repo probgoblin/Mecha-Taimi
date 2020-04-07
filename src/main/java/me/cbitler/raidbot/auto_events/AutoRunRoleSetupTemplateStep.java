@@ -1,4 +1,4 @@
-package me.cbitler.raidbot.creation_auto;
+package me.cbitler.raidbot.auto_events;
 
 import java.util.List;
 

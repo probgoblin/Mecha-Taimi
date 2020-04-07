@@ -42,7 +42,7 @@ public class AutomatedTaskExecutor
 
         };
         long delay = computeNextDelay(targetHour, targetMin, targetSec);
-        System.out.println("Next task scheduled in "+Long.toString(delay)+" seconds.");
+        //System.out.println("Next task scheduled in "+Long.toString(delay)+" seconds.");
         executorService.schedule(taskWrapper, delay, TimeUnit.SECONDS);
     }
 
@@ -61,9 +61,10 @@ public class AutomatedTaskExecutor
 
     public void stop()
     {
-        executorService.shutdown();
+    	// use shutdownNow instead of shutdown because the latter waits for scheduled tasks to be executed (roughly one day usually!)
+        executorService.shutdownNow();
         try {
-            executorService.awaitTermination(1, TimeUnit.DAYS);
+            executorService.awaitTermination(10, TimeUnit.SECONDS);
         } catch (InterruptedException ex) {
         	System.out.println("awaitTermination in AutomatedTaskExecutor did not succeed.");
         }

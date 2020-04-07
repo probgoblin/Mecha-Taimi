@@ -2,12 +2,13 @@ package me.cbitler.raidbot.handlers;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.RaidBot.ChannelType;
+import me.cbitler.raidbot.auto_events.AutoStopStep;
 import me.cbitler.raidbot.commands.Command;
 import me.cbitler.raidbot.commands.CommandRegistry;
 import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.creation.RunNameStep;
-import me.cbitler.raidbot.creation_auto.AutoCreationStep;
-import me.cbitler.raidbot.creation_auto.AutoRunNameStep;
+import me.cbitler.raidbot.auto_events.AutoCreationStep;
+import me.cbitler.raidbot.auto_events.AutoRunNameStep;
 import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.edit.EditIdleStep;
 import me.cbitler.raidbot.raids.Raid;
@@ -170,9 +171,31 @@ public class ChannelMessageHandler extends ListenerAdapter {
         			if (actvId != 0) {
         				RaidBot.writeNotificationActiveChat(e.getAuthor(), actvId);
         			} else {
-        				AutoCreationStep runNameStep = new AutoRunNameStep(e.getMessage().getGuild().getId());
-        				e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(runNameStep.getStepText()).queue());
-        				bot.getAutoCreationMap().put(e.getAuthor().getId(), runNameStep);
+        				String serverId = e.getMessage().getGuild().getId();
+        				if (bot.getNumAutoEvents(serverId) >= bot.getMaxNumAutoEvents())
+        					e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("This server already has reached the maximum number of auto events. Stop an event before creating a new one.").queue());
+        				else
+        				{
+        					AutoCreationStep runNameStep = new AutoRunNameStep(e.getMessage().getGuild().getId());
+        					e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(runNameStep.getStepText()).queue());
+        					bot.getAutoCreationMap().put(e.getAuthor().getId(), runNameStep);
+        				}
+        			}
+                } else if (stopAutoEvents) {
+                	// check if this user already has an active chat
+                	int actvId = bot.userHasActiveChat(e.getAuthor().getId());
+        			if (actvId != 0) {
+        				RaidBot.writeNotificationActiveChat(e.getAuthor(), actvId);
+        			} else {
+        				String serverId = e.getMessage().getGuild().getId();
+        				if (bot.getNumAutoEvents(serverId) <= 0)
+        					e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("There are no auto events on this server yet.").queue());
+        				else
+        				{
+        					AutoStopStep stopStep = new AutoStopStep(serverId);
+        					e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(stopStep.getStepText()).queue());
+        					bot.getAutoStopMap().put(e.getAuthor().getId(), stopStep);
+        				}
         			}
                 }
                 try {

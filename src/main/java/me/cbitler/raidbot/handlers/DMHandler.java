@@ -2,7 +2,8 @@ package me.cbitler.raidbot.handlers;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.creation.CreationStep;
-import me.cbitler.raidbot.creation_auto.AutoCreationStep;
+import me.cbitler.raidbot.auto_events.AutoCreationStep;
+import me.cbitler.raidbot.auto_events.AutoStopStep;
 import me.cbitler.raidbot.deselection.DeselectionStep;
 import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.logs.LogParser;
@@ -158,6 +159,35 @@ public class DMHandler extends ListenerAdapter {
                     else
                     	e.getChannel().sendMessage("Automated event could not be created. Make sure the maximum number of auto events is not reached yet.").queue();
            
+                }
+            }
+        } else if (bot.getAutoStopMap().containsKey(author.getId())) {
+            if(e.getMessage().getRawContent().equalsIgnoreCase("cancel")) {
+            	bot.getAutoStopMap().remove(author.getId());
+                author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Removal of automated event cancelled.").queue());    	
+                return;
+            }
+
+            AutoStopStep step = bot.getAutoStopMap().get(author.getId());
+            boolean done = false;
+            try {
+            	done = step.handleDM(e);
+            } catch (RuntimeException excp) {
+            	bot.getAutoStopMap().remove(author.getId());
+                author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Something went wrong. Removal of automated event cancelled.").queue());    	
+                return;
+            }
+
+            // If this step is done, move onto the next one or finish
+            if (done) {
+                AutoStopStep nextStep = step.getNextStep();
+                if(nextStep != null) {
+                    bot.getAutoStopMap().put(author.getId(), nextStep);
+                    e.getChannel().sendMessage(nextStep.getStepText()).queue();
+                } else {
+                    // finish
+                	bot.getAutoStopMap().remove(author.getId());
+                    e.getChannel().sendMessage("Automated event successfully stopped.").queue();
                 }
             }
         } else if (bot.getRoleDeselectionMap().containsKey(author.getId())) {

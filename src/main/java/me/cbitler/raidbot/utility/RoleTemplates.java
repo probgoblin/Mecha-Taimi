@@ -10,7 +10,8 @@ public class RoleTemplates {
 	static RaidRole[][] raidTemplates =
 	    { 	{	new RaidRole(1, "Tank"),
 	            new RaidRole(1, "Supporter"),
-	            new RaidRole(2, "Healer"),
+	            new RaidRole(1, "Druid"),
+	            new RaidRole(1, "Off-Healer"),
 	            new RaidRole(1, "BS"),
 	            new RaidRole(5, "DPS")
 	        }

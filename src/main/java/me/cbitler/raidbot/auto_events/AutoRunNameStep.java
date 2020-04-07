@@ -1,4 +1,4 @@
-package me.cbitler.raidbot.creation_auto;
+package me.cbitler.raidbot.auto_events;
 
 import me.cbitler.raidbot.raids.AutoPendingRaid;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
