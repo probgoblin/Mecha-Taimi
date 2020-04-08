@@ -27,7 +27,8 @@ public class HelpCommand implements Command {
     private final String helpMessageAutoEvents =
     		"__Auto event commands:__\n\n" +
     		"**!setAutoEventChannel [channel]** - Set the auto event announcement channel. This is only usable by people with the manage server permission.\n" +
-    	            "**!startAutoEvent** - Setup a new event that repeats automatically on a daily basis.\n" +
+    	            "**!startAutoEvent** - Setup a new event that repeats automatically on a daily basis. This is only usable by people with the manage server permission.\n" +
+    	            "**!stopAutoEvent** - Stop one or multiple auto events currently active on this server. This is only usable by people with the manage server permission.\n" +
     	            "\n_ _";
     
     private final String helpInfo = 
