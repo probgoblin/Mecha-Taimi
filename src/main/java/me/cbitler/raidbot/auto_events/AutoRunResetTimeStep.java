@@ -44,7 +44,7 @@ public class AutoRunResetTimeStep implements AutoCreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the time when the event should be reposted [ hh:mm ]:";
+        return "Enter the time when the event should be reposted [ format hh:mm ]:";
     }
 
     /**
