@@ -15,20 +15,20 @@ public class HelpCommand implements Command {
             "**!info** - Information about the bot and it's authors.\n" +
             "**!setEventManagerRole [role]** - Set the role that serves as an event manager. This is only usable by people with the manage server permission.\n" +
             "**!setArchiveChannel [channel]** - Set the archive channel. This is only usable by people with the manage server permission.\n" +
-            "\n\n_ _";
+            "\n_ _";
             
     private final String helpMessageFractals =
     		"__Fractal commands:__\n\n" +
     	            "**!createFractal [name];[date];[time];[team comp id] ** - Create a fractal event. Usable by people with the fractal creator role.\n" +
     	            "**!setFractalCreatorRole [role]** - Set the role that serves as fractal creator. This is only usable by people with the manage server permission.\n" +
     	            "**!setFractalChannel [channel]** - Set the fractal announcement channel. This is only usable by people with the manage server permission.\n" +
-    	            "\n\n_ _";
+    	            "\n_ _";
     
     private final String helpMessageAutoEvents =
     		"__Auto event commands:__\n\n" +
     		"**!setAutoEventChannel [channel]** - Set the auto event announcement channel. This is only usable by people with the manage server permission.\n" +
     	            "**!startAutoEvent** - Setup a new event that repeats automatically on a daily basis.\n" +
-    	            "\n\n_ _";
+    	            "\n_ _";
     
     private final String helpInfo = 
     		"__Help information:__\n\n" +

@@ -62,9 +62,13 @@ public class AutomatedTaskExecutor
     public void stop()
     {
     	// use shutdownNow instead of shutdown because the latter waits for scheduled tasks to be executed (roughly one day usually!)
-        executorService.shutdownNow();
+        // see: https://stackoverflow.com/questions/11520189/difference-between-shutdown-and-shutdownnow-of-executor-service
+    	executorService.shutdownNow();
         try {
-            executorService.awaitTermination(10, TimeUnit.SECONDS);
+            if (!executorService.awaitTermination(10, TimeUnit.SECONDS))
+            {
+            	System.out.println("awaitTermination in AutomatedTaskExecutor timed out.");
+            }
         } catch (InterruptedException ex) {
         	System.out.println("awaitTermination in AutomatedTaskExecutor did not succeed.");
         }

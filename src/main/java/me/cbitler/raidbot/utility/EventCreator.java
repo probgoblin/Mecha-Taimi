@@ -40,7 +40,7 @@ public class EventCreator implements ExecutableTask {
 		// TODO: change this to the actual date?
 		eventTemplate.setDate("today");
 		
-		RaidManager.createRaid(eventTemplate);
+		RaidManager.createRaid(eventTemplate, taskId);
 	}
 
 }
