@@ -1,5 +1,9 @@
 package me.cbitler.raidbot.edit;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
@@ -24,6 +28,38 @@ public class EditDateStep implements EditStep {
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         Raid raid = RaidManager.getRaid(messageID);
         raid.setDate(e.getMessage().getRawContent());
+        
+        boolean valid = true;
+        String dateString = "";
+        String[] split = e.getMessage().getRawContent().split("\\.");
+        if (split.length != 3)
+        {
+        	valid = false;
+        }
+        else 
+        {
+        	try {
+        		int day = Integer.parseInt(split[0]);
+        		int month = Integer.parseInt(split[1]);
+        		int year = Integer.parseInt(split[2]);
+        		LocalDate date = LocalDate.of(year, month, day);
+        		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd.MM.yyyy");
+        		formatter = formatter.withLocale(Locale.ENGLISH);
+        		dateString = date.format(formatter);
+        	} catch (Exception exp) {
+        		System.out.println(exp.getMessage());
+        		valid = false;
+        	}
+        }
+    	
+        if (valid == false)
+        {
+        	e.getChannel().sendMessage("Please use the correct format: dd.mm.yyyy, e.g., 29.02.2020").queue();
+    		return false;
+        }
+
+       	raid.setDate(dateString);
+            
         if (raid.updateDateDB()) {
         	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Date successfully updated in database.").queue());
         } else {
@@ -38,7 +74,7 @@ public class EditDateStep implements EditStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the new date for the event:";
+        return "Enter the new date for the event, the weekday will be added automatically [ format dd.mm.yyyy ]:";
     }
 
     /**
