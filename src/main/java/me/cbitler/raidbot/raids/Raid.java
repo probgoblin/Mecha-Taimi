@@ -54,6 +54,7 @@ public class Raid {
      * @param isOpenWorld    Open world event flag
      * @param isDisplayShort Flag for short message 
      * @param isFractalEvent Fractal event flag
+     * @param permittedRoles List of discord roles allowed to sign up, empty list means everyone
      */
     public Raid(String messageId, String serverId, String channelId, String raidLeaderId, String name,
             String description, String date, String time, boolean isOpenWorld, boolean isDisplayShort, 
@@ -1313,6 +1314,18 @@ public class Raid {
 
 	public void clearPermittedDiscordRoles() {
 		permittedDiscordRoles.clear();
+	}
+	
+	public boolean updatePermDiscRolesDB() {
+		String permDiscRoles = RaidManager.formatStringListForDatabase(permittedDiscordRoles);
+		try {
+	           RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `permittedRoles`=? WHERE `raidId`=?",
+	                   new String[] { permDiscRoles, messageId });
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	    return true;
 	}
 	
 	/**

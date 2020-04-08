@@ -52,6 +52,12 @@ public class EditPermDiscRoleStep implements EditStep {
                 raid.addPermittedDiscordRoles(chosenRoles[role]);
            	}
         }
+        if (raid.updatePermDiscRolesDB()) {
+        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Permitted roles successfully updated in database.").queue());
+    	} else {
+    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Permitted roles could not be updated in database.").queue());	
+    	}
+        
         String messageNewPerm = "Sign-up is now available for: " + getPermissionString();     
         e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(messageNewPerm).queue());
     	

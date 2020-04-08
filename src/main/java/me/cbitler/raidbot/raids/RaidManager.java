@@ -206,7 +206,8 @@ public class RaidManager {
                 List<String> permDiscRoles = new ArrayList<String>();
                 try {
                 	String permRolesText = results.getResults().getString("permittedRoles");
-                	permDiscRoles = new ArrayList<String>(Arrays.asList(permRolesText.split(",")));
+                	if (permRolesText != null && permRolesText.isEmpty() == false)
+                		permDiscRoles = new ArrayList<String>(Arrays.asList(permRolesText.split(",")));
                 } catch (Exception e) { }
 
                 Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time, isOpenWorld, isDisplayShort, isFractalEvent, permDiscRoles);
