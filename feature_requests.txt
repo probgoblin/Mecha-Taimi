@@ -1,3 +1,6 @@
+- add going back functionality for event creation
+- add preview message at the end of creation process for confirmation
+- add conversation for self-assignable roles
 - command for adding people to event
 - better database structure
 - move repeated and repeatable strings to resource
