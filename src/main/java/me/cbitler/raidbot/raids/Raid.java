@@ -2,6 +2,7 @@ package me.cbitler.raidbot.raids;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.database.Database;
+import me.cbitler.raidbot.server_settings.ServerSettings;
 import me.cbitler.raidbot.utility.PermissionsUtil;
 import me.cbitler.raidbot.utility.Reactions;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -1289,7 +1290,7 @@ public class Raid {
 		MessageEmbed message = isDisplayShort ? buildEmbedShort(false) : buildEmbed(false);
 
         Guild guild = RaidBot.getInstance().getServer(serverId);
-        List<TextChannel> channels = guild.getTextChannelsByName(RaidBot.getInstance().getArchiveChannel(serverId), true);
+        List<TextChannel> channels = guild.getTextChannelsByName(ServerSettings.getArchiveChannel(serverId), true);
         if(channels.size() > 0) {
             // We always go with the first channel if there is more than one
             try {

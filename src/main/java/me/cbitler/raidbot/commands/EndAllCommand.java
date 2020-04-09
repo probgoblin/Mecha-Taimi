@@ -1,8 +1,8 @@
 package me.cbitler.raidbot.commands;
 
-import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
+import me.cbitler.raidbot.server_settings.ServerSettings;
 import me.cbitler.raidbot.utility.PermissionsUtil;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -21,7 +21,7 @@ public class EndAllCommand implements Command {
             
             String serverId = channel.getGuild().getId();
             ArrayList<Boolean> archived = new ArrayList<Boolean>();
-            boolean archiveAvail = RaidBot.getInstance().isArchiveAvailable(serverId);
+            boolean archiveAvail = ServerSettings.isArchiveAvailable(serverId);
             if (archiveAvail) {
             	for (int ev = 0; ev < numEvents; ev++) {
                 	Raid raid = allEvents.get(ev);

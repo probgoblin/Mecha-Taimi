@@ -1,7 +1,6 @@
 package me.cbitler.raidbot.handlers;
 
 import me.cbitler.raidbot.RaidBot;
-import me.cbitler.raidbot.RaidBot.ChannelType;
 import me.cbitler.raidbot.auto_events.AutoStopStep;
 import me.cbitler.raidbot.commands.Command;
 import me.cbitler.raidbot.commands.CommandRegistry;
@@ -13,6 +12,8 @@ import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.edit.EditIdleStep;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
+import me.cbitler.raidbot.server_settings.ServerSettings;
+import me.cbitler.raidbot.server_settings.ServerSettings.ChannelType;
 import me.cbitler.raidbot.utility.PermissionsUtil;
 import me.cbitler.raidbot.utility.RoleTemplates;
 import net.dv8tion.jda.core.Permission;
@@ -147,17 +148,17 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 String[] commandParts = e.getMessage().getRawContent().split(" ");
                 String specifiedName = combineArguments(commandParts,1);
                 if (setEventManager) {
-                	RaidBot.getInstance().setRaidLeaderRole(e.getMember().getGuild().getId(), specifiedName);
+                	ServerSettings.setRaidLeaderRole(e.getMember().getGuild().getId(), specifiedName);
                 	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event manager role updated to: " + specifiedName).queue());
                 } else if (setFractalCreator) {
-                	RaidBot.getInstance().setFractalCreatorRole(e.getMember().getGuild().getId(), specifiedName);
+                	ServerSettings.setFractalCreatorRole(e.getMember().getGuild().getId(), specifiedName);
                 	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Fractal creator role updated to: " + specifiedName).queue());
                 } else if (setFractalChannel || setArchiveChannel || setAutoEventChannel) {
                 	ChannelType channelType;
                 	if (setFractalChannel) channelType = ChannelType.FRACTALS;
                 	else if (setArchiveChannel) channelType = ChannelType.ARCHIVE;
                 	else channelType = ChannelType.AUTOEVENTS;
-                	int success = RaidBot.getInstance().setChannel(e.getMember().getGuild().getId(), specifiedName, channelType);
+                	int success = ServerSettings.setChannel(e.getMember().getGuild().getId(), specifiedName, channelType);
                 	if (success == 0) {
                 		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Channel successfully updated to *" + specifiedName + "*.").queue());
                 	} else if (success == 1){

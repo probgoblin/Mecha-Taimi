@@ -1,3 +1,6 @@
+- rename flex roles into backup
+- set date: make year optional and use current year if nothing is provided. add option to use / instead of .?
+- make permitted roles a server setting
 - add going back functionality for event creation
 - add preview message at the end of creation process for confirmation
 - add conversation for self-assignable roles

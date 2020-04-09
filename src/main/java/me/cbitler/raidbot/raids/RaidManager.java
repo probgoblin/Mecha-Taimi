@@ -3,6 +3,7 @@ package me.cbitler.raidbot.raids;
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.database.QueryResult;
+import me.cbitler.raidbot.server_settings.ServerSettings;
 import me.cbitler.raidbot.utility.Reactions;
 import me.cbitler.raidbot.utility.RoleTemplates;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -108,8 +109,8 @@ public class RaidManager {
 		fractalEvent.setFractalEvent(true);
 		fractalEvent.addTemplateRoles(RoleTemplates.getFractalTemplates()[teamCompId]);
 		
-		String fractalChannel = RaidBot.getInstance().getFractalChannel(serverId);
-		if (RaidBot.getInstance().checkChannel(fractalEvent.getServerId(), fractalChannel)) {
+		String fractalChannel = ServerSettings.getFractalChannel(serverId);
+		if (ServerSettings.checkChannel(fractalEvent.getServerId(), fractalChannel)) {
 			fractalEvent.setAnnouncementChannel(fractalChannel);
 		} else {
 			author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The specified fractal channel is invalid. It needs to be set with !setFractalChannel [channelname without hash] by someone with MANAGE SERVER permissions.").queue());

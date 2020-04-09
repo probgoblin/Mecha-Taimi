@@ -1,8 +1,8 @@
 package me.cbitler.raidbot.utility;
 
-import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.AutoPendingRaid;
 import me.cbitler.raidbot.raids.RaidManager;
+import me.cbitler.raidbot.server_settings.ServerSettings;
 
 public class EventCreator implements ExecutableTask {
 
@@ -36,7 +36,7 @@ public class EventCreator implements ExecutableTask {
 		}
 		
 		// always take up-to-date channel
-		eventTemplate.setAnnouncementChannel(RaidBot.getInstance().getAutoEventsChannel(serverId));
+		eventTemplate.setAnnouncementChannel(ServerSettings.getAutoEventsChannel(serverId));
 		// TODO: change this to the actual date?
 		eventTemplate.setDate("today");
 		

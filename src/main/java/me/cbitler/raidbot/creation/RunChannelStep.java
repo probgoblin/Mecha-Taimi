@@ -2,6 +2,7 @@ package me.cbitler.raidbot.creation;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
+import me.cbitler.raidbot.server_settings.ServerSettings;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
@@ -32,7 +33,7 @@ public class RunChannelStep implements CreationStep {
     	String serverId = raid.getServerId();
         if (enterManually) {
             String channelWithoutHash = e.getMessage().getRawContent().replace("#","");
-        	if (bot.checkChannel(serverId, channelWithoutHash)) {
+        	if (ServerSettings.checkChannel(serverId, channelWithoutHash)) {
         		raid.setAnnouncementChannel(channelWithoutHash);
         	} else {
 				e.getChannel().sendMessage("Please choose a valid channel.").queue();
@@ -43,7 +44,7 @@ public class RunChannelStep implements CreationStep {
         	try {
         		int choiceId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
         		if (choiceId >= 0 && choiceId < defaultChannels.length) { // one of the default channels
-        			if (bot.checkChannel(serverId, defaultChannels[choiceId])) {
+        			if (ServerSettings.checkChannel(serverId, defaultChannels[choiceId])) {
                 		raid.setAnnouncementChannel(defaultChannels[choiceId]);
                 	} else {
         				e.getChannel().sendMessage("Please choose a valid channel.").queue();
