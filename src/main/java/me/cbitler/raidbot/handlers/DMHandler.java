@@ -11,6 +11,7 @@ import me.cbitler.raidbot.raids.AutoPendingRaid;
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.selection.SelectionStep;
+import me.cbitler.raidbot.server_settings.RoleGroupsEditStep;
 import me.cbitler.raidbot.swap.SwapStep;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Message;
@@ -190,6 +191,29 @@ public class DMHandler extends ListenerAdapter {
                     e.getChannel().sendMessage("Automated event successfully stopped.").queue();
                 }
             }
+        } else if (bot.getEditRoleGroupsMap().containsKey(author.getId())) {
+        	if(e.getMessage().getRawContent().equalsIgnoreCase("cancel")) {
+                cancelEditRoleGroups(author);
+                return;
+            }
+        	
+            RoleGroupsEditStep step = bot.getEditRoleGroupsMap().get(author.getId());
+            boolean done = step.handleDM(e);
+
+            // If this step is done, move onto the next one or finish
+            if (done) {
+                RoleGroupsEditStep nextStep = step.getNextStep();
+                if(nextStep != null) {
+                    bot.getEditRoleGroupsMap().put(author.getId(), nextStep);
+                    e.getChannel().sendMessage(nextStep.getStepText()).queue();
+                } else {
+                    // finish editing
+                    String serverId = step.getServerID();
+                    bot.getEditMap().remove(author.getId());
+                    bot.getEditList().remove(serverId);
+                    e.getChannel().sendMessage("Finished editing role groups for server.").queue();
+                }
+            }
         } else if (bot.getRoleDeselectionMap().containsKey(author.getId())) {
         	DeselectionStep step = bot.getRoleDeselectionMap().get(author.getId());
         	boolean done = step.handleDM(e);
@@ -247,8 +271,18 @@ public class DMHandler extends ListenerAdapter {
     	bot.getEditList().remove(bot.getEditMap().get(author.getId()).getMessageID());
         bot.getEditMap().remove(author.getId());
         
-        author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event editing cancelled.").queue());    	
+        author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event editing cancelled.").queue());    	    
+    }
+    
+    /**
+     * cancels role groups editing, i.e. removes the user from the edit role groups map, removes edit block, and sends notification
+     * @param user the user who started the editing process
+     */
+    private void cancelEditRoleGroups(User author) {
+    	bot.getEditRoleGroupsList().remove(bot.getEditRoleGroupsMap().get(author.getId()).getServerID());
+        bot.getEditRoleGroupsMap().remove(author.getId());
         
+        author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Editing role groups cancelled.").queue());    	    
     }
     
     /**

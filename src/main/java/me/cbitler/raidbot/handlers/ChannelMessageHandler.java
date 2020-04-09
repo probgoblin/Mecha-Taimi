@@ -12,6 +12,8 @@ import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.edit.EditIdleStep;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
+import me.cbitler.raidbot.server_settings.RoleGroupsEditStep;
+import me.cbitler.raidbot.server_settings.RoleGroupsIdleStep;
 import me.cbitler.raidbot.server_settings.ServerSettings;
 import me.cbitler.raidbot.server_settings.ServerSettings.ChannelType;
 import me.cbitler.raidbot.utility.PermissionsUtil;
@@ -90,7 +92,30 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 try {
                     e.getMessage().delete().queue();
                 } catch (Exception exception) {}
-            } 
+            } else if (e.getMessage().getRawContent().toLowerCase().startsWith("!editrolegroups")) {
+            	// check if this user already has an active chat
+            	int actvId = bot.userHasActiveChat(e.getAuthor().getId());
+    			if (actvId != 0) {
+    				RaidBot.writeNotificationActiveChat(e.getAuthor(), actvId);
+    				try {
+                        e.getMessage().delete().queue();
+                    } catch (Exception exception) {}
+    				return;
+    			}
+    			String serverId = e.getMessage().getGuild().getId();
+    			// check if the raid is being edited by someone else
+            	if (bot.getEditList().contains(serverId)) {
+            		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The role groups for this server are already being edited. Please wait and try again.").queue());
+            	} else {
+            		RoleGroupsEditStep idleStep = new RoleGroupsIdleStep(serverId);
+            		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(idleStep.getStepText()).queue());
+            		bot.getEditRoleGroupsMap().put(e.getAuthor().getId(), idleStep);
+            		bot.getEditRoleGroupsList().add(serverId);
+            	}
+            	try {
+                    e.getMessage().delete().queue();
+                } catch (Exception exception) {}
+            }
         }
         
         // edit can be made by event managers or the leader of the event (enables fractal event editing)

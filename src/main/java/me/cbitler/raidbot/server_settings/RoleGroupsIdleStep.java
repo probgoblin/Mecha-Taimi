@@ -96,4 +96,9 @@ public class RoleGroupsIdleStep implements RoleGroupsEditStep {
     public RoleGroupsEditStep getNextStep() {
         return nextStep;
     }
+    
+    @Override
+	public String getServerID() {
+		return serverId;
+	}
 }

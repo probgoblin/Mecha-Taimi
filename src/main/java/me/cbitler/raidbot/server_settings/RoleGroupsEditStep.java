@@ -26,4 +26,10 @@ public interface RoleGroupsEditStep {
      * @return The text to display to the user in relation to this step.
      */
     String getStepText();
+    
+    /**
+     * Get the serverId of the role groups being edited.
+     * @return the serverId of the role groups being edited
+     */
+    String getServerID();
 }

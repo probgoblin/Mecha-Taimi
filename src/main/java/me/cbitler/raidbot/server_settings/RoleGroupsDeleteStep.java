@@ -78,4 +78,9 @@ public class RoleGroupsDeleteStep implements RoleGroupsEditStep {
     public RoleGroupsEditStep getNextStep() {
         return new RoleGroupsIdleStep(serverId);
     }
+    
+    @Override
+	public String getServerID() {
+		return serverId;
+	}
 }
