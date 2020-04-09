@@ -1,10 +1,11 @@
 package me.cbitler.raidbot.creation;
 
-import java.util.List;
+import java.util.Iterator;
+import java.util.Set;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
-import me.cbitler.raidbot.utility.PermissionsUtil;
+import me.cbitler.raidbot.server_settings.ServerSettings;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
@@ -14,7 +15,13 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
  */
 public class RunPermDiscRoleSetupStep implements CreationStep {
 
-	List<String> discRoleNames = PermissionsUtil.getAllDiscordRoleNames();
+	String serverId;
+	Set<String> predefRoleGroupNames;
+	
+	public RunPermDiscRoleSetupStep(String serverId) {
+		this.serverId = serverId;
+		predefRoleGroupNames = ServerSettings.getPredefGroupNames(serverId);
+	}
 
     /**
      * Handle user input.
@@ -31,9 +38,9 @@ public class RunPermDiscRoleSetupStep implements CreationStep {
     		// try to parse an integer
     		try {
         		int choiceId = Integer.parseInt(chosenRoles[role]) - 1;
-        		if (choiceId < discRoleNames.size()) { // preset role
-        			raid.addPermittedDiscordRoles(discRoleNames.get(choiceId));
-        		} else if (choiceId == discRoleNames.size()) { // everyone
+        		if (choiceId < predefRoleGroupNames.size()) { // preset role group
+        			raid.addPermittedDiscordRoles(ServerSettings.getPredefGroupRoles(serverId, choiceId));
+        		} else if (choiceId == predefRoleGroupNames.size()) { // everyone
         			raid.clearPermittedDiscordRoles(); // make event availabe to everyone
         			return true;
         		}
@@ -50,10 +57,11 @@ public class RunPermDiscRoleSetupStep implements CreationStep {
      */
     public String getStepText() {
     	String message = "Choose who should be able to sign up for the event:\n";
-    	for (int i = 0; i < discRoleNames.size(); i++) {
-        	message += "`" + (i+1) + "` " + discRoleNames.get(i) + "\n";
+    	Iterator<String> it = predefRoleGroupNames.iterator();
+    	for (int i = 0; i < predefRoleGroupNames.size(); i++) {
+        	message += "`" + (i+1) + "` " + it.next() + "\n";
         }
-    	message += "`" + (discRoleNames.size() + 1) + "` *everyone* \n\n"
+    	message += "`" + (predefRoleGroupNames.size() + 1) + "` *everyone* \n\n"
         		+ "You can also enter a comma-separated list of the choices above and other role names, for example *1,Fractalist*.";
         return message;
     }

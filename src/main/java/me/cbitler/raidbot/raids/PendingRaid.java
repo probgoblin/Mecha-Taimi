@@ -137,7 +137,16 @@ public class PendingRaid {
 	}
 
 	public void addPermittedDiscordRoles(String role) {
-		permittedDiscordRoles.add(role);
+		if (permittedDiscordRoles.contains(role) == false)
+			permittedDiscordRoles.add(role);
+	}
+	
+	public void addPermittedDiscordRoles(List<String> roles) {
+		for (int r = 0; r < roles.size(); r++) 
+		{
+			if (permittedDiscordRoles.contains(roles.get(r)) == false)
+				permittedDiscordRoles.add(roles.get(r));
+		}
 	}
 
 	public void clearPermittedDiscordRoles() {

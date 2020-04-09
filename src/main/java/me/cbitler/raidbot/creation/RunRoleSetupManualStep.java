@@ -14,6 +14,8 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
  */
 public class RunRoleSetupManualStep implements CreationStep {
 
+	String serverId;
+	
     /**
      * Handle user input - should be in the format [number]:[role] unless it is 'done'.
      * @param e The direct message event
@@ -26,6 +28,7 @@ public class RunRoleSetupManualStep implements CreationStep {
         	// this will be caught in the handler
         	throw new RuntimeException();
         }
+        serverId = raid.getServerId();
 
         if(e.getMessage().getRawContent().equalsIgnoreCase("done")) {
             if(raid.getRolesWithNumbers().size() > 0) {
@@ -69,6 +72,6 @@ public class RunRoleSetupManualStep implements CreationStep {
      * {@inheritDoc}
      */
     public CreationStep getNextStep() {
-        return new RunPermDiscRoleSetupStep();
+        return new RunPermDiscRoleSetupStep(serverId);
     }
 }

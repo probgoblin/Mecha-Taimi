@@ -23,7 +23,6 @@ public class RunRoleSetupTemplateStep implements CreationStep {
     public RunRoleSetupTemplateStep() {
 		this.templates = RoleTemplates.getAllTemplates();
 		this.templateNames = RoleTemplates.getAllTemplateNames();
-		nextStep = new RunPermDiscRoleSetupStep();
 	}
 
     /**
@@ -38,6 +37,7 @@ public class RunRoleSetupTemplateStep implements CreationStep {
         	// this will be caught in the handler
         	throw new RuntimeException();
         }
+        nextStep = new RunPermDiscRoleSetupStep(raid.getServerId());
 
         try {
             int choiceId = Integer.parseInt(e.getMessage().getRawContent()) - 1;

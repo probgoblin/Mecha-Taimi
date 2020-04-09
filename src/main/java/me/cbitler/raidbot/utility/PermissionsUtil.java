@@ -1,8 +1,8 @@
 package me.cbitler.raidbot.utility;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
+//import java.util.List;
+//import java.util.ArrayList;
+//import java.util.Arrays;
 
 import me.cbitler.raidbot.server_settings.ServerSettings;
 import net.dv8tion.jda.core.entities.Member;
@@ -14,13 +14,13 @@ import net.dv8tion.jda.core.entities.Role;
  */
 public class PermissionsUtil {
 	
-	static String[] discordRoleNames = {
-            "Master Raider", "Adept Raider"
-    };
-	
-	public static List<String> getAllDiscordRoleNames() {
-		return new ArrayList<String>(Arrays.asList(discordRoleNames));
-	}	
+//	static String[] discordRoleNames = {
+//            "Master Raider", "Adept Raider"
+//    };
+//	
+//	public static List<String> getAllDiscordRoleNames() {
+//		return new ArrayList<String>(Arrays.asList(discordRoleNames));
+//	}	
 	
     /**
      * Check to see if a member has a specific role

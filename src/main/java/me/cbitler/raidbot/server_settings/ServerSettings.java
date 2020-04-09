@@ -7,8 +7,14 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Class representing different server settings.
@@ -21,11 +27,13 @@ public class ServerSettings {
 
     static HashMap<String, String> raidLeaderRoleCache = new HashMap<>();
     static HashMap<String, String> fractalCreatorRoleCache = new HashMap<>();
+    
     static HashMap<String, String> fractalChannelCache = new HashMap<>();
     static HashMap<String, String> archiveChannelCache = new HashMap<>();
     static HashMap<String, String> autoEventsChannelCache = new HashMap<>();
 
-
+    static HashMap<String, SortedMap<String, List<String>>> permittedDiscordRoles = new HashMap<>();
+    
     
     /**
      * Get the raid leader role for a specific server.
@@ -283,6 +291,148 @@ public class ServerSettings {
      */
     public static String getAutoEventsChannel(String serverId) {
         return getChannel(serverId, ChannelType.AUTOEVENTS);
+    }
+    
+    
+    public static void removeRoleGroup(String serverId, String groupName) {
+    	SortedMap<String, List<String>> serverRoleGroups = permittedDiscordRoles.get(serverId);
+    	if (serverRoleGroups != null)
+    	{
+    		serverRoleGroups.remove(groupName);
+    		updateRoleGroupsDB(serverId);
+    	}
+    }
+
+    
+    public static void addRoleGroup(String serverId, String groupName, List<String> roles) {
+    	SortedMap<String, List<String>> serverRoleGroups = permittedDiscordRoles.get(serverId);
+    	if (serverRoleGroups == null)
+    		serverRoleGroups = new TreeMap<>();
+    	serverRoleGroups.put(groupName, roles);
+    	updateRoleGroupsDB(serverId);
+    }
+    
+    
+    private static void updateRoleGroupsDB(String serverId) {
+    	SortedMap<String, List<String>> serverRoleGroups = permittedDiscordRoles.get(serverId);
+    	Database db = RaidBot.getInstance().getDatabase();
+    	if (serverRoleGroups == null) 
+    	{
+    		try {
+    			db.update("UPDATE `serverSettings` SET `predef_role_groups` = NULL WHERE `serverId` = ?",
+    					new String[]{ serverId });
+    		} catch (SQLException e_remove) { }
+    	}
+    	else
+    	{
+    		String dbString = convertRoleGroupsToString(serverRoleGroups);
+    		try {
+    			db.update("INSERT INTO `serverSettings` (`serverId`,`predef_role_groups`) VALUES (?,?)",
+                    new String[] { serverId, dbString});
+    		} catch (SQLException e) {
+    			//TODO: There is probably a much better way of doing this
+    			try {
+    				db.update("UPDATE `serverSettings` SET `predef_role_groups` = ? WHERE `serverId` = ?",
+    						new String[] { dbString, serverId });
+    			} catch (SQLException e1) {
+    				// Not much we can do if there is also an update error
+    			}
+    		}
+    	}
+    }
+    
+    private static String convertRoleGroupsToString(SortedMap<String, List<String>> roleGroups) {
+    	String result = "";
+    	Iterator<String> groupNamesIt = roleGroups.keySet().iterator();
+    	Iterator<List<String>> roleNamesIt = roleGroups.values().iterator();
+    	for (int g = 0; g < roleGroups.size(); g++)
+    	{
+    		result += groupNamesIt.next() + ";";
+    		List<String> roles = roleNamesIt.next();
+    		for (int r = 0; r < roles.size(); r++)
+    		{
+    			result += roles.get(r);
+    			if (r < roles.size() - 1)
+    				result += ",";
+    		}
+    		
+    		if (g < roleGroups.size() - 1)
+    			result += "/";
+    	}
+    	return result;
+    }
+    
+    private static SortedMap<String, List<String>> convertRoleGroupsFromString(String input) {
+    	SortedMap<String, List<String>> result = new TreeMap<>();
+    	String[] groupSplits = input.split("/");
+    	for (int g = 0; g < groupSplits.length; g++)
+    	{
+    		String[] nameSplits = groupSplits[g].split(";");
+    		if (nameSplits.length != 2)
+    			continue;
+    		String[] roleSplits = nameSplits[1].split(",");
+    		List<String> roleNames = new ArrayList<String>();
+    		for (int r = 0; r < roleSplits.length; r++)
+    			roleNames.add(roleSplits[r]);
+    		result.put(nameSplits[0], roleNames);
+    	}
+    	return result;
+    }
+    
+    /**
+     * Loads the predefined role groups for a server from the database if not already cached
+     * @param serverId
+     */
+    private static void loadPredefRoleGroups(String serverId) {
+    	if (permittedDiscordRoles.get(serverId) != null)
+    		return;
+    	try {
+            Database db = RaidBot.getInstance().getDatabase();
+            QueryResult results = db.query("SELECT `predef_role_groups` FROM `serverSettings` WHERE `serverId` = ?",
+                    new String[]{serverId});
+            if (results.getResults().next()) {
+            	String result = results.getResults().getString("predef_role_groups");
+            	if (result != null) {
+            		// construct sorted map
+            		permittedDiscordRoles.put(serverId, convertRoleGroupsFromString(result));
+                }
+            }
+        } catch (Exception e) { }
+    }
+    
+    /**
+     * Returns the set of predefined role groups on this server
+     * @param serverId
+     * @return list of predefined role groups 
+     */
+    public static Set<String> getPredefGroupNames(String serverId) {
+    	loadPredefRoleGroups(serverId);
+    	SortedMap<String, List<String>> permRolesServer = permittedDiscordRoles.get(serverId); 
+    	if (permRolesServer == null)
+    		return new HashSet<String>();
+    	return permRolesServer.keySet();
+    }
+    
+    /**
+     * Returns the list of discord roles corresponding to a predefined group name
+     * @param serverId
+     * @param groupId
+     * @return list of discord roles
+     */
+    public static List<String> getPredefGroupRoles(String serverId, int groupId) {
+    	loadPredefRoleGroups(serverId);
+    	SortedMap<String, List<String>> permRolesServer = permittedDiscordRoles.get(serverId); 
+    	List<String> result = new ArrayList<String>();
+    	if (permRolesServer == null)
+    		return result;
+    	Iterator<List<String>> it = permRolesServer.values().iterator();
+    	try {
+    		for (int i = 0; i < groupId; i++)
+    			it.next();
+    		return it.next();
+    	} catch (Exception exc) {
+    		return result;
+    	}
     }
     
     /** 

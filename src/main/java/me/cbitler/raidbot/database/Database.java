@@ -48,7 +48,8 @@ public class Database {
             + " fractal_creator_role text, \n"
             + " fractal_channel text, \n"
             + " archive_channel text, \n"
-            + " auto_events_channel text)";
+            + " auto_events_channel text, \n"
+            + " predef_role_groups text)";
 
     /**
      * Create a new database with the specific filename
@@ -156,6 +157,9 @@ public class Database {
         } catch (Exception e) { }
         try {
         	connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN auto_events_channel text");
+        } catch (Exception e) { }
+        try {
+        	connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN predef_role_groups text");
         } catch (Exception e) { }
     }
 }
