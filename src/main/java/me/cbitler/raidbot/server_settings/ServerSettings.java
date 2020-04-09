@@ -4,6 +4,7 @@ import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.database.QueryResult;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.sql.SQLException;
@@ -294,22 +295,40 @@ public class ServerSettings {
     }
     
     
-    public static void removeRoleGroup(String serverId, String groupName) {
+    public static void removeRoleGroup(String serverId, int groupId) {
     	SortedMap<String, List<String>> serverRoleGroups = permittedDiscordRoles.get(serverId);
     	if (serverRoleGroups != null)
     	{
-    		serverRoleGroups.remove(groupName);
+    		Iterator<String> groupNames = serverRoleGroups.keySet().iterator();
+    		try {
+    			while (groupId >= 0) 
+    			{
+    				groupNames.next();
+    				groupId--;
+    			}
+    			groupNames.remove();
+    		} catch (Exception e) { }
     		updateRoleGroupsDB(serverId);
     	}
     }
 
     
-    public static void addRoleGroup(String serverId, String groupName, List<String> roles) {
+    public static boolean addRoleGroup(String serverId, String groupName, List<String> roles) {
+    	// first check if all roles exist on this server
+    	for (String roleName : roles)
+    	{
+    		if (checkRole(serverId, roleName) == false)
+    			return false;
+    	}
+    	
+    	// add role group
     	SortedMap<String, List<String>> serverRoleGroups = permittedDiscordRoles.get(serverId);
     	if (serverRoleGroups == null)
     		serverRoleGroups = new TreeMap<>();
     	serverRoleGroups.put(groupName, roles);
     	updateRoleGroupsDB(serverId);
+    	
+    	return true;
     }
     
     
@@ -343,6 +362,8 @@ public class ServerSettings {
     
     private static String convertRoleGroupsToString(SortedMap<String, List<String>> roleGroups) {
     	String result = "";
+    	if (roleGroups == null)
+    		return result;
     	Iterator<String> groupNamesIt = roleGroups.keySet().iterator();
     	Iterator<List<String>> roleNamesIt = roleGroups.values().iterator();
     	for (int g = 0; g < roleGroups.size(); g++)
@@ -400,6 +421,7 @@ public class ServerSettings {
         } catch (Exception e) { }
     }
     
+    
     /**
      * Returns the set of predefined role groups on this server
      * @param serverId
@@ -435,6 +457,23 @@ public class ServerSettings {
     	}
     }
     
+    /**
+     * Returns a list of lists of discord roles corresponding to a all group names
+     * @param serverId
+     * @return list of lists of discord roles
+     */
+    public static List<List<String>> getAllPredefGroupRoles(String serverId) {
+    	loadPredefRoleGroups(serverId);
+    	SortedMap<String, List<String>> permRolesServer = permittedDiscordRoles.get(serverId); 
+    	List<List<String>> result = new ArrayList<>();
+    	if (permRolesServer == null)
+    		return result;
+    	Iterator<List<String>> it = permRolesServer.values().iterator();
+    	while (it.hasNext())
+    		result.add(it.next());
+    	return result;
+    }
+    
     /** 
      * checks if a given channel exists
      * @param serverId the id of the server to be checked 
@@ -451,6 +490,27 @@ public class ServerSettings {
         }
         return validChannel;
     }
+    
+    
+    /** 
+     * checks if a given role exists
+     * @param serverId the id of the server to be checked 
+     * @param roleName the role name
+     * @return true if role is valid, false otherwise
+     */
+    public static boolean checkRole(String serverId, String roleName) {      
+    	boolean validRole = false;
+        RaidBot bot = RaidBot.getInstance();
+    	for (Role role : bot.getServer(serverId).getRoles()) {
+            if(role.getName().equals(roleName)) {
+                validRole = true;
+                break;
+            }
+        }
+        return validRole;
+    }
+    
+    
 
     /**
      * checks if a valid archive channel is available for a server
