@@ -7,14 +7,19 @@ public class HelpCommand implements Command {
     private final String helpMessage = "**Riz-GW2-Event-Bot Help:**\n\n" +
             "__General commands:__\n\n" +
             "**!createEvent** - Start the event creation process. Usable by people with the event manager role.\n" +
-            "**!editEvent [event id]** - Start the event edit process. Usable by people with then event manager role.\n" +
+            "**!editEvent [event id]** - Start the event edit process. Usable by people with the event manager role.\n" +
             "**!endEvent [event id] [log link 1] [log link 2] ...** - End an event and DM the users in the event with log links. The log links are optional arguments.\n" +
             "**!endAllEvents** - End all existing events. __Do not use this while any event is active__ since users will not be able to sign up for any existing event anymore! However, this should be done from time to time to free up memory.\n" +
             "**!removeFromEvent [event id] [name]** - Remove a player from an event. Only usable by people with the event manager role.\n" +
             "**!help** - You are looking at it.\n" +
             "**!info** - Information about the bot and it's authors.\n" +
+            "\n_ _";
+    
+    private final String helpMessageServer =
+            "__Server settings commands:__\n\n" +
             "**!setEventManagerRole [role]** - Set the role that serves as an event manager. This is only usable by people with the manage server permission.\n" +
             "**!setArchiveChannel [channel]** - Set the archive channel. This is only usable by people with the manage server permission.\n" +
+            "**!editRoleGroups** - Start the edit process for role groups. Role groups make it easy to grant sign-up permissions to a set of discord roles. Usable by people with the event manager role.\n" +
             "\n_ _";
             
     private final String helpMessageFractals =
@@ -42,6 +47,7 @@ public class HelpCommand implements Command {
     @Override
     public void handleCommand(String command, String[] args, TextChannel channel, User author) {
     	channel.sendMessage(helpMessage).queue();
+    	channel.sendMessage(helpMessageServer).queue();
     	channel.sendMessage(helpMessageFractals).queue();
     	channel.sendMessage(helpMessageAutoEvents).queue();
     	channel.sendMessage(helpInfo).queue();

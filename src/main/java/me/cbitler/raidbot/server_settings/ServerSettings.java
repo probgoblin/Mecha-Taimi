@@ -326,6 +326,7 @@ public class ServerSettings {
     	if (serverRoleGroups == null)
     		serverRoleGroups = new TreeMap<>();
     	serverRoleGroups.put(groupName, roles);
+    	permittedDiscordRoles.put(serverId, serverRoleGroups);
     	updateRoleGroupsDB(serverId);
     	
     	return true;

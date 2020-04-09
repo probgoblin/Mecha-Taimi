@@ -209,8 +209,8 @@ public class DMHandler extends ListenerAdapter {
                 } else {
                     // finish editing
                     String serverId = step.getServerID();
-                    bot.getEditMap().remove(author.getId());
-                    bot.getEditList().remove(serverId);
+                    bot.getEditRoleGroupsMap().remove(author.getId());
+                    bot.getEditRoleGroupsList().remove(serverId);
                     e.getChannel().sendMessage("Finished editing role groups for server.").queue();
                 }
             }

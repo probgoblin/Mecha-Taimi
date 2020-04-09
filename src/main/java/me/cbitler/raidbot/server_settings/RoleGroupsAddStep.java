@@ -39,7 +39,7 @@ public class RoleGroupsAddStep implements RoleGroupsEditStep {
         String groupName = parts[0].trim();
         if (availableRoleGroups.contains(groupName))
         {
-        	e.getChannel().sendMessage("This server already has a role group with this name. Choose a different name or delete teh existing group first.").queue();
+        	e.getChannel().sendMessage("This server already has a role group with this name. Choose a different name or delete the existing group first.").queue();
             return false;
         }
         
@@ -47,13 +47,15 @@ public class RoleGroupsAddStep implements RoleGroupsEditStep {
         
         try {
            	String[] roles = parts[1].trim().split("\\s*,\\s*");
-            roleNames = Arrays.asList(roles);	
+           	roleNames = Arrays.asList(roles);	
             boolean success = ServerSettings.addRoleGroup(serverId, groupName, roleNames);
             if (success == false)
             {
             	e.getChannel().sendMessage("Invalid input: One or more of these discord roles do not exist on this server. Try again.").queue();
                 valid = false;
             }
+            else
+            	e.getChannel().sendMessage("Added group `"+groupName+"` which corresponds to "+roleNames.toString()+".").queue();
         } catch (Exception ex) {
             e.getChannel().sendMessage("Invalid input: Could not parse the list of roles. Make sure it's in the correct format.").queue();
             valid = false;
@@ -67,7 +69,7 @@ public class RoleGroupsAddStep implements RoleGroupsEditStep {
      */
     public String getStepText() {
         return "Enter a new role group for the server\n" 
-        		+ "__format:__ `[group name]:[role 1],[role 2],...,[role n]`, e.g., `Experts+: Expert Raider, Master Raider`)\n"
+        		+ "__format:__ `[group name]:[role 1],[role 2],...,[role n]`, e.g., `Experts+: Expert Raider, Master Raider`\n"
         		+ "(this means you cannot use colon `:` in your group name!)\n";
     }
 
