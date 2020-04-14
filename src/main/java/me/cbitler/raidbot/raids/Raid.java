@@ -26,6 +26,8 @@ public class Raid {
     HashMap<RaidUser, List<FlexRole>> usersToFlexRoles = new HashMap<>();
     HashMap<String, String> userIDsToNicknames = new HashMap<>();
     List<String> permittedDiscordRoles = new ArrayList<String>();
+    
+    String flexRolesName = "Flex Roles / Backup";
 
     /* *
      * open world events only have a single role (Participants) and users sign up without any class
@@ -850,7 +852,7 @@ public class Raid {
         builder.addField("Time: ", getTime(), true);
         builder.addBlankField(false);
         builder.addField("Roles:", buildRolesText(), true);
-        builder.addField("Flex Roles:", buildFlexRolesText(), true);
+        builder.addField(flexRolesName + ":", buildFlexRolesText(), true);
         if (provide_instr && this.isOpenWorld == false) {
         	builder.addBlankField(false);
         	builder.addField("How to sign up:", 
@@ -901,7 +903,7 @@ public class Raid {
         String flexText = buildFlexRolesTextShort(usersInMain);
         if (flexText.isEmpty() == false) {
         	//builder.addBlankField(false);
-        	builder.addField("Flex Roles:", flexText, true);
+        	builder.addField(flexRolesName + ":", flexText, true);
         }
 
         return builder.build();
