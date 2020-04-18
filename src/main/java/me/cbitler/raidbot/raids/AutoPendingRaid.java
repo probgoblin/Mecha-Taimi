@@ -7,9 +7,12 @@ package me.cbitler.raidbot.raids;
  * @author Franziska Mueller
  */
 public class AutoPendingRaid extends PendingRaid {
-    
-	int resetHour;
-	int resetMin;
+	
+	int resetHour = 0;
+	int resetMin = 0;
+
+	int deleteHour = 0;
+	int deleteMin = 0;
 	
 	public int getResetHour() {
         return resetHour;
@@ -22,5 +25,18 @@ public class AutoPendingRaid extends PendingRaid {
     public void setResetTime(int hour, int mins) {
         resetHour = hour;
         resetMin = mins;
+    }
+    
+	public int getDeleteHour() {
+        return deleteHour;
+    }
+	
+	public int getDeleteMinutes() {
+        return deleteMin;
+    }
+
+    public void setDeleteTime(int hour, int mins) {
+        deleteHour = hour;
+        deleteMin = mins;
     }
 }

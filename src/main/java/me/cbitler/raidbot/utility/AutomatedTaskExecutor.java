@@ -29,7 +29,7 @@ public class AutomatedTaskExecutor
     	return task.getName();
     }
 
-    public void startExecutionAt(int targetHour, int targetMin, int targetSec)
+    public void startExecution()
     {
         Runnable taskWrapper = new Runnable(){
 
@@ -37,11 +37,11 @@ public class AutomatedTaskExecutor
             public void run() 
             {
             	task.execute();
-                startExecutionAt(targetHour, targetMin, targetSec);
+                startExecution();
             }
 
         };
-        long delay = computeNextDelay(targetHour, targetMin, targetSec);
+        long delay = computeNextDelay(task.getNextTargetHour(), task.getNextTargetMin(), 0);
         //System.out.println("Next task scheduled in "+Long.toString(delay)+" seconds.");
         executorService.schedule(taskWrapper, delay, TimeUnit.SECONDS);
     }

@@ -306,7 +306,7 @@ public class RaidBot {
 		AutomatedTaskExecutor taskExec = new AutomatedTaskExecutor(new EventCreator(event, tasks.size()));
 		tasks.add(taskExec);
 		autoEventCreator.put(serverId, tasks);
-		taskExec.startExecutionAt(event.getResetHour(), event.getResetMinutes(), 0);
+		taskExec.startExecution();
 		
 		return true;
 	}
