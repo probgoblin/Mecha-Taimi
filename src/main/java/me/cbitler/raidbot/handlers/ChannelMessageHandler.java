@@ -8,8 +8,6 @@ import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.creation.RunNameStep;
 import me.cbitler.raidbot.auto_events.AutoCreationStep;
 import me.cbitler.raidbot.auto_events.AutoRunNameStep;
-import me.cbitler.raidbot.edit.EditStep;
-import me.cbitler.raidbot.edit.EditIdleStep;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.server_settings.RoleGroupsEditStep;
@@ -127,28 +125,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 String messageId = split[1];
                 Raid raid = RaidManager.getRaid(messageId);
                 if (raid != null && raid.getServerId().equalsIgnoreCase(e.getGuild().getId())) {
-                	// check permissions here since raid leader should also be able to edit
-                    if (PermissionsUtil.hasRaidLeaderRole(e.getMember()) || e.getAuthor().getId().contentEquals(raid.getRaidLeaderId())) {
-                    	// check if this user already has an active chat
-                    	int actvId = bot.userHasActiveChat(e.getAuthor().getId());
-            			if (actvId != 0) {
-            				RaidBot.writeNotificationActiveChat(e.getAuthor(), actvId);
-            				try {
-                                e.getMessage().delete().queue();
-                            } catch (Exception exception) {}
-            				return;
-            			}
-                    	// check if the raid is being edited by someone else
-                    	if (bot.getEditList().contains(messageId)) {
-                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The selected event is already being edited.").queue());
-                    	} else {
-                    		// start editing process
-                    		EditStep editIdleStep = new EditIdleStep(messageId);
-                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(editIdleStep.getStepText()).queue());
-                    		bot.getEditMap().put(e.getAuthor().getId(), editIdleStep);
-                    		bot.getEditList().add(messageId);
-                    	}
-                    } 
+                	bot.startEditEvent(messageId, e.getMember(), e.getAuthor(), raid.getRaidLeaderId());
                 } else {
                     e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Non-existant event.").queue());
                 }

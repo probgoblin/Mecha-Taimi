@@ -4,6 +4,7 @@ import me.cbitler.raidbot.commands.*;
 import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.auto_events.AutoCreationStep;
 import me.cbitler.raidbot.auto_events.AutoStopStep;
+import me.cbitler.raidbot.edit.EditIdleStep;
 import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.deselection.DeselectionStep;
@@ -18,8 +19,10 @@ import me.cbitler.raidbot.server_settings.RoleGroupsEditStep;
 import me.cbitler.raidbot.swap.SwapStep;
 import me.cbitler.raidbot.utility.AutomatedTaskExecutor;
 import me.cbitler.raidbot.utility.EventCreator;
+import me.cbitler.raidbot.utility.PermissionsUtil;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 
 import java.util.ArrayList;
@@ -339,5 +342,37 @@ public class RaidBot {
 		if (result == null)
 			result = new ArrayList<>();
 		return result;
+	}
+	
+	
+	/**
+	 * initiates event editing if user has correct permissions
+	 * @param messageId message id of the event message
+	 * @param member object that holds information about the discord user within a server
+	 * @param user the discord user
+	 * @param leaderId leader id for the event that should be edited
+	 */
+	public void startEditEvent(String messageId, Member member, User user, String leaderId) {
+		// check permissions here since raid leader should also be able to edit
+        if (PermissionsUtil.hasRaidLeaderRole(member) || user.getId().contentEquals(leaderId)) {
+        	// check if this user already has an active chat
+        	int actvId = userHasActiveChat(user.getId());
+			if (actvId != 0) {
+				RaidBot.writeNotificationActiveChat(user, actvId);
+				return;
+			}
+        	// check if the raid is being edited by someone else
+        	if (getEditList().contains(messageId)) {
+        		user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The selected event is already being edited.").queue());
+        	} else {
+        		// start editing process
+        		EditStep editIdleStep = new EditIdleStep(messageId);
+        		user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(editIdleStep.getStepText()).queue());
+        		getEditMap().put(user.getId(), editIdleStep);
+        		getEditList().add(messageId);
+        	}
+        } else {
+        	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You do not have permissions to edit this event. If you think this is wrong, please contact your friendly IT person <3").queue());
+        }
 	}
 }
