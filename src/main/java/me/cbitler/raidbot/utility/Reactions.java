@@ -84,7 +84,7 @@ public class Reactions {
             getEmoji("592463347291783168"), // Flex
             getEmoji("614289684754857984"), // Swap
             getEmoji("548530947591634944"), // X_
-            getEmoji("") // edit
+            getEmoji("727111299749904396")  // edit
     };
 
     static Emote[] reactionsCore = {
@@ -100,13 +100,13 @@ public class Reactions {
             getEmoji("592463347291783168"), // Flex
             getEmoji("614289684754857984"), // Swap
             getEmoji("548530947591634944"), // X_
-            getEmoji("") // edit
+            getEmoji("727111299749904396")  // edit
     };
 
     static Emote[] reactionsOpenWorld = {
             getEmoji("553296724584562688"), // Check
-            getEmoji("548530947591634944"),  // X_
-            getEmoji("") // edit
+            getEmoji("548530947591634944"), // X_
+            getEmoji("727111299749904396")  // edit
     };
 
     /**

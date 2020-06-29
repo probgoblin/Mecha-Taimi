@@ -8,17 +8,34 @@ import me.cbitler.raidbot.raids.RaidRole;
 public class RoleTemplates {
 	
 	static RaidRole[][] raidTemplates =
-	    { 	{	new RaidRole(1, "Tank"),
+	    { 	
+	    	{	new RaidRole(1, "Tank"),
 	            new RaidRole(1, "Supporter"),
 	            new RaidRole(1, "Druid"),
 	            new RaidRole(1, "Off-Healer"),
 	            new RaidRole(1, "BS"),
 	            new RaidRole(5, "DPS")
+	        },
+	    	{	new RaidRole(2, "Chronotank"),
+	            new RaidRole(1, "Druid"),
+	            new RaidRole(1, "Off-Healer"),
+	            new RaidRole(1, "BS"),
+	            new RaidRole(1, "Epi Scg"),
+	            new RaidRole(4, "DPS")
+	        },
+	    	{	new RaidRole(1, "Chronotank"),
+	            new RaidRole(1, "BS (G1)"),
+	            new RaidRole(1, "Kiter (G2)"),
+	            new RaidRole(1, "Off-Chrono (G3)"),
+	            new RaidRole(1, "Druid"),
+	            new RaidRole(5, "DPS")
 	        }
 	    };
 	
 	static String[] raidTemplateNames = {
-	            "default raid"
+	            "default raid",
+	            "Desmina",
+	            "Dhuum"
 	    };
 	
 	static RaidRole[][] fractalTemplates =
