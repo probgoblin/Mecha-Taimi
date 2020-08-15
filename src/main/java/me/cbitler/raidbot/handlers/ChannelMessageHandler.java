@@ -1,13 +1,13 @@
 package me.cbitler.raidbot.handlers;
 
 import me.cbitler.raidbot.RaidBot;
+import me.cbitler.raidbot.auto_events.AutoCreationStep;
+import me.cbitler.raidbot.auto_events.AutoRunNameStep;
 import me.cbitler.raidbot.auto_events.AutoStopStep;
 import me.cbitler.raidbot.commands.Command;
 import me.cbitler.raidbot.commands.CommandRegistry;
 import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.creation.RunNameStep;
-import me.cbitler.raidbot.auto_events.AutoCreationStep;
-import me.cbitler.raidbot.auto_events.AutoRunNameStep;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.server_settings.RoleGroupsEditStep;

@@ -1,10 +1,10 @@
 package me.cbitler.raidbot.server_settings;
 
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Delete a role from the event

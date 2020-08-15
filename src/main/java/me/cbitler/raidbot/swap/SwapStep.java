@@ -2,13 +2,14 @@
 
 package me.cbitler.raidbot.swap;
 
-import java.util.ArrayList;
-
 import me.cbitler.raidbot.raids.FlexRole;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.utility.Reactions;
+import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
-import net.dv8tion.jda.api.entities.*;
+
+import java.util.ArrayList;
 
 /**
  * Step for swapping main/flex roles in a raid

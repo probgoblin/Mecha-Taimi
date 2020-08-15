@@ -1,9 +1,9 @@
 package me.cbitler.raidbot.handlers;
 
 import me.cbitler.raidbot.RaidBot;
-import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.auto_events.AutoCreationStep;
 import me.cbitler.raidbot.auto_events.AutoStopStep;
+import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.deselection.DeselectionStep;
 import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.logs.LogParser;

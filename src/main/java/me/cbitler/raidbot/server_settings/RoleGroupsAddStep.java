@@ -1,11 +1,11 @@
 package me.cbitler.raidbot.server_settings;
 
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-
-import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Add a role to an event

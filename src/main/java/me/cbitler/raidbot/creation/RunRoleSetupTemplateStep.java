@@ -1,13 +1,12 @@
 package me.cbitler.raidbot.creation;
 
-import java.util.List;
-
 import me.cbitler.raidbot.RaidBot;
-import me.cbitler.raidbot.utility.RoleTemplates;
-
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidRole;
+import me.cbitler.raidbot.utility.RoleTemplates;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+
+import java.util.List;
 
 /**
  * Role setup step for the event.

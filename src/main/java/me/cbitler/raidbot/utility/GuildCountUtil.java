@@ -1,9 +1,10 @@
 package me.cbitler.raidbot.utility;
 
 import net.dv8tion.jda.api.JDA;
-// import net.dv8tion.jda.api.entities.Guild;
 
-import java.io.*;
+import java.io.IOException;
+
+// import net.dv8tion.jda.api.entities.Guild;
 // import java.net.HttpURLConnection;
 // import java.net.URL;
 // import java.net.URLConnection;

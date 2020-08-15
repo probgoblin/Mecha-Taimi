@@ -1,12 +1,12 @@
 package me.cbitler.raidbot.creation;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 /**
  * Step to set the date of the event

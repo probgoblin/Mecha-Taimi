@@ -1,11 +1,11 @@
 package me.cbitler.raidbot.auto_events;
 
+import me.cbitler.raidbot.RaidBot;
+import me.cbitler.raidbot.utility.AutomatedTaskExecutor;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import me.cbitler.raidbot.utility.AutomatedTaskExecutor;
-import me.cbitler.raidbot.RaidBot;
-import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Stop step for auto events.

@@ -1,11 +1,11 @@
 package me.cbitler.raidbot.edit;
 
-import java.util.List;
-
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.raids.RaidRole;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+
+import java.util.List;
 
 /**
  * Change the amount for a role of the event
