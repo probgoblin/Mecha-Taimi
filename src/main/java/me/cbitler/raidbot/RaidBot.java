@@ -1,13 +1,13 @@
 package me.cbitler.raidbot;
 
-import me.cbitler.raidbot.commands.*;
-import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.auto_events.AutoCreationStep;
 import me.cbitler.raidbot.auto_events.AutoStopStep;
-import me.cbitler.raidbot.edit.EditIdleStep;
-import me.cbitler.raidbot.edit.EditStep;
+import me.cbitler.raidbot.commands.*;
+import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.deselection.DeselectionStep;
+import me.cbitler.raidbot.edit.EditIdleStep;
+import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.handlers.ChannelMessageHandler;
 import me.cbitler.raidbot.handlers.DMHandler;
 import me.cbitler.raidbot.handlers.ReactionHandler;
@@ -21,15 +21,14 @@ import me.cbitler.raidbot.utility.AutomatedTaskExecutor;
 import me.cbitler.raidbot.utility.EventCreator;
 import me.cbitler.raidbot.utility.PermissionsUtil;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import javax.security.auth.login.LoginException;
+import java.util.*;
 
 /**
  * Class representing the raid bot itself.
@@ -64,13 +63,23 @@ public class RaidBot {
 
     /**
      * Create a new instance of the raid bot with the specified JDA api
-     * @param jda The API for the bot to use
+     *
+     * @param token the token used to connect to the Discord API
      */
-    public RaidBot(JDA jda) {
+    public RaidBot(String token) throws LoginException, InterruptedException {
         instance = this;
 
+        Collection<GatewayIntent> intents = GatewayIntent.getIntents(GatewayIntent.DIRECT_MESSAGES.getRawValue() +
+                                                                      GatewayIntent.GUILD_MESSAGE_REACTIONS.getRawValue() +
+                                                                      GatewayIntent.GUILD_MESSAGES.getRawValue());
+
+        JDA jda = JDABuilder.create(token, intents)
+                            .addEventListeners(new DMHandler(this),
+                                               new ChannelMessageHandler(),
+                                               new ReactionHandler())
+                            .build()
+                            .awaitReady();
         this.jda = jda;
-        jda.addEventListener(new DMHandler(this), new ChannelMessageHandler(), new ReactionHandler());
         db = new Database("events.db");
         db.connect();
         RaidManager.loadRaids();
@@ -79,21 +88,6 @@ public class RaidBot {
         CommandRegistry.addCommand("info", new InfoCommand());
         CommandRegistry.addCommand("endEvent", new EndRaidCommand());
         CommandRegistry.addCommand("endAllEvents", new EndAllCommand());
-
-//        new Thread(() -> {
-//            while (true) {
-//                try {
-//                    GuildCountUtil.sendGuilds(jda);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                try {
-//                    Thread.sleep(1000*60*5);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
     }
 
     /**

@@ -15,7 +15,7 @@ import java.net.URISyntaxException;
  * @author Christopher Bitler
  */
 public class Main {
-    public static void main(String[] args) throws LoginException, InterruptedException, RateLimitedException {
+    public static void main(String[] args) throws LoginException, InterruptedException {
         String token = null;
         try {
             token = readToken();
@@ -24,8 +24,7 @@ public class Main {
             System.exit(1);
         }
 
-        JDA jda = new JDABuilder(AccountType.BOT).setToken(token).build().awaitReady();
-        new RaidBot(jda);
+        new RaidBot(token);
     }
 
     /**
