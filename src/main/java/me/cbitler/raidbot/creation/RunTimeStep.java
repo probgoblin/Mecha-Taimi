@@ -2,7 +2,7 @@ package me.cbitler.raidbot.creation;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Set the time for the event
@@ -23,7 +23,7 @@ public class RunTimeStep implements CreationStep {
         	throw new RuntimeException();
         }
 
-        raid.setTime(e.getMessage().getRawContent());
+        raid.setTime(e.getMessage().getContentRaw());
 
         return true;
     }

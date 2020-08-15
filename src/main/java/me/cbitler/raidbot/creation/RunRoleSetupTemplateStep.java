@@ -7,7 +7,7 @@ import me.cbitler.raidbot.utility.RoleTemplates;
 
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidRole;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Role setup step for the event.
@@ -19,7 +19,7 @@ public class RunRoleSetupTemplateStep implements CreationStep {
     CreationStep nextStep;
     List<RaidRole[]> templates;
     List<String> templateNames;
-    
+
     public RunRoleSetupTemplateStep() {
 		this.templates = RoleTemplates.getAllTemplates();
 		this.templateNames = RoleTemplates.getAllTemplateNames();
@@ -40,7 +40,7 @@ public class RunRoleSetupTemplateStep implements CreationStep {
         nextStep = new RunPermDiscRoleSetupStep(raid.getServerId());
 
         try {
-            int choiceId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+            int choiceId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
             if (choiceId == templateNames.size()) { // user chose to add roles manually
                 nextStep = new RunRoleSetupManualStep();
                 return true;
@@ -62,7 +62,7 @@ public class RunRoleSetupTemplateStep implements CreationStep {
         for (int i = 0; i < templateNames.size(); i++) {
         	message += "`" + (i+1) + "` " + RoleTemplates.templateToString(templateNames.get(i), templates.get(i)) + "\n";
         }
-        
+
         return message + "`" + (templateNames.size()+1) + "` add roles manually";
     }
 

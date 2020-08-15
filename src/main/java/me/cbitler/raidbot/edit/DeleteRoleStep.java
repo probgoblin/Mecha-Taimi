@@ -5,20 +5,20 @@ import java.util.List;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.raids.RaidRole;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
- * Delete a role from the event 
+ * Delete a role from the event
  * @author Franziska Mueller
  */
 public class DeleteRoleStep implements EditStep {
 
 	private String messageID;
-	
+
 	public DeleteRoleStep(String messageId) {
 		this.messageID = messageId;
 	}
-	
+
     /**
      * Handle deleting a role from the event
      * @param e The direct message event
@@ -29,10 +29,10 @@ public class DeleteRoleStep implements EditStep {
     	Raid raid = RaidManager.getRaid(messageID);
     	List<RaidRole> roles = raid.getRoles();
     	int roleID = -1;
-    	
+
     	// try to parse an integer
     	try {
-    		roleID = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+    		roleID = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
     		if (roleID < 0 || roleID >= roles.size())
     			valid = false;
     	} catch (Exception excp) {
@@ -46,9 +46,9 @@ public class DeleteRoleStep implements EditStep {
     			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully deleted role.").queue());
     			raid.updateMessage();
     		} else if (out == 1)
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Role could not be deleted because users already signed up for it.").queue());	
+    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Role could not be deleted because users already signed up for it.").queue());
     		else if (out == 2)
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Role could not be deleted from database.").queue());	
+    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Role could not be deleted from database.").queue());
     	}
     	return valid;
     }
@@ -62,7 +62,7 @@ public class DeleteRoleStep implements EditStep {
         stepText = "Which role do you want to delete? \n";
         for (int r = 0; r < roles.size(); r++)
         	stepText += "`" + (r+1) + "` " + roles.get(r).getName() + " \n";
-        
+
         return stepText;
     }
 

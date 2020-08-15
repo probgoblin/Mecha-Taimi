@@ -6,7 +6,7 @@ import java.util.Locale;
 
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Edit the date for the event
@@ -15,11 +15,11 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 public class EditDateStep implements EditStep {
 
 	private String messageID;
-	
+
 	public EditDateStep(String messageId) {
 		this.messageID = messageId;
 	}
-	
+
     /**
      * Handle changing the date for the event
      * @param e The direct message event
@@ -27,16 +27,16 @@ public class EditDateStep implements EditStep {
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         Raid raid = RaidManager.getRaid(messageID);
-        raid.setDate(e.getMessage().getRawContent());
-        
+        raid.setDate(e.getMessage().getContentRaw());
+
         boolean valid = true;
         String dateString = "";
-        String[] split = e.getMessage().getRawContent().split("\\.");
+        String[] split = e.getMessage().getContentRaw().split("\\.");
         if (split.length != 3)
         {
         	valid = false;
         }
-        else 
+        else
         {
         	try {
         		int day = Integer.parseInt(split[0]);
@@ -51,7 +51,7 @@ public class EditDateStep implements EditStep {
         		valid = false;
         	}
         }
-    	
+
         if (valid == false)
         {
         	e.getChannel().sendMessage("Please use the correct format: dd.mm.yyyy, e.g., 29.02.2020").queue();
@@ -59,11 +59,11 @@ public class EditDateStep implements EditStep {
         }
 
        	raid.setDate(dateString);
-            
+
         if (raid.updateDateDB()) {
         	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Date successfully updated in database.").queue());
         } else {
-        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Date could not be updated in database.").queue());	
+        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Date could not be updated in database.").queue());
         }
         raid.updateMessage();
 

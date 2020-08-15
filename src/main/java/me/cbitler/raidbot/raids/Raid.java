@@ -5,12 +5,12 @@ import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.server_settings.ServerSettings;
 import me.cbitler.raidbot.utility.PermissionsUtil;
 import me.cbitler.raidbot.utility.Reactions;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Emote;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.MessageEmbed;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -26,19 +26,19 @@ public class Raid {
     HashMap<RaidUser, List<FlexRole>> usersToFlexRoles = new HashMap<>();
     HashMap<String, String> userIDsToNicknames = new HashMap<>();
     List<String> permittedDiscordRoles = new ArrayList<String>();
-    
+
     String flexRolesName = "Flex Roles / Backup";
 
     /* *
      * open world events only have a single role (Participants) and users sign up without any class
      */
     boolean isOpenWorld;
-    
+
     /* *
      * whether to display the short version of the raid message
      */
     boolean isDisplayShort;
-    
+
     /* *
      * whether the event is a fractal. Fractal events will not be archived and they can only be displayed as short message.
      */
@@ -55,12 +55,12 @@ public class Raid {
      * @param date           The date of the raid
      * @param time           The time of the raid
      * @param isOpenWorld    Open world event flag
-     * @param isDisplayShort Flag for short message 
+     * @param isDisplayShort Flag for short message
      * @param isFractalEvent Fractal event flag
      * @param permittedRoles List of discord roles allowed to sign up, empty list means everyone
      */
     public Raid(String messageId, String serverId, String channelId, String raidLeaderId, String name,
-            String description, String date, String time, boolean isOpenWorld, boolean isDisplayShort, 
+            String description, String date, String time, boolean isOpenWorld, boolean isDisplayShort,
             boolean isFractalEvent, List<String> permittedRoles) {
         this.messageId = messageId;
         this.serverId = serverId;
@@ -127,7 +127,7 @@ public class Raid {
     public String getChannelId() {
         return channelId;
     }
-    
+
     /**
      * The display-short-message flag for this event
      *
@@ -136,7 +136,7 @@ public class Raid {
     public boolean isDisplayShort() {
         return isDisplayShort;
     }
-    
+
     /**
      * The fractal flag for this event
      *
@@ -145,16 +145,16 @@ public class Raid {
     public boolean isFractalEvent() {
         return isFractalEvent;
     }
-    
+
     /**
      * Sets the display-short-message flag for this event
      *
-     * @param displayshort new display-short-message flag 
+     * @param displayshort new display-short-message flag
      */
     public void setDisplayShort(boolean displayshort) {
         this.isDisplayShort = displayshort;
     }
-    
+
     /**
      * Updates the display-short-message flag in the database
      */
@@ -221,11 +221,11 @@ public class Raid {
     		return 1;
     	else if (memberList.size() == 1) {
     		this.raidLeaderId = memberList.get(0).getUser().getId();
-            userIDsToNicknames.put(this.raidLeaderId, getNicknameOnServer(this.raidLeaderId, this.serverId));    
+            userIDsToNicknames.put(this.raidLeaderId, getNicknameOnServer(this.raidLeaderId, this.serverId));
             return 0;
     	} else { // more than 1
     		return 2;
-    	} 
+    	}
     }
 
     /**
@@ -346,7 +346,7 @@ public class Raid {
     public String getRaidLeaderId() {
         return raidLeaderId;
     }
-    
+
     /**
      * Get the raid leader's name
      *
@@ -628,7 +628,7 @@ public class Raid {
 
         return users;
     }
-    
+
     /**
      * Returns the nickname of the user on a server. If no nickname is set, it returns the username instead
      * @param userId the ID of the user
@@ -644,7 +644,7 @@ public class Raid {
     		// escape _ in the user names (this will lead to markdown formatting otherwise)
     		nickname = nickname.replace("_", "\\_");
     		return nickname;
-    	} else 
+    	} else
     		return null;
     }
 
@@ -855,7 +855,7 @@ public class Raid {
         builder.addField(flexRolesName + ":", buildFlexRolesText(), true);
         if (provide_instr && this.isOpenWorld == false) {
         	builder.addBlankField(false);
-        	builder.addField("How to sign up:", 
+        	builder.addField("How to sign up:",
         		"- To choose a main role, click on the reaction of the class you want to play.\n"
         		+ "- To sign up as a flex role, click on the flex reaction (Fx).\n"
         		+ "- To remove one or all of your sign-ups, click the red X reaction.\n"
@@ -865,7 +865,7 @@ public class Raid {
 
         return builder.build();
     }
-    
+
 //    /**
 //     * Build the short embedded message that shows the information about this raid
 //     *
@@ -885,7 +885,7 @@ public class Raid {
 //
 //        return builder.build();
 //    }
-    
+
     /**
      * Build the short embedded message that shows the information about this raid
      *
@@ -899,7 +899,7 @@ public class Raid {
         Set<String> usersInMain = new HashSet<String>();
         String rolesTxt = buildRolesTextShort(usersInMain);
         builder.addField("Roles:", rolesTxt, true);
-        
+
         String flexText = buildFlexRolesTextShort(usersInMain);
         if (flexText.isEmpty() == false) {
         	//builder.addBlankField(false);
@@ -908,7 +908,7 @@ public class Raid {
 
         return builder.build();
     }
-    
+
     /**
      * collects a list of users for every role
      * @param excludeUsers user ids to not include in the result, may be null
@@ -945,21 +945,21 @@ public class Raid {
             for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
                 if (flex.getKey() != null && flex.getValue().isEmpty() == false) {
                 	String username = userIDsToNicknames.get(flex.getKey().getId());
-                	if (username == null) 
+                	if (username == null)
                 		username = flex.getKey().getName();
                     text += ("- " + username + "\n");
                 }
             }
         } else {
         	Map<String, List<RaidUser>> flexUsersByRole = collectFlexUsersByRole(null);
-            
+
             for (int r = 0; r < roles.size(); r++) {
                 String roleName = roles.get(r).getName();
                 text += (roleName + ": \n");
 
                 for (RaidUser user : flexUsersByRole.get(roleName)) {
                 	String username = userIDsToNicknames.get(user.getId());
-                	if (username == null) 
+                	if (username == null)
                 		username = user.getName();
                     Emote userEmote = Reactions.getEmoteByName(user.getSpec());
                     if(userEmote == null)
@@ -973,7 +973,7 @@ public class Raid {
 
         return text;
     }
-    
+
     /**
      * Build the short flex roles text, which includes a list of flex roles users are
      * playing and their specs
@@ -988,7 +988,7 @@ public class Raid {
                 	if (text.isEmpty() == false)
                     	text += ", ";
                 	String username = userIDsToNicknames.get(flex.getKey().getId());
-                	if (username == null) 
+                	if (username == null)
                 		username = flex.getKey().getName();
                 	text += username;
                 }
@@ -1000,13 +1000,13 @@ public class Raid {
                 List<RaidUser> usersPerRole = flexUsersByRole.get(roleName);
                 if (usersPerRole.isEmpty() == false) {
                 	text += ("[ **" + roleName + "**: ");
-                
+
                 	for (int u = 0; u < usersPerRole.size(); u++) {
                 		RaidUser user = usersPerRole.get(u);
                 		if (u != 0)
                 			text += ", ";
                 		String username = userIDsToNicknames.get(user.getId());
-                    	if (username == null) 
+                    	if (username == null)
                     		username = user.getName();
                 		text += username;
                 	}
@@ -1031,7 +1031,7 @@ public class Raid {
             text += ("**" + role.name + " ( " + raidUsersInRole.size() + " / " + role.amount + " ):** \n");
             for (RaidUser user : raidUsersInRole) {
             	String username = userIDsToNicknames.get(user.getId());
-            	if (username == null) 
+            	if (username == null)
             		username = user.getName();
                 if (isOpenWorld) {
                     text += ("- " + username + "\n");
@@ -1047,7 +1047,7 @@ public class Raid {
         }
         return text;
     }
-    
+
     /**
      * Build the short role text, which shows the roles users are playing in the raids
      *
@@ -1062,9 +1062,9 @@ public class Raid {
             	text += ("**" + role.getName() + " ( " + raidUsersInRole.size() + " / " + role.getAmount() + " ):** \n");
             	for (RaidUser user : raidUsersInRole) {
                 	String username = userIDsToNicknames.get(user.getId());
-                	if (username == null) 
+                	if (username == null)
                 		username = user.getName();
-                    text += ("- " + username + "\n");   
+                    text += ("- " + username + "\n");
                 }
                 text += "\n";
             } else {
@@ -1075,15 +1075,15 @@ public class Raid {
             			if (usersInMain != null)
             				usersInMain.add(user.getId());
             			String username = userIDsToNicknames.get(user.getId());
-                    	if (username == null) 
+                    	if (username == null)
                     		username = user.getName();
-                        
+
                         Emote userEmote = Reactions.getEmoteByName(user.getSpec());
                         if(userEmote == null)
                             text += username;
                         else
-                            text += "<:"+userEmote.getName()+":"+userEmote.getId()+"> " + username;  
-                        
+                            text += "<:"+userEmote.getName()+":"+userEmote.getId()+"> " + username;
+
                         // add flex roles for that user
                         List<FlexRole> userFlexRoles = usersToFlexRoles.get(new RaidUser(user.getId(), user.getName(), "", ""));
                         if (userFlexRoles.isEmpty() == false) {
@@ -1102,7 +1102,7 @@ public class Raid {
         text += "\n";
         return text;
     }
-    
+
 //    /**
 //     * Build the text per role, which shows the roles users are playing in the raids
 //     *
@@ -1117,7 +1117,7 @@ public class Raid {
 //            text += ("**" + role.name + " ( " + raidUsersInRole.size() + " / " + role.amount + " ):** \n");
 //            for (RaidUser user : raidUsersInRole) {
 //            	String username = userIDsToNicknames.get(user.getId());
-//            	if (username == null) 
+//            	if (username == null)
 //            		username = user.getName();
 //                if (isOpenWorld) {
 //                    text += ("- " + username + "\n");
@@ -1253,7 +1253,7 @@ public class Raid {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        
+
         if (update_message)
         	updateMessage();
         return found;
@@ -1279,8 +1279,8 @@ public class Raid {
     }
 
     /**
-     * Posts the latest event message to the archive channel 
-     * 
+     * Posts the latest event message to the archive channel
+     *
      * @return whether the message was posted successfully
      */
 	public boolean postToArchive() {
@@ -1288,7 +1288,7 @@ public class Raid {
 			// fractal events are not archived
 			return false;
 		}
-		
+
 		MessageEmbed message = isDisplayShort ? buildEmbedShort(false) : buildEmbed(false);
 
         Guild guild = RaidBot.getInstance().getServer(serverId);
@@ -1300,24 +1300,24 @@ public class Raid {
             } catch (Exception ecxp) {
             	return false;
             }
-            
+
             return true;
         } else {
         	return false;
         }
 	}
-	
+
 	public List<String> getPermittedDiscordRoles() {
 		return permittedDiscordRoles;
 	}
-	
+
 	public void addPermittedDiscordRoles(String role) {
 		if (permittedDiscordRoles.contains(role) == false)
 			permittedDiscordRoles.add(role);
 	}
-	
+
 	public void addPermittedDiscordRoles(List<String> roles) {
-		for (int r = 0; r < roles.size(); r++) 
+		for (int r = 0; r < roles.size(); r++)
 		{
 			if (permittedDiscordRoles.contains(roles.get(r)) == false)
 				permittedDiscordRoles.add(roles.get(r));
@@ -1327,7 +1327,7 @@ public class Raid {
 	public void clearPermittedDiscordRoles() {
 		permittedDiscordRoles.clear();
 	}
-	
+
 	public boolean updatePermDiscRolesDB() {
 		String permDiscRoles = RaidManager.formatStringListForDatabase(permittedDiscordRoles);
 		try {
@@ -1339,17 +1339,17 @@ public class Raid {
 	    }
 	    return true;
 	}
-	
+
 	/**
 	 * Checks whether the given user is permitted to sign up for this event
-	 * 
-	 * @param userId 
+	 *
+	 * @param userId
 	 * @return whether user has permission
 	 */
 	public boolean isUserPermitted(Member member) {
 		if (permittedDiscordRoles.isEmpty()) {
 			// if there are no restrictions, user has permission
-			return true; 
+			return true;
 		}
 		boolean match = false;
 		// iterate over permitted roles

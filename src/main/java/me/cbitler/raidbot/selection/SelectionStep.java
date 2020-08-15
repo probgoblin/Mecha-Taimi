@@ -1,6 +1,6 @@
 package me.cbitler.raidbot.selection;
 
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Step in the role selection process

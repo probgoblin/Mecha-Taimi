@@ -3,7 +3,7 @@ package me.cbitler.raidbot.creation;
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.server_settings.ServerSettings;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Get the announcement channel for the event from the user
@@ -13,11 +13,11 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 public class RunChannelStep implements CreationStep {
     static String[] defaultChannels = { "board-of-adventures", "banner-of-tactics", "gw2-raid-bot", "test" };
 	boolean enterManually;
-    
+
 	public RunChannelStep() {
 		this.enterManually = false;
 	}
-	
+
 	/**
      * Set the announcement channel
      * @param e The direct message event
@@ -32,7 +32,7 @@ public class RunChannelStep implements CreationStep {
     	}
     	String serverId = raid.getServerId();
         if (enterManually) {
-            String channelWithoutHash = e.getMessage().getRawContent().replace("#","");
+            String channelWithoutHash = e.getMessage().getContentRaw().replace("#","");
         	if (ServerSettings.checkChannel(serverId, channelWithoutHash)) {
         		raid.setAnnouncementChannel(channelWithoutHash);
         	} else {
@@ -42,7 +42,7 @@ public class RunChannelStep implements CreationStep {
 			return true;
         } else {
         	try {
-        		int choiceId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+        		int choiceId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
         		if (choiceId >= 0 && choiceId < defaultChannels.length) { // one of the default channels
         			if (ServerSettings.checkChannel(serverId, defaultChannels[choiceId])) {
                 		raid.setAnnouncementChannel(defaultChannels[choiceId]);
@@ -58,7 +58,7 @@ public class RunChannelStep implements CreationStep {
         		} else { // no valid choice
         			e.getChannel().sendMessage("Please choose a valid option.").queue();
         			return false;
-        		}   	
+        		}
         	} catch (Exception excp) { // not an integer
         		e.getChannel().sendMessage("Please choose a valid option.").queue();
         		return false;

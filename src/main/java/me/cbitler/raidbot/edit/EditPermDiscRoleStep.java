@@ -6,7 +6,7 @@ import java.util.Set;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.server_settings.ServerSettings;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Permitted role setup step for the event.
@@ -19,14 +19,14 @@ public class EditPermDiscRoleStep implements EditStep {
 	Raid raid;
 	String serverId;
 	Set<String> predefRoleGroupNames;
-	
+
 	public EditPermDiscRoleStep(String messageId) {
 		this.messageID = messageId;
 		this.raid = RaidManager.getRaid(messageID);
 		this.serverId = raid.getServerId();
 		predefRoleGroupNames = ServerSettings.getPredefGroupNames(serverId);
 	}
-	
+
 	private String getPermissionString() {
 		if (raid.getPermittedDiscordRoles().isEmpty())
         	return "*everyone*";
@@ -40,7 +40,7 @@ public class EditPermDiscRoleStep implements EditStep {
      * @return True if the user entered a valid choice, false otherwise
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-    	String[] chosenRoles = e.getMessage().getRawContent().split(",");
+    	String[] chosenRoles = e.getMessage().getContentRaw().split(",");
         for (int role = 0; role < chosenRoles.length; role++) {
         	// try to parse an integer
         	try {
@@ -59,12 +59,12 @@ public class EditPermDiscRoleStep implements EditStep {
         if (raid.updatePermDiscRolesDB()) {
         	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Permitted roles successfully updated in database.").queue());
     	} else {
-    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Permitted roles could not be updated in database.").queue());	
+    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Permitted roles could not be updated in database.").queue());
     	}
-        
-        String messageNewPerm = "Sign-up is now available for: " + getPermissionString();     
+
+        String messageNewPerm = "Sign-up is now available for: " + getPermissionString();
         e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(messageNewPerm).queue());
-    	
+
         return true;
     }
 
@@ -89,7 +89,7 @@ public class EditPermDiscRoleStep implements EditStep {
     public EditStep getNextStep() {
         return new EditIdleStep(messageID);
     }
-    
+
     @Override
 	public String getMessageID() {
 		return messageID;

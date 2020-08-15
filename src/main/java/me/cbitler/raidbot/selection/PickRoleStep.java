@@ -2,8 +2,8 @@ package me.cbitler.raidbot.selection;
 
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidRole;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Step for picking a role for a raid
@@ -39,7 +39,7 @@ public class PickRoleStep implements SelectionStep {
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         boolean success = true;
         try {
-            int roleId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+            int roleId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
             String roleName = raid.getRoles().get(roleId).getName();
             success = pickRole(e.getAuthor().getId(), e.getAuthor().getName(), roleName);
         } catch (Exception exp) {

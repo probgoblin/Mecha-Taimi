@@ -2,7 +2,7 @@ package me.cbitler.raidbot.edit;
 
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Edit the time for the event
@@ -11,11 +11,11 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 public class EditTimeStep implements EditStep {
 
 	private String messageID;
-	
+
 	public EditTimeStep(String messageId) {
 		this.messageID = messageId;
 	}
-	
+
     /**
      * Handle changing the time for the event
      * @param e The direct message event
@@ -23,11 +23,11 @@ public class EditTimeStep implements EditStep {
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         Raid raid = RaidManager.getRaid(messageID);
-        raid.setTime(e.getMessage().getRawContent());
+        raid.setTime(e.getMessage().getContentRaw());
         if (raid.updateTimeDB()) {
         	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Time successfully updated in database.").queue());
         } else {
-        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Time could not be updated in database.").queue());	
+        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Time could not be updated in database.").queue());
         }
         raid.updateMessage();
 

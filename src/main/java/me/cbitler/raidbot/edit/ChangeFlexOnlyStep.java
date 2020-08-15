@@ -5,7 +5,7 @@ import java.util.List;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.raids.RaidRole;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Change the amount for a role of the event
@@ -32,7 +32,7 @@ public class ChangeFlexOnlyStep implements EditStep {
         int inputNumber;
         // try to parse an integer
         try {
-            inputNumber = Integer.parseInt(e.getMessage().getRawContent());
+            inputNumber = Integer.parseInt(e.getMessage().getContentRaw());
         } catch (Exception excp) {
             e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid input. Try again.").queue());
             return false;

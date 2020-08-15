@@ -2,7 +2,7 @@ package me.cbitler.raidbot.edit;
 
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Edit a property for the event
@@ -27,12 +27,12 @@ public class EditIdleStep implements EditStep {
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         boolean valid = true;
-        if(e.getMessage().getRawContent().equalsIgnoreCase("done")) {
+        if(e.getMessage().getContentRaw().equalsIgnoreCase("done")) {
             nextStep = null;
         } else {
         	// try to parse an integer
         	try {
-        		int choiceId = Integer.parseInt(e.getMessage().getRawContent());
+        		int choiceId = Integer.parseInt(e.getMessage().getContentRaw());
         		if (choiceId == 1) // time
         			nextStep = new EditTimeStep(messageID);
         		else if (choiceId == 2) // date
@@ -51,10 +51,10 @@ public class EditIdleStep implements EditStep {
         					nextStep = new EditDisplayStep(messageID);
         				else if (choiceId == 8) // change permitted discord roles
         					nextStep = new EditPermDiscRoleStep(messageID);
-        				else 
+        				else
         					valid = false;
         			} else
-        				valid = false; 
+        				valid = false;
         		}
         	} catch (Exception excp) {
         		valid = false;

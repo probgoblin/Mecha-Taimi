@@ -1,13 +1,13 @@
 package me.cbitler.raidbot.server_settings;
 
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Represents a step while editing role groups
  * @author Franziska Mueller
  */
 public interface RoleGroupsEditStep {
-	
+
     /**
      * Handle the direct message for this step in the process
      * @param e The direct message event
@@ -26,7 +26,7 @@ public interface RoleGroupsEditStep {
      * @return The text to display to the user in relation to this step.
      */
     String getStepText();
-    
+
     /**
      * Get the serverId of the role groups being edited.
      * @return the serverId of the role groups being edited

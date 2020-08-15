@@ -3,7 +3,7 @@ package me.cbitler.raidbot.swap;
 import me.cbitler.raidbot.raids.FlexRole;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidUser;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.api.entities.User;
 
 
 public class SwapUtil {
@@ -14,14 +14,14 @@ public class SwapUtil {
 	 * @param userId
 	 */
 	public static void moveMainToFlex(Raid raid, String userId, boolean update_message) {
-		RaidUser mainRole = raid.getRaidUsersById(userId).get(0); // this should never return null 
+		RaidUser mainRole = raid.getRaidUsersById(userId).get(0); // this should never return null
 		raid.addUserFlexRole(userId, mainRole.getName(), mainRole.getSpec(), mainRole.getRole(), true, false);
 		raid.removeUserFromMainRoles(userId, false);
 		if (update_message)
 			raid.updateMessage();
 	}
-	
-	
+
+
 	/**
 	 * Tries to convert one of the user's flex roles to his main role (and moves the main role to flex if it exists)
 	 * @param raid
@@ -41,7 +41,7 @@ public class SwapUtil {
 			raid.removeUserFromFlexRoles(user.getId(), flexRole.getRole(), flexRole.getSpec(), true);
 			// remove will update the message as well
 			return true;
-		} else 
+		} else
 			return false;
 	}
 }

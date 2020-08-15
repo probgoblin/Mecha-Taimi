@@ -2,7 +2,7 @@ package me.cbitler.raidbot.edit;
 
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Edit display-short-message flag for the event
@@ -11,11 +11,11 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 public class EditDisplayStep implements EditStep {
 
 	private String messageID;
-	
+
 	public EditDisplayStep(String messageId) {
 		this.messageID = messageId;
 	}
-	
+
     /**
      * Handle changing the display-short-message flag for the event
      * @param e The direct message event
@@ -26,7 +26,7 @@ public class EditDisplayStep implements EditStep {
     	// try to parse an integer
     	int choiceID = 0;
     	try {
-    		choiceID = Integer.parseInt(e.getMessage().getRawContent());
+    		choiceID = Integer.parseInt(e.getMessage().getContentRaw());
     		if (choiceID < 0 || choiceID >= 2)
     			valid = false;
     	} catch (Exception excp) {
@@ -36,13 +36,13 @@ public class EditDisplayStep implements EditStep {
     		e.getChannel().sendMessage("Please choose a valid option.").queue();
     		return false;
     	}
-    	
+
     	Raid raid = RaidManager.getRaid(messageID);
         raid.setDisplayShort(choiceID == 1);
         if (raid.updateDisplayShortDB()) {
         	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Display format successfully updated in database.").queue());
         } else {
-        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Display format could not be updated in database.").queue());	
+        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Display format could not be updated in database.").queue());
         }
         raid.updateMessage();
 

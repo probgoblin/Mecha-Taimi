@@ -2,7 +2,7 @@ package me.cbitler.raidbot.auto_events;
 
 import me.cbitler.raidbot.raids.AutoPendingRaid;
 import me.cbitler.raidbot.raids.RaidRole;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Role setup step for the event.
@@ -14,18 +14,18 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 public class AutoRunRoleSetupManualStep implements AutoCreationStep {
 
 	AutoPendingRaid event;
-	
+
 	public AutoRunRoleSetupManualStep(AutoPendingRaid event) {
         this.event = event;
     }
-	
+
     /**
      * Handle user input - should be in the format [number]:[role] unless it is 'done'.
      * @param e The direct message event
      * @return True if the user entered 'done', false otherwise
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-        if(e.getMessage().getRawContent().equalsIgnoreCase("done")) {
+        if(e.getMessage().getContentRaw().equalsIgnoreCase("done")) {
             if(event.getRolesWithNumbers().size() > 0) {
                 return true;
             } else {
@@ -33,7 +33,7 @@ public class AutoRunRoleSetupManualStep implements AutoCreationStep {
                 return false;
             }
         } else {
-            String[] parts = e.getMessage().getRawContent().split(":");
+            String[] parts = e.getMessage().getContentRaw().split(":");
             if(parts.length < 2) {
                 e.getChannel().sendMessage("You need to specify the role in the format `[amount]:[role name]`.\nMake the role `flex only` by prepending its name with an exclamation mark (`!`) or by setting the amount to `0`.").queue();
             } else {
@@ -69,7 +69,7 @@ public class AutoRunRoleSetupManualStep implements AutoCreationStep {
     public AutoCreationStep getNextStep() {
         return new AutoRunResetTimeStep(event);
     }
-    
+
     /**
      * {@inheritDoc}
      */

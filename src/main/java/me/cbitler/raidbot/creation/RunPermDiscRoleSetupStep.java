@@ -6,7 +6,7 @@ import java.util.Set;
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.server_settings.ServerSettings;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Permitted role setup step for the event.
@@ -17,7 +17,7 @@ public class RunPermDiscRoleSetupStep implements CreationStep {
 
 	String serverId;
 	Set<String> predefRoleGroupNames;
-	
+
 	public RunPermDiscRoleSetupStep(String serverId) {
 		this.serverId = serverId;
 		predefRoleGroupNames = ServerSettings.getPredefGroupNames(serverId);
@@ -32,8 +32,8 @@ public class RunPermDiscRoleSetupStep implements CreationStep {
     	PendingRaid raid = RaidBot.getInstance().getPendingRaids().get(e.getAuthor().getId());
         if (raid == null)
         	throw new RuntimeException();
-    	
-    	String[] chosenRoles = e.getMessage().getRawContent().split(",");
+
+    	String[] chosenRoles = e.getMessage().getContentRaw().split(",");
     	for (int role = 0; role < chosenRoles.length; role++) {
     		// try to parse an integer
     		try {

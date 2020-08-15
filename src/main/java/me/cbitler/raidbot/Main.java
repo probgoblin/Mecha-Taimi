@@ -1,11 +1,9 @@
 package me.cbitler.raidbot;
 
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-//import net.dv8tion.jda.core.entities.Emote;
-//import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.exceptions.RateLimitedException;
+import net.dv8tion.jda.api.AccountType;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.exceptions.RateLimitedException;
 
 import javax.security.auth.login.LoginException;
 import java.io.*;
@@ -26,18 +24,8 @@ public class Main {
             System.exit(1);
         }
 
-        JDA jda = new JDABuilder(AccountType.BOT).setToken(token).buildBlocking();
+        JDA jda = new JDABuilder(AccountType.BOT).setToken(token).build().awaitReady();
         new RaidBot(jda);
-        
-//        int serverCount = jda.getGuilds().size();
-//        for (int g = 0; g < serverCount; g++) {
-//        	Guild guild = jda.getGuilds().get(g);
-//        	System.out.println(guild.getName());
-//        	for (Emote e : guild.getEmotes()) {
-//        		System.out.println(e.getName() + " " + e.getId());
-//        	}
-//        	
-//        }
     }
 
     /**

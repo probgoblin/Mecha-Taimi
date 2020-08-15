@@ -2,7 +2,7 @@ package me.cbitler.raidbot.edit;
 
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Edit the roles for the event (rename, add, delete, change amount)
@@ -27,7 +27,7 @@ public class EditRoleStep implements EditStep {
         Raid raid = RaidManager.getRaid(messageID);
         // try to parse an integer
         try {
-            int choiceId = Integer.parseInt(e.getMessage().getRawContent());
+            int choiceId = Integer.parseInt(e.getMessage().getContentRaw());
             if (choiceId == 1) { // add role
             	if (raid.isOpenWorld()) {
             		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("No roles can be added for open world events.").queue());

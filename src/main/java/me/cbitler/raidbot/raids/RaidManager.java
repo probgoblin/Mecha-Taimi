@@ -6,8 +6,8 @@ import me.cbitler.raidbot.database.QueryResult;
 import me.cbitler.raidbot.server_settings.ServerSettings;
 import me.cbitler.raidbot.utility.Reactions;
 import me.cbitler.raidbot.utility.RoleTemplates;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,9 +30,9 @@ public class RaidManager {
      * Create a raid. This turns a PendingRaid object into a Raid object and inserts it into the list of raids.
      * It also sends the associated embedded message and adds the reactions for people to join to the embed
      * @param raid The pending raid to create
-     * @param taskExecId unique identifier of the task executor, only non-empty for auto events 
+     * @param taskExecId unique identifier of the task executor, only non-empty for auto events
      */
-    public static void createRaid(PendingRaid raid, String taskExecId) {    	
+    public static void createRaid(PendingRaid raid, String taskExecId) {
     	MessageEmbed message = raid.isDisplayShort() ? buildEmbedShort(raid) : buildEmbed(raid);
 
         Guild guild = RaidBot.getInstance().getServer(raid.getServerId());
@@ -49,7 +49,7 @@ public class RaidManager {
                         newRaid.roles.addAll(raid.rolesWithNumbers);
                         raids.add(newRaid);
                         newRaid.updateMessage();
-                        
+
                         if (taskExecId.isEmpty() == false)
                         {
                         	autoCreatorToEventMap.put(taskExecId, message1.getId());
@@ -60,7 +60,7 @@ public class RaidManager {
                             emoteList = Reactions.getOpenWorldEmotes();
                         else
                             emoteList = Reactions.getCoreClassEmotes();
-                        
+
                         try {
                         	for (Emote emote : emoteList)
                         		message1.addReaction(emote).complete(); // complete will block until the reaction was added -> reactions are always in same order
@@ -78,8 +78,8 @@ public class RaidManager {
             }
         }
     }
-    
-    
+
+
     /**
      * Create a raid. This turns a PendingRaid object into a Raid object and inserts it into the list of raids.
      * It also sends the associated embedded message and adds the reactions for people to join to the embed
@@ -88,7 +88,7 @@ public class RaidManager {
     public static void createRaid(PendingRaid raid) {
     	createRaid(raid, "");
     }
-    
+
     /**
      * Create a fractal event
      * @param name
@@ -100,7 +100,7 @@ public class RaidManager {
 		// TODO Auto-generated method stub
 		PendingRaid fractalEvent = new PendingRaid();
 		fractalEvent.setLeaderId(author.getId());
-        fractalEvent.setServerId(serverId);		
+        fractalEvent.setServerId(serverId);
         fractalEvent.setName(name);
 		fractalEvent.setDescription("-");
 		fractalEvent.setDate(date);
@@ -108,7 +108,7 @@ public class RaidManager {
 		fractalEvent.setDisplayShort(true);
 		fractalEvent.setFractalEvent(true);
 		fractalEvent.addTemplateRoles(RoleTemplates.getFractalTemplates()[teamCompId]);
-		
+
 		String fractalChannel = ServerSettings.getFractalChannel(serverId);
 		if (ServerSettings.checkChannel(fractalEvent.getServerId(), fractalChannel)) {
 			fractalEvent.setAnnouncementChannel(fractalChannel);
@@ -118,7 +118,7 @@ public class RaidManager {
 		}
 		createRaid(fractalEvent);
 	}
-      
+
     /**
      * Insert a raid into the database
      * @param raid The raid to insert
@@ -135,7 +135,7 @@ public class RaidManager {
         String permDiscRoles = formatStringListForDatabase(raid.getPermittedDiscordRoles());
         try {
             db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `isDisplayShort`, `isOpenWorld`, `isFractalEvent`, "
-            		+ "`leader`, `name`, `description`, `date`, `time`, `roles`, `permittedRoles`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", 
+            		+ "`leader`, `name`, `description`, `date`, `time`, `roles`, `permittedRoles`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
             		new String[] {
                     messageId,
                     serverId,
@@ -193,17 +193,17 @@ public class RaidManager {
                 try {
                     isOpenWorld = results.getResults().getString("isOpenWorld").equals("true");
                 } catch (Exception e) { }
-                
+
                 boolean isDisplayShort = false;
                 try {
                 	isDisplayShort = results.getResults().getString("isDisplayShort").equals("true");
                 } catch (Exception e) { }
-                
+
                 boolean isFractalEvent = false;
                 try {
                 	isFractalEvent = results.getResults().getString("isFractalEvent").equals("true");
                 } catch (Exception e) { }
-                
+
                 List<String> permDiscRoles = new ArrayList<String>();
                 try {
                 	String permRolesText = results.getResults().getString("permittedRoles");
@@ -221,7 +221,7 @@ public class RaidManager {
                         raid.roles.add(new RaidRole(amnt, role));
                     } catch (Exception excp) {
                     	System.out.println("Invalid format for role with amount: " + roleAndAmount);
-                    }                    
+                    }
                 }
                 if (raid.roles.size() > 0) // this should always be the case
                 	raids.add(raid);
@@ -282,7 +282,7 @@ public class RaidManager {
     /**
      * Delete the raid from the database and maps, and delete the message if it is still there
      * @param messageId The raid ID
-     * @param whether the original message should be deleted
+     * @param delete_message whether the original message should be deleted
      * @return true if deleted, false if not deleted
      */
     public static boolean deleteRaid(String messageId, boolean delete_message) {
@@ -291,7 +291,7 @@ public class RaidManager {
         	if (delete_message) {
         		try {
         			RaidBot.getInstance().getServer(r.getServerId())
-        			.getTextChannelById(r.getChannelId()).getMessageById(messageId).queue(message -> message.delete().queue());
+        			.getTextChannelById(r.getChannelId()).retrieveMessageById(messageId).queue(message -> message.delete().queue());
         		} catch (Exception e) {
         			// Nothing, the message doesn't exist - it can happen
         		}
@@ -338,7 +338,7 @@ public class RaidManager {
         }
         return null;
     }
-    
+
     /**
      * Get all raids
      * @return The list of all raid objects.
@@ -347,7 +347,7 @@ public class RaidManager {
     {
     	return raids;
     }
-    
+
     /**
      * Get event id for the specified creator if it created an event before
      * @param creatorId unique identifier of a creator task
@@ -380,7 +380,7 @@ public class RaidManager {
 
         return data;
     }
-    
+
     /**
      * Formats the given String list in a form that can be inserted into a database row.
      * @param stringList The list of Strings
@@ -415,7 +415,7 @@ public class RaidManager {
         builder.addBlankField(false);
         return builder.build();
     }
-    
+
     /**
      * Create a short message embed to show the raid
      * @param raid The raid object
@@ -454,7 +454,7 @@ public class RaidManager {
 //        }
 //        return text;
 //    }
-    
+
     /**
      * Get the max number of roles per user
      * @return the maximum number of roles per user

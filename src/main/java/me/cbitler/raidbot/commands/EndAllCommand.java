@@ -4,9 +4,9 @@ import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.server_settings.ServerSettings;
 import me.cbitler.raidbot.utility.PermissionsUtil;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ public class EndAllCommand implements Command {
         if (PermissionsUtil.hasRaidLeaderRole(member)) {
             List<Raid> allEvents = RaidManager.getAllRaids();
             int numEvents = allEvents.size();
-            
+
             String serverId = channel.getGuild().getId();
             ArrayList<Boolean> archived = new ArrayList<Boolean>();
             boolean archiveAvail = ServerSettings.isArchiveAvailable(serverId);
@@ -33,7 +33,7 @@ public class EndAllCommand implements Command {
                     }
                 }
             }
-            
+
             List<String> notDeleted = new ArrayList<String>();
             for (int ev = numEvents-1; ev >= 0; ev--) {
             	Raid raid = allEvents.get(ev);

@@ -1,7 +1,7 @@
 package me.cbitler.raidbot.auto_events;
 
 import me.cbitler.raidbot.raids.AutoPendingRaid;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Role setup step for the event.
@@ -12,11 +12,11 @@ public class AutoRunRoleSetupStep implements AutoCreationStep {
 
 	AutoCreationStep nextStep;
 	AutoPendingRaid event;
-	
+
 	public AutoRunRoleSetupStep(AutoPendingRaid event) {
         this.event = event;
     }
-	
+
 
     /**
      * Handle user input.
@@ -25,7 +25,7 @@ public class AutoRunRoleSetupStep implements AutoCreationStep {
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         try {
-    		int choiceId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+    		int choiceId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
     		if (choiceId == 0) { // role template
     			nextStep = new AutoRunRoleSetupTemplateStep(event);
         		return true;
@@ -57,7 +57,7 @@ public class AutoRunRoleSetupStep implements AutoCreationStep {
     public AutoCreationStep getNextStep() {
         return nextStep;
     }
-    
+
     /**
      * {@inheritDoc}
      */

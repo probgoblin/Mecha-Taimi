@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import me.cbitler.raidbot.raids.FlexRole;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.utility.Reactions;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.entities.*;
 
 /**
  * Step for removing a registration from a raid
@@ -36,7 +36,7 @@ public class DeselectFlexRoleStep implements DeselectionStep {
     @Override
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         ArrayList<FlexRole> rRoles = this.raid.getRaidUsersFlexRolesById(this.user.getId());
-        String msg = e.getMessage().getRawContent();
+        String msg = e.getMessage().getContentRaw();
         if(rRoles.size()==0){
             // no roles
             e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not registered for any flex roles.").queue());

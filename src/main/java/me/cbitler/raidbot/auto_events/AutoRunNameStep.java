@@ -1,7 +1,7 @@
 package me.cbitler.raidbot.auto_events;
 
 import me.cbitler.raidbot.raids.AutoPendingRaid;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Set the name for the event
@@ -29,7 +29,7 @@ public class AutoRunNameStep implements AutoCreationStep {
      * @return True always
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-        event.setName(e.getMessage().getRawContent());
+        event.setName(e.getMessage().getContentRaw());
 
         return true;
     }

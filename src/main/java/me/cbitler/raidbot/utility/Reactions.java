@@ -1,7 +1,7 @@
 package me.cbitler.raidbot.utility;
 
 import me.cbitler.raidbot.RaidBot;
-import net.dv8tion.jda.core.entities.Emote;
+import net.dv8tion.jda.api.entities.Emote;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +40,7 @@ public class Reactions {
             "Mesmer", // 530541438769823747
             "Necromancer" // 530541439218876416
     };
-    
+
     public static String[] coreClasses = {
             "Guardian", // 530541438891589643
             "Revenant", // 530541439751290901
@@ -145,7 +145,7 @@ public class Reactions {
     public static List<Emote> getCoreClassEmotes() {
         return new ArrayList<>(Arrays.asList(reactionsCore));
     }
-    
+
     /**
      * Get the list of open world emote objects
      *

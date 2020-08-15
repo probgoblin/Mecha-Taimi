@@ -3,9 +3,9 @@ package me.cbitler.raidbot.server_settings;
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.database.QueryResult;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,19 +23,19 @@ import java.util.TreeMap;
  * @author Franziska Mueller
  */
 public class ServerSettings {
-    
+
     public enum ChannelType { ARCHIVE, FRACTALS, AUTOEVENTS };
 
     static HashMap<String, String> raidLeaderRoleCache = new HashMap<>();
     static HashMap<String, String> fractalCreatorRoleCache = new HashMap<>();
-    
+
     static HashMap<String, String> fractalChannelCache = new HashMap<>();
     static HashMap<String, String> archiveChannelCache = new HashMap<>();
     static HashMap<String, String> autoEventsChannelCache = new HashMap<>();
 
     static HashMap<String, SortedMap<String, List<String>>> permittedDiscordRoles = new HashMap<>();
-    
-    
+
+
     /**
      * Get the raid leader role for a specific server.
      * This works by caching the role once it's retrieved once, and returning the default if a server hasn't set one.
@@ -62,7 +62,7 @@ public class ServerSettings {
         }
     }
 
-    
+
     /**
      * Set the raid leader role for a server. This also updates it in SQLite
      * @param serverId The server ID
@@ -84,8 +84,8 @@ public class ServerSettings {
             }
         }
     }
-    
-	
+
+
     /**
      * Get the fractal creator role for a specific server.
      * This works by caching the role once it's retrieved once, and returning the default if a server hasn't set one.
@@ -133,8 +133,8 @@ public class ServerSettings {
             }
         }
     }
-    
-    
+
+
     /**
      * Set a channel for a server. This also updates it in SQLite
      * @param serverId The server ID
@@ -145,7 +145,7 @@ public class ServerSettings {
     	// check if channel exists
     	if (checkChannel(serverId, channel) == false)
     		return 1;
-    	
+
     	// check if a message can be written into the channel
     	Guild guild = RaidBot.getInstance().getServer(serverId);
         List<TextChannel> channels = guild.getTextChannelsByName(getChannel(serverId, type), true);
@@ -156,7 +156,7 @@ public class ServerSettings {
             // TODO:
             // check if we have "embed links" permission required to post embedded event messages
         }
-    	
+
         String dbField = "";
         if (type == ChannelType.ARCHIVE)
         {
@@ -171,8 +171,8 @@ public class ServerSettings {
         else if (type == ChannelType.AUTOEVENTS)
         {
         	autoEventsChannelCache.put(serverId,  channel);
-        	dbField = "auto_events_channel";        	
-        }        
+        	dbField = "auto_events_channel";
+        }
 
         Database db = RaidBot.getInstance().getDatabase();
         try {
@@ -189,7 +189,7 @@ public class ServerSettings {
         }
         return 0;
     }
-    
+
     /**
      * Get a channel for a specific server.
      * This works by caching the channel once it's retrieved once, and returning the default if a server hasn't set one.
@@ -212,9 +212,9 @@ public class ServerSettings {
         else if (type == ChannelType.AUTOEVENTS)
         {
         	autoEventsChannelCache.get(serverId);
-        	dbField = "auto_events_channel";  
-        }    
-        
+        	dbField = "auto_events_channel";
+        }
+
     	if (cached != null) {
             return cached;
         } else {
@@ -231,9 +231,9 @@ public class ServerSettings {
                 			fractalChannelCache.put(serverId, result);
                 		else if (type == ChannelType.AUTOEVENTS)
                         	autoEventsChannelCache.get(serverId);
-                		return result; 
+                		return result;
                     }
-                	else 
+                	else
                 		return "dummy-channel";
                 } else {
                     return "dummy-channel";
@@ -243,7 +243,7 @@ public class ServerSettings {
             }
         }
     }
-    
+
     /**
      * Set the fractal announcement channel for a server. This also updates it in SQLite
      * @param serverId The server ID
@@ -253,7 +253,7 @@ public class ServerSettings {
     public static int setFractalChannel(String serverId, String channel) {
     	return setChannel(serverId, channel, ChannelType.FRACTALS);
     }
-    
+
     /**
      * Get the fractal announcement channel for a specific server.
      * This works by caching the channel once it's retrieved once, and returning the default if a server hasn't set one.
@@ -263,7 +263,7 @@ public class ServerSettings {
     public static String getFractalChannel(String serverId) {
         return getChannel(serverId, ChannelType.FRACTALS);
     }
-    
+
     /**
      * Set the archive channel for a server. This also updates it in SQLite
      * @param serverId The server ID
@@ -273,7 +273,7 @@ public class ServerSettings {
     public static int setArchiveChannel(String serverId, String channel) {
     	return setChannel(serverId, channel, ChannelType.ARCHIVE);
     }
-    
+
     /**
      * Get the archive channel for a specific server.
      * This works by caching the channel once it's retrieved once, and returning the default if a server hasn't set one.
@@ -283,7 +283,7 @@ public class ServerSettings {
     public static String getArchiveChannel(String serverId) {
         return getChannel(serverId, ChannelType.ARCHIVE);
     }
-    
+
     /**
      * Get the auto events channel for a specific server.
      * This works by caching the channel once it's retrieved once, and returning the default if a server hasn't set one.
@@ -293,15 +293,15 @@ public class ServerSettings {
     public static String getAutoEventsChannel(String serverId) {
         return getChannel(serverId, ChannelType.AUTOEVENTS);
     }
-    
-    
+
+
     public static void removeRoleGroup(String serverId, int groupId) {
     	SortedMap<String, List<String>> serverRoleGroups = permittedDiscordRoles.get(serverId);
     	if (serverRoleGroups != null)
     	{
     		Iterator<String> groupNames = serverRoleGroups.keySet().iterator();
     		try {
-    			while (groupId >= 0) 
+    			while (groupId >= 0)
     			{
     				groupNames.next();
     				groupId--;
@@ -312,7 +312,7 @@ public class ServerSettings {
     	}
     }
 
-    
+
     public static boolean addRoleGroup(String serverId, String groupName, List<String> roles) {
     	// first check if all roles exist on this server
     	for (String roleName : roles)
@@ -320,7 +320,7 @@ public class ServerSettings {
     		if (checkRole(serverId, roleName) == false)
     			return false;
     	}
-    	
+
     	// add role group
     	SortedMap<String, List<String>> serverRoleGroups = permittedDiscordRoles.get(serverId);
     	if (serverRoleGroups == null)
@@ -328,15 +328,15 @@ public class ServerSettings {
     	serverRoleGroups.put(groupName, roles);
     	permittedDiscordRoles.put(serverId, serverRoleGroups);
     	updateRoleGroupsDB(serverId);
-    	
+
     	return true;
     }
-    
-    
+
+
     private static void updateRoleGroupsDB(String serverId) {
     	SortedMap<String, List<String>> serverRoleGroups = permittedDiscordRoles.get(serverId);
     	Database db = RaidBot.getInstance().getDatabase();
-    	if (serverRoleGroups == null) 
+    	if (serverRoleGroups == null)
     	{
     		try {
     			db.update("UPDATE `serverSettings` SET `predef_role_groups` = NULL WHERE `serverId` = ?",
@@ -360,7 +360,7 @@ public class ServerSettings {
     		}
     	}
     }
-    
+
     private static String convertRoleGroupsToString(SortedMap<String, List<String>> roleGroups) {
     	String result = "";
     	if (roleGroups == null)
@@ -377,13 +377,13 @@ public class ServerSettings {
     			if (r < roles.size() - 1)
     				result += ",";
     		}
-    		
+
     		if (g < roleGroups.size() - 1)
     			result += "/";
     	}
     	return result;
     }
-    
+
     private static SortedMap<String, List<String>> convertRoleGroupsFromString(String input) {
     	SortedMap<String, List<String>> result = new TreeMap<>();
     	String[] groupSplits = input.split("/");
@@ -400,7 +400,7 @@ public class ServerSettings {
     	}
     	return result;
     }
-    
+
     /**
      * Loads the predefined role groups for a server from the database if not already cached
      * @param serverId
@@ -421,21 +421,21 @@ public class ServerSettings {
             }
         } catch (Exception e) { }
     }
-    
-    
+
+
     /**
      * Returns the set of predefined role groups on this server
      * @param serverId
-     * @return list of predefined role groups 
+     * @return list of predefined role groups
      */
     public static Set<String> getPredefGroupNames(String serverId) {
     	loadPredefRoleGroups(serverId);
-    	SortedMap<String, List<String>> permRolesServer = permittedDiscordRoles.get(serverId); 
+    	SortedMap<String, List<String>> permRolesServer = permittedDiscordRoles.get(serverId);
     	if (permRolesServer == null)
     		return new HashSet<String>();
     	return permRolesServer.keySet();
     }
-    
+
     /**
      * Returns the list of discord roles corresponding to a predefined group name
      * @param serverId
@@ -444,7 +444,7 @@ public class ServerSettings {
      */
     public static List<String> getPredefGroupRoles(String serverId, int groupId) {
     	loadPredefRoleGroups(serverId);
-    	SortedMap<String, List<String>> permRolesServer = permittedDiscordRoles.get(serverId); 
+    	SortedMap<String, List<String>> permRolesServer = permittedDiscordRoles.get(serverId);
     	List<String> result = new ArrayList<String>();
     	if (permRolesServer == null)
     		return result;
@@ -457,7 +457,7 @@ public class ServerSettings {
     		return result;
     	}
     }
-    
+
     /**
      * Returns a list of lists of discord roles corresponding to a all group names
      * @param serverId
@@ -465,7 +465,7 @@ public class ServerSettings {
      */
     public static List<List<String>> getAllPredefGroupRoles(String serverId) {
     	loadPredefRoleGroups(serverId);
-    	SortedMap<String, List<String>> permRolesServer = permittedDiscordRoles.get(serverId); 
+    	SortedMap<String, List<String>> permRolesServer = permittedDiscordRoles.get(serverId);
     	List<List<String>> result = new ArrayList<>();
     	if (permRolesServer == null)
     		return result;
@@ -474,14 +474,14 @@ public class ServerSettings {
     		result.add(it.next());
     	return result;
     }
-    
-    /** 
+
+    /**
      * checks if a given channel exists
-     * @param serverId the id of the server to be checked 
+     * @param serverId the id of the server to be checked
      * @param channelName the channel name
      * @return true if channel is valid, false otherwise
      */
-    public static boolean checkChannel(String serverId, String channelName) {      
+    public static boolean checkChannel(String serverId, String channelName) {
     	boolean validChannel = false;
         RaidBot bot = RaidBot.getInstance();
     	for (TextChannel channel : bot.getServer(serverId).getTextChannels()) {
@@ -491,15 +491,15 @@ public class ServerSettings {
         }
         return validChannel;
     }
-    
-    
-    /** 
+
+
+    /**
      * checks if a given role exists
-     * @param serverId the id of the server to be checked 
+     * @param serverId the id of the server to be checked
      * @param roleName the role name
      * @return true if role is valid, false otherwise
      */
-    public static boolean checkRole(String serverId, String roleName) {      
+    public static boolean checkRole(String serverId, String roleName) {
     	boolean validRole = false;
         RaidBot bot = RaidBot.getInstance();
     	for (Role role : bot.getServer(serverId).getRoles()) {
@@ -510,17 +510,17 @@ public class ServerSettings {
         }
         return validRole;
     }
-    
-    
+
+
 
     /**
      * checks if a valid archive channel is available for a server
      *
-     * @param serverId 
+     * @param serverId
      * @return whether a valid archive channel is available
      */
 	public static boolean isArchiveAvailable(String serverId) {
 		return checkChannel(serverId, getArchiveChannel(serverId));
 	}
-	
+
 }

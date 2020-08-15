@@ -5,7 +5,7 @@ import java.util.List;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.raids.RaidRole;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Rename a role for the event
@@ -15,12 +15,12 @@ public class RenameRoleStep implements EditStep {
 
 	private String messageID;
 	private int roleID;
-	
+
 	public RenameRoleStep(String messageId) {
 		this.messageID = messageId;
 		this.roleID = -1;
 	}
-	
+
     /**
      * Handle renaming an existing role
      * @param e The direct message event
@@ -35,7 +35,7 @@ public class RenameRoleStep implements EditStep {
     		boolean valid = true;
     		// try to parse an integer
     		try {
-    			int choiceId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+    			int choiceId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
     			if (choiceId >= 0 && choiceId < roles.size())
     				roleID = choiceId;
     			else
@@ -46,19 +46,19 @@ public class RenameRoleStep implements EditStep {
     		if (valid == false)
         		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Try again.").queue());
     		else
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Enter a new name for the role *" + roles.get(roleID).getName() + "*:").queue());		
+    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Enter a new name for the role *" + roles.get(roleID).getName() + "*:").queue());
     	}
     	else { // message contains new name
-    		int out = raid.renameRole(roleID, e.getMessage().getRawContent());
+    		int out = raid.renameRole(roleID, e.getMessage().getContentRaw());
     		if (out == 0) {
     			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully renamed role.").queue());
     			raid.updateMessage();
     			finished = true;
     		} else if (out == 1) {
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("A role with this name already exists. Choose a different new name:").queue());	
+    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("A role with this name already exists. Choose a different new name:").queue());
     	    	finished = false;
     		} else {
-    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Role could not be updated in database.").queue());	
+    			e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Role could not be updated in database.").queue());
     			finished = true;
     		}
     	}
@@ -72,11 +72,11 @@ public class RenameRoleStep implements EditStep {
     public String getStepText() {
         String stepText;
         List<RaidRole> roles = RaidManager.getRaid(messageID).getRoles();
-        
+
         stepText = "Which role do you want to rename? \n";
         for (int r = 0; r < roles.size(); r++)
         	stepText += "`" + (r+1) + "` " + roles.get(r).getName() + " \n";
-        
+
         return stepText;
     }
 

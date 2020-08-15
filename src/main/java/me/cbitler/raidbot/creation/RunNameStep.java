@@ -2,7 +2,7 @@ package me.cbitler.raidbot.creation;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Set the name for the event
@@ -34,7 +34,7 @@ public class RunNameStep implements CreationStep {
             bot.getPendingRaids().put(e.getAuthor().getId(), raid);
         }
 
-        raid.setName(e.getMessage().getRawContent());
+        raid.setName(e.getMessage().getContentRaw());
         raid.setServerId(serverId);
 
         return true;

@@ -16,10 +16,10 @@ import me.cbitler.raidbot.server_settings.ServerSettings;
 import me.cbitler.raidbot.server_settings.ServerSettings.ChannelType;
 import me.cbitler.raidbot.utility.PermissionsUtil;
 import me.cbitler.raidbot.utility.RoleTemplates;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 /**
  * Handle channel message-related events sent to the bot
@@ -41,8 +41,8 @@ public class ChannelMessageHandler extends ListenerAdapter {
            return;
         }
 
-        if(e.getMessage().getRawContent().startsWith("!")) {
-            String[] messageParts = e.getMessage().getRawContent().split(" ");
+        if(e.getMessage().getContentRaw().startsWith("!")) {
+            String[] messageParts = e.getMessage().getContentRaw().split(" ");
             String[] arguments = CommandRegistry.getArguments(messageParts);
             Command command = CommandRegistry.getCommand(messageParts[0].replace("!",""));
             if(command != null) {
@@ -53,9 +53,9 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 } catch (Exception exception) {}
             }
         }
-        
+
         if (PermissionsUtil.hasRaidLeaderRole(e.getMember())) {
-            if (e.getMessage().getRawContent().equalsIgnoreCase("!createEvent")) {
+            if (e.getMessage().getContentRaw().equalsIgnoreCase("!createEvent")) {
             	// check if this user already has an active chat
             	int actvId = bot.userHasActiveChat(e.getAuthor().getId());
     			if (actvId != 0) {
@@ -71,8 +71,8 @@ public class ChannelMessageHandler extends ListenerAdapter {
             	try {
                     e.getMessage().delete().queue();
                 } catch (Exception exception) {}
-            } else if (e.getMessage().getRawContent().toLowerCase().startsWith("!removefromevent")) {
-                String[] split = e.getMessage().getRawContent().split(" ");
+            } else if (e.getMessage().getContentRaw().toLowerCase().startsWith("!removefromevent")) {
+                String[] split = e.getMessage().getContentRaw().split(" ");
                 if(split.length < 3) {
                     e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Format for !removeFromEvent: !removeFromEvent [event id] [name]").queue());
                 } else {
@@ -90,7 +90,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 try {
                     e.getMessage().delete().queue();
                 } catch (Exception exception) {}
-            } else if (e.getMessage().getRawContent().toLowerCase().startsWith("!editrolegroups")) {
+            } else if (e.getMessage().getContentRaw().toLowerCase().startsWith("!editrolegroups")) {
             	// check if this user already has an active chat
             	int actvId = bot.userHasActiveChat(e.getAuthor().getId());
     			if (actvId != 0) {
@@ -115,10 +115,10 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 } catch (Exception exception) {}
             }
         }
-        
+
         // edit can be made by event managers or the leader of the event (enables fractal event editing)
-        if (e.getMessage().getRawContent().toLowerCase().startsWith("!editevent")) {
-           	String[] split = e.getMessage().getRawContent().split(" ");
+        if (e.getMessage().getContentRaw().toLowerCase().startsWith("!editevent")) {
+           	String[] split = e.getMessage().getContentRaw().split(" ");
             if(split.length < 2) {
                 e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Format for !editEvent: !editEvent [event id]").queue());
             } else {
@@ -137,17 +137,17 @@ public class ChannelMessageHandler extends ListenerAdapter {
 
         // all commands that require manage server permissions
         if (e.getMember().getPermissions().contains(Permission.MANAGE_SERVER)) {
-        	boolean setEventManager = e.getMessage().getRawContent().toLowerCase().startsWith("!seteventmanagerrole");
-        	boolean setFractalCreator = e.getMessage().getRawContent().toLowerCase().startsWith("!setfractalcreatorrole");
-        	boolean setFractalChannel = e.getMessage().getRawContent().toLowerCase().startsWith("!setfractalchannel");
-        	boolean setArchiveChannel = e.getMessage().getRawContent().toLowerCase().startsWith("!setarchivechannel");
-            boolean setAutoEventChannel = e.getMessage().getRawContent().toLowerCase().startsWith("!setautoeventchannel");
-            boolean startAutoEvents = e.getMessage().getRawContent().toLowerCase().startsWith("!startautoevent");
-            boolean stopAutoEvents = e.getMessage().getRawContent().toLowerCase().startsWith("!stopautoevent");
-        	
-        	if (setEventManager || setFractalCreator || setFractalChannel || setArchiveChannel 
+        	boolean setEventManager = e.getMessage().getContentRaw().toLowerCase().startsWith("!seteventmanagerrole");
+        	boolean setFractalCreator = e.getMessage().getContentRaw().toLowerCase().startsWith("!setfractalcreatorrole");
+        	boolean setFractalChannel = e.getMessage().getContentRaw().toLowerCase().startsWith("!setfractalchannel");
+        	boolean setArchiveChannel = e.getMessage().getContentRaw().toLowerCase().startsWith("!setarchivechannel");
+            boolean setAutoEventChannel = e.getMessage().getContentRaw().toLowerCase().startsWith("!setautoeventchannel");
+            boolean startAutoEvents = e.getMessage().getContentRaw().toLowerCase().startsWith("!startautoevent");
+            boolean stopAutoEvents = e.getMessage().getContentRaw().toLowerCase().startsWith("!stopautoevent");
+
+        	if (setEventManager || setFractalCreator || setFractalChannel || setArchiveChannel
             		|| setAutoEventChannel || startAutoEvents || stopAutoEvents) {
-                String[] commandParts = e.getMessage().getRawContent().split(" ");
+                String[] commandParts = e.getMessage().getContentRaw().split(" ");
                 String specifiedName = combineArguments(commandParts,1);
                 if (setEventManager) {
                 	ServerSettings.setRaidLeaderRole(e.getMember().getGuild().getId(), specifiedName);
@@ -206,14 +206,14 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 } catch (Exception exception) {}
             }
         }
-        
+
         // new creation command for fractal event
         if (PermissionsUtil.hasRaidLeaderRole(e.getMember()) || PermissionsUtil.hasFractalCreatorRole(e.getMember())) {
         	String createFracCommand = "!createfractal";
-            if (e.getMessage().getRawContent().toLowerCase().startsWith(createFracCommand)) {
+            if (e.getMessage().getContentRaw().toLowerCase().startsWith(createFracCommand)) {
             	String[] split = new String[0];
             	try {
-            		split = e.getMessage().getRawContent().substring(createFracCommand.length()+1).split(";");
+            		split = e.getMessage().getContentRaw().substring(createFracCommand.length()+1).split(";");
             	} catch (Exception excp) { }
             	String helpMessageAccum = "Correct format: !createFractal [name];[date];[time];[team comp id]\n"
             			+ "Enter the information without brackets, for example: !createFractal CMs+T4;13.04.19;13:37 CEST;1\n"
@@ -223,11 +223,11 @@ public class ChannelMessageHandler extends ListenerAdapter {
             		helpMessageAccum += "`" + (t+1) + "` " + RoleTemplates.templateToString(templNames[t], RoleTemplates.getFractalTemplates()[t]) + "\n";
             	}
             	String helpMessage = helpMessageAccum; // otherwise the lambda for sending the message is unhappy because var not effectively final
-                
+
                 if(split.length < 4) {
             		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Incorrect number of arguments provided.").queue());
                     e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(helpMessage).queue());
-                } else { 
+                } else {
                 	// check if the team comp is valid
                 	boolean validTeamComp = true;
                 	int teamCompId = -1;
@@ -258,7 +258,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
 
     @Override
     public void onGuildMessageDelete(GuildMessageDeleteEvent e) {
-    	Raid raid = RaidManager.getRaid(e.getMessageId()); 
+    	Raid raid = RaidManager.getRaid(e.getMessageId());
         if (raid != null && raid.getServerId().equalsIgnoreCase(e.getGuild().getId())) {
         	raid.postToArchive();
             RaidManager.deleteRaid(e.getMessageId(), true);

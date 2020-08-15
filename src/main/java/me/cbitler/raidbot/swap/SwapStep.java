@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import me.cbitler.raidbot.raids.FlexRole;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.utility.Reactions;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.entities.*;
 
 /**
  * Step for swapping main/flex roles in a raid
@@ -36,7 +36,7 @@ public class SwapStep {
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         ArrayList<FlexRole> rRoles = this.raid.getRaidUsersFlexRolesById(this.user.getId());
-        String msg = e.getMessage().getRawContent();
+        String msg = e.getMessage().getContentRaw();
         int choiceId = -1;
         boolean valid = true;
         try {
@@ -44,11 +44,11 @@ public class SwapStep {
     	} catch (Exception excp) { valid = false; }
         if(choiceId < 0 || choiceId >= (rRoles.size() + 1 + (userHasMain ? 1 : 0)))
 			valid = false;
-	
+
         if (valid == false) {
     		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Try again.").queue());
     	}
-        
+
         if (userHasMain) {
         	if (choiceId == 0) {
         		SwapUtil.moveMainToFlex(raid, user.getId(), true);
@@ -60,7 +60,7 @@ public class SwapStep {
         	if (SwapUtil.moveFlexToMain(raid, user, choiceId)) {
         		return true;
         	} else {
-        		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Your chosen role does not have a free spot in the main squad. Try again.").queue());           	
+        		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Your chosen role does not have a free spot in the main squad. Try again.").queue());
         		return false;
         	}
         } else {
@@ -87,7 +87,7 @@ public class SwapStep {
         outer += "`"+(++counter)+"` cancel";
         return "What do you want to do?\n"+outer+"\n";
     }
-    
+
     /**
      * The step text changes the text based on the available roles.
      * @return The step text
