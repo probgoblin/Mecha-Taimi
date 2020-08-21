@@ -1099,42 +1099,10 @@ public class Raid {
         return text;
     }
 
-//    /**
-//     * Build the text per role, which shows the roles users are playing in the raids
-//     *
-//     * @return The role text
-//     */
-//    private List<String> buildTextPerRole() {
-//        List<String> texts = new ArrayList<String>();
-//        for (RaidRole role : roles) {
-//            if(role.isFlexOnly()) continue;
-//            String text = "";
-//            List<RaidUser> raidUsersInRole = getUsersInRole(role.name);
-//            text += ("**" + role.name + " ( " + raidUsersInRole.size() + " / " + role.amount + " ):** \n");
-//            for (RaidUser user : raidUsersInRole) {
-//            	String username = userIDsToNicknames.get(user.getId());
-//            	if (username == null)
-//            		username = user.getName();
-//                if (isOpenWorld) {
-//                    text += ("- " + username + "\n");
-//                } else {
-//                    Emote userEmote = Reactions.getEmoteByName(user.spec);
-//                    if(userEmote == null)
-//                        text += "   - " + username + "\n";
-//                    else
-//                        text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + username + "\n";
-//                }
-//            }
-//            text += "\n";
-//            texts.add(text);
-//        }
-//        return texts;
-//    }
-
     /**
      * Get a List of RaidUsers from main roles in this raid by their ID
      *
-     * @param name The user's ID
+     * @param id The user's ID
      * @return The List of RaidUsers if they are in this raid, null otherwise
      */
     public ArrayList<RaidUser> getRaidUsersById(String id) {
@@ -1150,7 +1118,7 @@ public class Raid {
     /**
      * Get a List of RaidUsers from flex roles in this raid by their ID
      *
-     * @param name The user's ID
+     * @param id The user's ID
      * @return The List of RaidUsers if they are in this raid, null otherwise
      */
     public ArrayList<FlexRole> getRaidUsersFlexRolesById(String id) {
