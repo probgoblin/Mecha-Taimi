@@ -36,37 +36,38 @@ public class RaidManager {
         if(channels.size() > 0) {
             // We always go with the first channel if there is more than one
             try {
-                channels.get(0).sendMessage(message).queue(message1 -> {
-                    boolean inserted = insertToDatabase(raid, message1.getId(), message1.getGuild().getId(), message1.getChannel().getId());
-                    if (inserted) {
-                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderId(),
-                        		raid.getName(), raid.getDescription(), raid.getDate(), raid.getTime(), raid.isOpenWorld(), raid.isDisplayShort(),
-                        		raid.isFractalEvent(), raid.getPermittedDiscordRoles());
-                        newRaid.roles.addAll(raid.rolesWithNumbers);
-                        raids.add(newRaid);
-                        newRaid.updateMessage();
+                Message sentMessage = channels.get(0).sendMessage(message).complete();
+                boolean inserted = insertToDatabase(raid, sentMessage.getId(), sentMessage.getGuild().getId(), sentMessage.getChannel().getId());
+                if (inserted) {
+                    Raid newRaid = new Raid(sentMessage.getId(), sentMessage.getGuild().getId(), sentMessage.getChannel().getId(), raid.getLeaderId(),
+                            raid.getName(), raid.getDescription(), raid.getDate(), raid.getTime(), raid.isOpenWorld(), raid.isDisplayShort(),
+                            raid.isFractalEvent(), raid.getPermittedDiscordRoles());
+                    newRaid.roles.addAll(raid.rolesWithNumbers);
+                    raids.add(newRaid);
+                    newRaid.updateMessage();
 
-                        if (taskExecId.isEmpty() == false)
-                        {
-                        	autoCreatorToEventMap.put(taskExecId, message1.getId());
-                        }
-
-                        List<Emote> emoteList;
-                        if (newRaid.isOpenWorld)
-                            emoteList = Reactions.getOpenWorldEmotes();
-                        else
-                            emoteList = Reactions.getCoreClassEmotes();
-
-                        try {
-                        	for (Emote emote : emoteList)
-                        		message1.addReaction(emote).complete(); // complete will block until the reaction was added -> reactions are always in same order
-                        } catch (Exception excp) {
-                        	System.out.println("Could not add all reactions to the event message. At least one emoji was null.");
-                        }
-                    } else {
-                        message1.delete().queue();
+                    if (taskExecId.isEmpty() == false)
+                    {
+                        autoCreatorToEventMap.put(taskExecId, sentMessage.getId());
                     }
-                });
+
+                    List<Emote> emoteList;
+                    if (newRaid.isOpenWorld)
+                        emoteList = Reactions.getOpenWorldEmotes();
+                    else
+                        emoteList = Reactions.getCoreClassEmotes();
+
+                    for (Emote emote : emoteList) {
+                        try {
+                            sentMessage.addReaction(emote).complete(); // complete will block until the reaction was added -> reactions are always in same order
+                        } catch (Exception e) {
+                            System.out.println("Could not add reaction '" + emote.getName() + "' to message. Threw " + e.getClass().getSimpleName() + ": " + e.getMessage());
+                            System.out.println("Could not add all reactions to the event message. At least one emoji was null.");
+                        }
+                    }
+                } else {
+                    sentMessage.delete().queue();
+                }
             } catch (Exception e) {
                 System.out.println("Error encountered in sending message.");
                 e.printStackTrace();
