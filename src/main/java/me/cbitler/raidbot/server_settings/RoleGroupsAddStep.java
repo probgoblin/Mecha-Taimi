@@ -37,6 +37,11 @@ public class RoleGroupsAddStep implements RoleGroupsEditStep {
         }
 
         String groupName = parts[0].trim();
+        if (groupName.contains(";") || groupName.contains("/") || groupName.contains(","))
+        {
+        	e.getChannel().sendMessage("The group name contains invalid symbols. Choose a different name.").queue();
+            return false;
+        }
         if (availableRoleGroups.contains(groupName))
         {
         	e.getChannel().sendMessage("This server already has a role group with this name. Choose a different name or delete the existing group first.").queue();
@@ -70,7 +75,7 @@ public class RoleGroupsAddStep implements RoleGroupsEditStep {
     public String getStepText() {
         return "Enter a new role group for the server\n"
         		+ "__format:__ `[group name]:[role 1],[role 2],...,[role n]`, e.g., `Experts+: Expert Raider, Master Raider`\n"
-        		+ "(this means you cannot use colon `:` in your group name!)\n";
+        		+ "(Note: You cannot use colon `:`, semi-colon `;`, slash `/`, or comma `,` in your template name!)\n";
     }
 
     /**

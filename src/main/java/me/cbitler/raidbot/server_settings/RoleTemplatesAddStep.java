@@ -37,6 +37,11 @@ public class RoleTemplatesAddStep implements RoleTemplatesEditStep {
         }
 
         String templateName = parts[0].trim();
+        if (templateName.contains(";") || templateName.contains("/") || templateName.contains(","))
+        {
+        	e.getChannel().sendMessage("The group name contains invalid symbols. Choose a different name.").queue();
+            return false;
+        }
         if (availableRoleTemplates.contains(templateName))
         {
         	e.getChannel().sendMessage("This server already has a role template with this name. Choose a different name or delete the existing template first.").queue();
@@ -51,7 +56,7 @@ public class RoleTemplatesAddStep implements RoleTemplatesEditStep {
            	for (int r = 0; r < roles.length; r++)
            	{
            		String[] nameAmount = roles[r].trim().split(",");
-           		if (nameAmount.length != 2)
+           		if (nameAmount.length != 2 || nameAmount[0].contains(";"))
            		{
            			success = false;
            			break;
