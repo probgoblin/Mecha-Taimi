@@ -2,7 +2,7 @@ package me.cbitler.raidbot.creation;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Step to set the display-short-message flag of the event
@@ -20,7 +20,7 @@ public class RunDisplayStep implements CreationStep {
     	// try to parse an integer
     	int choiceID = 0;
     	try {
-    		choiceID = Integer.parseInt(e.getMessage().getRawContent());
+    		choiceID = Integer.parseInt(e.getMessage().getContentRaw());
     		if (choiceID < 0 || choiceID >= 2)
     			valid = false;
     	} catch (Exception excp) {

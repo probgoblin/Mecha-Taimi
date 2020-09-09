@@ -1,6 +1,6 @@
 package me.cbitler.raidbot.creation;
 
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Represents a step in the creation of an event

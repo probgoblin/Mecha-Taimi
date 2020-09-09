@@ -2,6 +2,12 @@
 This bot is meant to be used to help organize teams for events (raids, fractals, dungeons, etc.) in discord servers for GuildWars 2.
 It attempts to create a streamlined user experience so that creating and joining are easy.
 
+## Discord.com and Gateway Intents
+As you may know, the Discord API was updated over time and we used to make use of an older version.
+The new changes requiring us to upgrade our API connector also require the the new Gateway Intents.
+We have updated the bot using the new Gateway Intents but to run the bot, you will have to enable the `Server Members Intent` for the bot from your Developer Portal's bot page. It is located in the `Bot` tab in the `Privileged Gateway Intents` section.
+If you don't enable this the bot will not work, it will just log off again as soon as the first action is called.
+
 ## How does it work?
 Once the bot is running, you need to set the event leader role (using the !setEventLeaderRole \[role\] command) to a server user role.
 Any user who should be able to create events needs this role.

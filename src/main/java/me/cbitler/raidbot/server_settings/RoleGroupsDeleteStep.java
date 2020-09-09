@@ -1,13 +1,13 @@
 package me.cbitler.raidbot.server_settings;
 
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
-
 /**
- * Delete a role from the event 
+ * Delete a role from the event
  * @author Franziska Mueller
  */
 public class RoleGroupsDeleteStep implements RoleGroupsEditStep {
@@ -15,13 +15,13 @@ public class RoleGroupsDeleteStep implements RoleGroupsEditStep {
 	private String serverId;
 	private Set<String> availableRoleGroups;
 	private List<List<String>> correspondingRoles;
-	
+
 	public RoleGroupsDeleteStep(String serverId, Set<String> availableRoleGroups, List<List<String>> correspondingRoles) {
 		this.serverId = serverId;
 		this.availableRoleGroups = availableRoleGroups;
 		this.correspondingRoles = correspondingRoles;
 	}
-	
+
     /**
      * Handle deleting a role from the event
      * @param e The direct message event
@@ -30,10 +30,10 @@ public class RoleGroupsDeleteStep implements RoleGroupsEditStep {
     public boolean handleDM(PrivateMessageReceivedEvent e) {
     	boolean valid = true;
     	int groupId = -1;
-    	
+
     	// try to parse an integer
     	try {
-    		groupId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+    		groupId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
     		if (groupId < 0 || groupId >= availableRoleGroups.size())
     			valid = false;
     	} catch (Exception excp) {
@@ -54,7 +54,7 @@ public class RoleGroupsDeleteStep implements RoleGroupsEditStep {
     public String getStepText() {
         String message;
         message = "Which role group do you want to delete? \n";
-        
+
         Iterator<String> groupsIt = availableRoleGroups.iterator();
         for (int g = 0; g < availableRoleGroups.size(); g++)
         {
@@ -67,8 +67,8 @@ public class RoleGroupsDeleteStep implements RoleGroupsEditStep {
         			message += ", ";
         	}
         	message += " ]\n";
-        }	
-        
+        }
+
         return message;
     }
 
@@ -78,7 +78,7 @@ public class RoleGroupsDeleteStep implements RoleGroupsEditStep {
     public RoleGroupsEditStep getNextStep() {
         return new RoleGroupsIdleStep(serverId);
     }
-    
+
     @Override
 	public String getServerID() {
 		return serverId;

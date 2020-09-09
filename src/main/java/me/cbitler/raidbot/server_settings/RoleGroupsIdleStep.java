@@ -1,10 +1,10 @@
 package me.cbitler.raidbot.server_settings;
 
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Edit a role groups for server
@@ -30,12 +30,12 @@ public class RoleGroupsIdleStep implements RoleGroupsEditStep {
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         boolean valid = true;
-        if(e.getMessage().getRawContent().equalsIgnoreCase("done")) {
+        if(e.getMessage().getContentRaw().equalsIgnoreCase("done")) {
             nextStep = null;
         } else {
         	// try to parse an integer
         	try {
-        		int choiceId = Integer.parseInt(e.getMessage().getRawContent());
+        		int choiceId = Integer.parseInt(e.getMessage().getContentRaw());
         		if (choiceId == 1) // add: always possible
         			nextStep = new RoleGroupsAddStep(serverId, availableRoleGroups);
         		else if (choiceId == 2) // remove: only if we have at least one
@@ -48,7 +48,7 @@ public class RoleGroupsIdleStep implements RoleGroupsEditStep {
         			else
         				nextStep = new RoleGroupsDeleteStep(serverId, availableRoleGroups, correspondingRoles);
         		}
-        		else 
+        		else
         			valid = false;
         	} catch (Exception excp) {
         		valid = false;
@@ -69,7 +69,7 @@ public class RoleGroupsIdleStep implements RoleGroupsEditStep {
         		+ "NOTE: You can type *cancel* at any point during this process to stop editing.\n\n"
         		+ "Currently available discord role groups on this server:\n";
         Iterator<String> groupsIt = availableRoleGroups.iterator();
-        
+
         for (int g = 0; g < availableRoleGroups.size(); g++)
         {
         	message += "`"+groupsIt.next()+"`: ";
@@ -81,8 +81,8 @@ public class RoleGroupsIdleStep implements RoleGroupsEditStep {
         			message += ", ";
         	}
         	message += "\n";
-        }		
-     
+        }
+
         message += "\nChoose what you want to do:\n"
         		+ "`1` add a role group \n"
         		+ "`2` remove a role group \n"
@@ -96,7 +96,7 @@ public class RoleGroupsIdleStep implements RoleGroupsEditStep {
     public RoleGroupsEditStep getNextStep() {
         return nextStep;
     }
-    
+
     @Override
 	public String getServerID() {
 		return serverId;

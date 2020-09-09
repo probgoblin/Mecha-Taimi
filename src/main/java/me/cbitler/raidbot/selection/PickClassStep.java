@@ -2,9 +2,9 @@ package me.cbitler.raidbot.selection;
 
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.utility.Reactions;
-import net.dv8tion.jda.core.entities.Emote;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Step for a user picking a class (will only be used when clicking the flex role icon)
@@ -36,7 +36,7 @@ public class PickClassStep implements SelectionStep {
     @Override
     public boolean handleDM(PrivateMessageReceivedEvent e) {
     	try {
-    		int classId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+    		int classId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
     		String coreClass = Reactions.coreClasses[classId];
     		nextStep = new PickSpecStep(raid, coreClass, user, forceFlex);
     		return true;

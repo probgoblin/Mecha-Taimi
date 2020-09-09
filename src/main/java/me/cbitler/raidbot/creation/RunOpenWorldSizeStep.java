@@ -3,7 +3,7 @@ package me.cbitler.raidbot.creation;
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidRole;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Step for choosing squad size for open world event.
@@ -18,7 +18,7 @@ public class RunOpenWorldSizeStep implements CreationStep {
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         try {
-    		int size = Integer.parseInt(e.getMessage().getRawContent());
+    		int size = Integer.parseInt(e.getMessage().getContentRaw());
     		RaidBot bot = RaidBot.getInstance();
             PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
             if (raid == null) {

@@ -3,9 +3,9 @@ package me.cbitler.raidbot.selection;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.utility.ClassesSpecs;
 import me.cbitler.raidbot.utility.Reactions;
-import net.dv8tion.jda.core.entities.Emote;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Step for a user picking a specialization (or core class)
@@ -42,7 +42,7 @@ public class PickSpecStep implements SelectionStep {
     @Override
     public boolean handleDM(PrivateMessageReceivedEvent e) {
     	try {
-    		int specId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+    		int specId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
     		String spec = allSpecs[specId];
     		if (raid.getRoles().size() == 1) { // if there is only one role, skip PickRoleStep
     			PickRoleStep autoRoleStep = new PickRoleStep(raid, spec, user, forceFlex);

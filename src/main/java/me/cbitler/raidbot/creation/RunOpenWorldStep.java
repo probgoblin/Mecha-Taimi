@@ -2,7 +2,7 @@ package me.cbitler.raidbot.creation;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Step for choosing between structued or open world event.
@@ -19,7 +19,7 @@ public class RunOpenWorldStep implements CreationStep {
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         try {
-    		int choiceId = Integer.parseInt(e.getMessage().getRawContent());
+    		int choiceId = Integer.parseInt(e.getMessage().getContentRaw());
     		RaidBot bot = RaidBot.getInstance();
             PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
             if (raid == null) {

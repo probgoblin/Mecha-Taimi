@@ -1,14 +1,14 @@
 package me.cbitler.raidbot.auto_events;
 
 import me.cbitler.raidbot.raids.AutoPendingRaid;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Represents a step in the creation of an automatically repeated event
  * @author Franziska Mueller
  */
 public interface AutoCreationStep {
-	
+
     /**
      * Handle the direct message for this step in the process
      * @param e The direct message event
@@ -27,7 +27,7 @@ public interface AutoCreationStep {
      * @return The text to display to the user in relation to this step.
      */
     String getStepText();
-    
+
     /**
      * Get the event template
      * @return The event template

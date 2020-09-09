@@ -2,7 +2,7 @@ package me.cbitler.raidbot.auto_events;
 
 import me.cbitler.raidbot.raids.AutoPendingRaid;
 import me.cbitler.raidbot.raids.RaidRole;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Step for choosing squad size for open world event.
@@ -11,11 +11,11 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 public class AutoRunOpenWorldSizeStep implements AutoCreationStep {
 
 	AutoPendingRaid event;
-	
+
 	public AutoRunOpenWorldSizeStep(AutoPendingRaid event) {
         this.event = event;
     }
-	
+
     /**
      * Handle user input.
      * @param e The direct message event
@@ -23,7 +23,7 @@ public class AutoRunOpenWorldSizeStep implements AutoCreationStep {
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         try {
-    		int size = Integer.parseInt(e.getMessage().getRawContent());
+    		int size = Integer.parseInt(e.getMessage().getContentRaw());
             event.getRolesWithNumbers().add(new RaidRole(size, "Participants"));
         	return true;
     	} catch (Exception exp) {
@@ -45,7 +45,7 @@ public class AutoRunOpenWorldSizeStep implements AutoCreationStep {
     public AutoCreationStep getNextStep() {
         return new AutoRunResetTimeStep(event);
     }
-    
+
     /**
      * {@inheritDoc}
      */

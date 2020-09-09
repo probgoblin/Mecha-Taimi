@@ -1,8 +1,8 @@
 package me.cbitler.raidbot.logs;
 
 import me.cbitler.raidbot.utility.EnvVariables;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.PrivateChannel;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -60,7 +60,7 @@ public class LogParser implements Runnable {
         File file = new File("parser/" + attachment.getFileName());
 
         if(file.exists()) file.delete();
-        attachment.download(file);
+        attachment.downloadToFile(file);
         channel.sendMessage("File downloaded.. parsing.").queue();
 
         String finalFileName = "";

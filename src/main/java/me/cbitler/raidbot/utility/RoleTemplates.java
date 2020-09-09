@@ -1,14 +1,14 @@
 package me.cbitler.raidbot.utility;
 
+import me.cbitler.raidbot.raids.RaidRole;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import me.cbitler.raidbot.raids.RaidRole;
-
 public class RoleTemplates {
-	
+
 	static RaidRole[][] raidTemplates =
-	    { 	
+	    {
 	    	{	new RaidRole(1, "Tank"),
 	            new RaidRole(1, "Supporter"),
 	            new RaidRole(1, "Druid"),
@@ -31,13 +31,13 @@ public class RoleTemplates {
 	            new RaidRole(5, "DPS")
 	        }
 	    };
-	
+
 	static String[] raidTemplateNames = {
 	            "default raid",
 	            "Desmina",
 	            "Dhuum"
 	    };
-	
+
 	static RaidRole[][] fractalTemplates =
 	    { 	{	new RaidRole(1, "Chrono"),
 	            new RaidRole(1, "Healer"),
@@ -55,15 +55,15 @@ public class RoleTemplates {
 	            new RaidRole(2, "DPS")
 	        }
 	    };
-	
+
 	static String[] fractalTemplateNames = {
 	            "fractal (Chrono)",
 	            "fractal (Firebrigade)",
 	            "fractal (general)"
 	    };
-	
+
 	private static List<RaidRole[]> templates = new ArrayList<RaidRole[]>();
-	
+
 	private static List<String> templateNames = new ArrayList<String>();
 
     /**
@@ -73,14 +73,14 @@ public class RoleTemplates {
      */
     public static List<RaidRole[]> getAllTemplates() {
     	if (templates.isEmpty()) {
-    		for (int t = 0; t < raidTemplates.length; t++) 
+    		for (int t = 0; t < raidTemplates.length; t++)
     			templates.add(raidTemplates[t]);
-    		for (int t = 0; t < fractalTemplates.length; t++) 
+    		for (int t = 0; t < fractalTemplates.length; t++)
     			templates.add(fractalTemplates[t]);
     	}
     	return templates;
     }
-    
+
     /**
      * Get all template names (merges raid and fractal template names first if not done already)
      *
@@ -88,14 +88,14 @@ public class RoleTemplates {
      */
     public static List<String> getAllTemplateNames() {
     	if (templateNames.isEmpty()) {
-    		for (int t = 0; t < raidTemplateNames.length; t++) 
+    		for (int t = 0; t < raidTemplateNames.length; t++)
     			templateNames.add(raidTemplateNames[t]);
-    		for (int t = 0; t < fractalTemplateNames.length; t++) 
+    		for (int t = 0; t < fractalTemplateNames.length; t++)
     			templateNames.add(fractalTemplateNames[t]);
     	}
     	return templateNames;
     }
-    
+
     /**
      * Get fractal templates
      *
@@ -104,7 +104,7 @@ public class RoleTemplates {
     public static RaidRole[][] getFractalTemplates() {
     	return fractalTemplates;
     }
-    
+
     /**
      * Get fractal template names
      *
@@ -113,7 +113,7 @@ public class RoleTemplates {
     public static String[] getFractalTemplateNames() {
     	return fractalTemplateNames;
     }
-    
+
     /**
      * Converts a template to a string for e.g. printing / displaying
      * @param name The name of the template

@@ -11,9 +11,9 @@ import me.cbitler.raidbot.selection.SelectionStep;
 import me.cbitler.raidbot.swap.SwapStep;
 import me.cbitler.raidbot.swap.SwapUtil;
 import me.cbitler.raidbot.utility.Reactions;
-import net.dv8tion.jda.core.entities.Emote;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class ReactionHandler extends ListenerAdapter {
     @Override
@@ -27,7 +27,7 @@ public class ReactionHandler extends ListenerAdapter {
         	if (emote != null) {
     			RaidBot bot = RaidBot.getInstance();
         		// edit reaction, this is the same whether isOpenWorld or not
-    			// active chat check is within RaidBot function (since it can also be triggered via the command, 
+    			// active chat check is within RaidBot function (since it can also be triggered via the command,
     			// no need to repeat here
     			if(emote.getName().equalsIgnoreCase("Edit")) {
                     bot.startEditEvent(e.getMessageId(), e.getMember(), e.getUser(), raid.getRaidLeaderId());
@@ -102,18 +102,18 @@ public class ReactionHandler extends ListenerAdapter {
     				} else { // open world event
     					if (emote.getName().equalsIgnoreCase("Check")) {
     						if (raid.isUserInRaid(e.getUser().getId()) || raid.getUserNumFlexRoles(e.getUser().getId()) > 0) { // already signed up
-    							e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are already signed up for this event.").queue());                 	       
+    							e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are already signed up for this event.").queue());
     						} else {
-    							if (raid.addUserOpenWorld(e.getUser().getId(), e.getUser().getName())) 
-    								e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully signed up for the event.").queue());                 	       
-    							else 
-    								e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Sign-up failed.").queue());                 	                     		
+    							if (raid.addUserOpenWorld(e.getUser().getId(), e.getUser().getName()))
+    								e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully signed up for the event.").queue());
+    							else
+    								e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Sign-up failed.").queue());
     						}
     					} else if (emote.getName().equalsIgnoreCase("X_")) {
-    						if (raid.removeUser(e.getUser().getId())) 
-    							e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully removed from event.").queue());                 	       
+    						if (raid.removeUser(e.getUser().getId()))
+    							e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully removed from event.").queue());
     						else
-    							e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for this event.").queue());                 	       	
+    							e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are not signed up for this event.").queue());
     					}
     				}
     			}

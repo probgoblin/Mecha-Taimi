@@ -1,13 +1,13 @@
 package me.cbitler.raidbot;
 
-import me.cbitler.raidbot.commands.*;
-import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.auto_events.AutoCreationStep;
 import me.cbitler.raidbot.auto_events.AutoStopStep;
-import me.cbitler.raidbot.edit.EditIdleStep;
-import me.cbitler.raidbot.edit.EditStep;
+import me.cbitler.raidbot.commands.*;
+import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.deselection.DeselectionStep;
+import me.cbitler.raidbot.edit.EditIdleStep;
+import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.handlers.ChannelMessageHandler;
 import me.cbitler.raidbot.handlers.DMHandler;
 import me.cbitler.raidbot.handlers.ReactionHandler;
@@ -20,16 +20,15 @@ import me.cbitler.raidbot.swap.SwapStep;
 import me.cbitler.raidbot.utility.AutomatedTaskExecutor;
 import me.cbitler.raidbot.utility.EventCreator;
 import me.cbitler.raidbot.utility.PermissionsUtil;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import javax.security.auth.login.LoginException;
+import java.util.*;
 
 /**
  * Class representing the raid bot itself.
@@ -59,18 +58,30 @@ public class RaidBot {
     Set<String> editRoleGroupsList = new HashSet<String>();
 
     Database db;
-    
+
     HashMap<String, List<AutomatedTaskExecutor>> autoEventCreator = new HashMap<>();
 
     /**
      * Create a new instance of the raid bot with the specified JDA api
-     * @param jda The API for the bot to use
+     *
+     * @param token the token used to connect to the Discord API
      */
-    public RaidBot(JDA jda) {
+    public RaidBot(String token) throws LoginException, InterruptedException {
         instance = this;
 
+        Collection<GatewayIntent> intents = GatewayIntent.getIntents(GatewayIntent.DIRECT_MESSAGES.getRawValue() +
+                                                                      GatewayIntent.GUILD_MESSAGE_REACTIONS.getRawValue() +
+                                                                      GatewayIntent.GUILD_MEMBERS.getRawValue() +
+                                                                      GatewayIntent.GUILD_EMOJIS.getRawValue() +
+                                                                      GatewayIntent.GUILD_MESSAGES.getRawValue());
+
+        JDA jda = JDABuilder.create(token, intents)
+                            .addEventListeners(new DMHandler(this),
+                                               new ChannelMessageHandler(),
+                                               new ReactionHandler())
+                            .build()
+                            .awaitReady();
         this.jda = jda;
-        jda.addEventListener(new DMHandler(this), new ChannelMessageHandler(), new ReactionHandler());
         db = new Database("events.db");
         db.connect();
         RaidManager.loadRaids();
@@ -79,21 +90,6 @@ public class RaidBot {
         CommandRegistry.addCommand("info", new InfoCommand());
         CommandRegistry.addCommand("endEvent", new EndRaidCommand());
         CommandRegistry.addCommand("endAllEvents", new EndAllCommand());
-
-//        new Thread(() -> {
-//            while (true) {
-//                try {
-//                    GuildCountUtil.sendGuilds(jda);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                try {
-//                    Thread.sleep(1000*60*5);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
     }
 
     /**
@@ -127,7 +123,7 @@ public class RaidBot {
     public HashMap<String, DeselectionStep> getRoleDeselectionMap() {
         return roleDeselection;
     }
-    
+
     /**
      * Map of the UserId -> roleSwap step for people in the role swapping process
      * @return The map of the UserId -> roleSwap step for people in the role swapping process
@@ -135,7 +131,7 @@ public class RaidBot {
     public HashMap<String, SwapStep> getRoleSwapMap() {
         return roleSwap;
     }
-    
+
     /**
      * Map of UserId -> auto creation step for people in the creation process for auto events
      * @return The map of UserId -> auto creation step for people in the creation process
@@ -143,7 +139,7 @@ public class RaidBot {
     public HashMap<String, AutoCreationStep> getAutoCreationMap() {
         return creationAuto;
     }
-    
+
     /**
      * Map of UserId -> auto stop step for people stopping auto events
      * @return The map of UserId -> auto stop step
@@ -151,7 +147,7 @@ public class RaidBot {
     public HashMap<String, AutoStopStep> getAutoStopMap() {
         return stopAuto;
     }
-    
+
     /**
      * Map of UserId -> role groups edit step for people editing role groups
      * @return The map of UserId -> role groups edit step
@@ -175,7 +171,7 @@ public class RaidBot {
     public Set<String> getEditList() {
         return editList;
     }
-    
+
     /**
      * List of serverIDs for servers in the edit role groups process
      * @return List of serverIDs for servers in the edit role groups process
@@ -217,9 +213,9 @@ public class RaidBot {
     public static RaidBot getInstance() {
         return instance;
     }
-    
+
     /**
-     * Writes a message to the user notifying them that they have an active chat already 
+     * Writes a message to the user notifying them that they have an active chat already
      * @param user the user
      * @param actvId the type of active acticity
      */
@@ -234,18 +230,18 @@ public class RaidBot {
     	else if (actvId == 7) actvName = "stop auto event";
     	else if (actvId == 8) actvName = "edit role groups";
     	else actvName = "";
-    	
+
     	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You already have an active chat with me (" + actvName + "). Finish it first!").queue());
     }
 
     /**
      * Determines whether the user has an active chat with the bot which is waiting for DM input
      * @param id the user's id
-     * @return 
-     * 0: no active chat, 
-     * 1: role selection, 
-     * 2: role deselection, 
-     * 3: event creation, 
+     * @return
+     * 0: no active chat,
+     * 1: role selection,
+     * 2: role deselection,
+     * 3: event creation,
      * 4: event edit,
      * 5: swap roles,
      * 6: create auto event
@@ -262,11 +258,11 @@ public class RaidBot {
 		else if (creationAuto.get(id) != null) actvId = 6;
 		else if (stopAuto.get(id) != null) actvId = 7;
 		else if (editRoleGroups.get(id) != null) actvId = 8;
-		
+
 		return actvId;
 	}
-    
-	
+
+
 	/**
      * returns the maximum allowed number of auto events per server
      *
@@ -275,12 +271,12 @@ public class RaidBot {
 	public int getMaxNumAutoEvents() {
 		return maxNumAutoEvents;
 	}
-	
-	
+
+
 	/**
      * returns the number of currently active auto events for a server
      *
-     * @param serverId 
+     * @param serverId
      * @return the number of auto events currently active for this server
      */
 	public int getNumAutoEvents(String serverId) {
@@ -291,11 +287,11 @@ public class RaidBot {
 			return tasks.size();
 	}
 
-	
+
 	/**
-     * creates an auto event 
+     * creates an auto event
      *
-     * @param event The event template for the auto event 
+     * @param event The event template for the auto event
      * @return whether the auto event was successfully created
      */
 	public boolean createAutoEvent(AutoPendingRaid event) {
@@ -310,16 +306,16 @@ public class RaidBot {
 		tasks.add(taskExec);
 		autoEventCreator.put(serverId, tasks);
 		taskExec.startExecution();
-		
+
 		return true;
 	}
-	
-	
+
+
 	/**
-     * stops an auto event 
+     * stops an auto event
      *
-     * @param serverId 
-     * @param taskId 
+     * @param serverId
+     * @param taskId
      */
 	public void stopAutoEvent(String serverId, int taskId) {
 		List<AutomatedTaskExecutor> tasks = autoEventCreator.get(serverId);
@@ -329,12 +325,12 @@ public class RaidBot {
 			task.stop();
 		}
 	}
-	
-	
+
+
 	/**
      * returns the list of automated tasks for a server
      *
-     * @param serverId 
+     * @param serverId
      * @return list of automated tasks for this server (empty list if there are none)
      */
 	public List<AutomatedTaskExecutor> getAutoTasks(String serverId) {
@@ -343,8 +339,8 @@ public class RaidBot {
 			result = new ArrayList<>();
 		return result;
 	}
-	
-	
+
+
 	/**
 	 * initiates event editing if user has correct permissions
 	 * @param messageId message id of the event message

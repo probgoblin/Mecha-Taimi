@@ -1,11 +1,11 @@
 package me.cbitler.raidbot.auto_events;
 
-import java.util.List;
-
-import me.cbitler.raidbot.utility.RoleTemplates;
 import me.cbitler.raidbot.raids.AutoPendingRaid;
 import me.cbitler.raidbot.raids.RaidRole;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import me.cbitler.raidbot.utility.RoleTemplates;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+
+import java.util.List;
 
 /**
  * Role setup step for the event.
@@ -18,7 +18,7 @@ public class AutoRunRoleSetupTemplateStep implements AutoCreationStep {
     List<RaidRole[]> templates;
     List<String> templateNames;
     AutoPendingRaid event;
-    
+
     public AutoRunRoleSetupTemplateStep(AutoPendingRaid event) {
 		this.templates = RoleTemplates.getAllTemplates();
 		this.templateNames = RoleTemplates.getAllTemplateNames();
@@ -33,7 +33,7 @@ public class AutoRunRoleSetupTemplateStep implements AutoCreationStep {
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         try {
-            int choiceId = Integer.parseInt(e.getMessage().getRawContent()) - 1;
+            int choiceId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
             if (choiceId == templateNames.size()) { // user chose to add roles manually
                 nextStep = new AutoRunRoleSetupManualStep(event);
                 return true;
@@ -55,7 +55,7 @@ public class AutoRunRoleSetupTemplateStep implements AutoCreationStep {
         for (int i = 0; i < templateNames.size(); i++) {
         	message += "`" + (i+1) + "` " + RoleTemplates.templateToString(templateNames.get(i), templates.get(i)) + "\n";
         }
-        
+
         return message + "`" + (templateNames.size()+1) + "` add roles manually";
     }
 
@@ -65,7 +65,7 @@ public class AutoRunRoleSetupTemplateStep implements AutoCreationStep {
     public AutoCreationStep getNextStep() {
         return nextStep;
     }
-    
+
     /**
      * {@inheritDoc}
      */

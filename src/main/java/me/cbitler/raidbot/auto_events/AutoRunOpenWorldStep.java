@@ -1,7 +1,7 @@
 package me.cbitler.raidbot.auto_events;
 
 import me.cbitler.raidbot.raids.AutoPendingRaid;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Step for choosing between structued or open world event.
@@ -11,7 +11,7 @@ public class AutoRunOpenWorldStep implements AutoCreationStep {
 
 	AutoCreationStep nextStep;
 	AutoPendingRaid event;
-	
+
 	public AutoRunOpenWorldStep(AutoPendingRaid event) {
         this.event = event;
     }
@@ -23,7 +23,7 @@ public class AutoRunOpenWorldStep implements AutoCreationStep {
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         try {
-    		int choiceId = Integer.parseInt(e.getMessage().getRawContent());
+    		int choiceId = Integer.parseInt(e.getMessage().getContentRaw());
 
     		if (choiceId == 1) { // open world
     			event.setOpenWorld(true);
@@ -57,7 +57,7 @@ public class AutoRunOpenWorldStep implements AutoCreationStep {
     public AutoCreationStep getNextStep() {
         return nextStep;
     }
-    
+
     /**
      * {@inheritDoc}
      */

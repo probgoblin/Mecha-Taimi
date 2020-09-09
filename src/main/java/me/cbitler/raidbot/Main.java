@@ -1,14 +1,10 @@
 package me.cbitler.raidbot;
 
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-//import net.dv8tion.jda.core.entities.Emote;
-//import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.exceptions.RateLimitedException;
-
 import javax.security.auth.login.LoginException;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -17,7 +13,7 @@ import java.net.URISyntaxException;
  * @author Christopher Bitler
  */
 public class Main {
-    public static void main(String[] args) throws LoginException, InterruptedException, RateLimitedException {
+    public static void main(String[] args) throws LoginException, InterruptedException {
         String token = null;
         try {
             token = readToken();
@@ -26,18 +22,7 @@ public class Main {
             System.exit(1);
         }
 
-        JDA jda = new JDABuilder(AccountType.BOT).setToken(token).buildBlocking();
-        new RaidBot(jda);
-        
-//        int serverCount = jda.getGuilds().size();
-//        for (int g = 0; g < serverCount; g++) {
-//        	Guild guild = jda.getGuilds().get(g);
-//        	System.out.println(guild.getName());
-//        	for (Emote e : guild.getEmotes()) {
-//        		System.out.println(e.getName() + " " + e.getId());
-//        	}
-//        	
-//        }
+        new RaidBot(token);
     }
 
     /**

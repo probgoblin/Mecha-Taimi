@@ -1,11 +1,11 @@
 package me.cbitler.raidbot.auto_events;
 
+import me.cbitler.raidbot.RaidBot;
+import me.cbitler.raidbot.utility.AutomatedTaskExecutor;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import me.cbitler.raidbot.utility.AutomatedTaskExecutor;
-import me.cbitler.raidbot.RaidBot;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Stop step for auto events.
@@ -16,7 +16,7 @@ public class AutoStopStep {
 
     List<String> tasks = new ArrayList<>();
     String serverId;
-    
+
     public AutoStopStep(String serverId) {
 		List<AutomatedTaskExecutor> taskExecs = RaidBot.getInstance().getAutoTasks(serverId);
 		for (int t = 0; t < taskExecs.size(); t++)
@@ -35,8 +35,8 @@ public class AutoStopStep {
         boolean valid = true;
         ArrayList<Integer> choiceIds = new ArrayList<>();
     	try {
-        	String[] splits = e.getMessage().getRawContent().split(",");
-        	for (int c = 0; c < splits.length; c++) 
+        	String[] splits = e.getMessage().getContentRaw().split(",");
+        	for (int c = 0; c < splits.length; c++)
         	{
         		int id = Integer.parseInt(splits[c]) - 1;
         		if (id < 0 || id >= tasks.size())
@@ -50,23 +50,23 @@ public class AutoStopStep {
         } catch (Exception exp) {
             valid = false;
         }
-        
+
         if (valid == false)
         {
         	e.getChannel().sendMessage("Please choose a valid option.").queue();
             return false;
-        } 
-        else 
+        }
+        else
         {
         	// stop chosen tasks
         	RaidBot bot = RaidBot.getInstance();
-        	for (int c  = 0; c < choiceIds.size(); c++) 
+        	for (int c  = 0; c < choiceIds.size(); c++)
         	{
         		bot.stopAutoEvent(serverId, choiceIds.get(c));
         	}
-        	return true;	
+        	return true;
         }
-        
+
     }
 
     public String getStepText() {
@@ -75,7 +75,7 @@ public class AutoStopStep {
         	message += "`" + (i+1) + "` " + tasks.get(i) + "\n";
         }
         message += "or write *cancel* to cancel.\n";
-        
+
         return message;
     }
 

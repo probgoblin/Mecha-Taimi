@@ -1,12 +1,12 @@
 package me.cbitler.raidbot.creation;
 
+import me.cbitler.raidbot.RaidBot;
+import me.cbitler.raidbot.raids.PendingRaid;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-
-import me.cbitler.raidbot.RaidBot;
-import me.cbitler.raidbot.raids.PendingRaid;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Step to set the date of the event
@@ -26,15 +26,15 @@ public class RunDateStep implements CreationStep {
         	// this will be caught in the handler
         	throw new RuntimeException();
         }
-        
+
         boolean valid = true;
         String dateString = "";
-        String[] split = e.getMessage().getRawContent().split("\\.");
+        String[] split = e.getMessage().getContentRaw().split("\\.");
         if (split.length != 3)
         {
         	valid = false;
         }
-        else 
+        else
         {
         	try {
         		int day = Integer.parseInt(split[0]);
@@ -49,7 +49,7 @@ public class RunDateStep implements CreationStep {
         		valid = false;
         	}
         }
-    	
+
         if (valid == false)
         {
         	e.getChannel().sendMessage("Please use the correct format: dd.mm.yyyy, e.g., 29.02.2020").queue();
