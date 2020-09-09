@@ -94,7 +94,6 @@ public class RaidManager {
      * @param teamCompId
      */
     public static void createFractal(User author, String serverId, String name, String date, String time, int teamCompId) {
-		// TODO Auto-generated method stub
 		PendingRaid fractalEvent = new PendingRaid();
 		fractalEvent.setLeaderId(author.getId());
         fractalEvent.setServerId(serverId);
@@ -220,7 +219,15 @@ public class RaidManager {
                     	System.out.println("Invalid format for role with amount: " + roleAndAmount);
                     }
                 }
-                if (raid.roles.size() > 0) // this should always be the case
+                
+                boolean messageUnknown = false;
+                try {
+                    RaidBot.getInstance().getServer(serverId).getTextChannelById(channelId).retrieveMessageById(messageId).complete();
+                } catch (Exception excp) {
+                	messageUnknown = true;
+                }
+                
+                if (raid.roles.size() > 0 && !messageUnknown)
                 	raids.add(raid);
                 else {
                 	// delete this raid from the database
@@ -288,7 +295,7 @@ public class RaidManager {
         	if (delete_message) {
         		try {
         			RaidBot.getInstance().getServer(r.getServerId())
-        			.getTextChannelById(r.getChannelId()).retrieveMessageById(messageId).queue(message -> message.delete().queue());
+        			.getTextChannelById(r.getChannelId()).retrieveMessageById(messageId).queue(message -> message.delete().queue(), error -> System.out.println(error.getMessage()));
         		} catch (Exception e) {
         			// Nothing, the message doesn't exist - it can happen
         		}

@@ -261,7 +261,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
     	Raid raid = RaidManager.getRaid(e.getMessageId());
         if (raid != null && raid.getServerId().equalsIgnoreCase(e.getGuild().getId())) {
         	raid.postToArchive();
-            RaidManager.deleteRaid(e.getMessageId(), true);
+            RaidManager.deleteRaid(e.getMessageId(), false); // message will be deleted by discord API already
         }
     }
 
