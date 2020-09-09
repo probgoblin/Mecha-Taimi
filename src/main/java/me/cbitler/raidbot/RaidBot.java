@@ -16,6 +16,7 @@ import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.selection.SelectionStep;
 import me.cbitler.raidbot.server_settings.RoleGroupsEditStep;
+import me.cbitler.raidbot.server_settings.RoleTemplatesEditStep;
 import me.cbitler.raidbot.swap.SwapStep;
 import me.cbitler.raidbot.utility.AutomatedTaskExecutor;
 import me.cbitler.raidbot.utility.EventCreator;
@@ -53,9 +54,11 @@ public class RaidBot {
     HashMap<String, AutoCreationStep> creationAuto = new HashMap<String, AutoCreationStep>();
     HashMap<String, AutoStopStep> stopAuto = new HashMap<String, AutoStopStep>();
     HashMap<String, RoleGroupsEditStep> editRoleGroups = new HashMap<String, RoleGroupsEditStep>();
+    HashMap<String, RoleTemplatesEditStep> editRoleTemplates = new HashMap<String, RoleTemplatesEditStep>();
 
     Set<String> editList = new HashSet<String>();
     Set<String> editRoleGroupsList = new HashSet<String>();
+    Set<String> editRoleTemplatesList = new HashSet<String>();
 
     Database db;
 
@@ -155,6 +158,14 @@ public class RaidBot {
     public HashMap<String, RoleGroupsEditStep> getEditRoleGroupsMap() {
         return editRoleGroups;
     }
+    
+    /**
+     * Map of UserId -> role templates edit step for people editing role templates
+     * @return The map of UserId -> role templates edit step
+     */
+    public HashMap<String, RoleTemplatesEditStep> getEditRoleTemplatesMap() {
+        return editRoleTemplates;
+    }
 
     /**
      * Map of the UserId -> pendingRaid step for raids in the setup process
@@ -178,6 +189,14 @@ public class RaidBot {
      */
     public Set<String> getEditRoleGroupsList() {
     	return editRoleGroupsList;
+    }
+    
+    /**
+     * List of serverIDs for servers in the edit role templates process
+     * @return List of serverIDs for servers in the edit role templates process
+     */
+    public Set<String> getEditRoleTemplatesList() {
+    	return editRoleTemplatesList;
     }
 
     /**
@@ -229,6 +248,7 @@ public class RaidBot {
     	else if (actvId == 6) actvName = "create auto event";
     	else if (actvId == 7) actvName = "stop auto event";
     	else if (actvId == 8) actvName = "edit role groups";
+    	else if (actvId == 9) actvName = "edit role templates";
     	else actvName = "";
 
     	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You already have an active chat with me (" + actvName + "). Finish it first!").queue());
@@ -247,6 +267,7 @@ public class RaidBot {
      * 6: create auto event
      * 7: stop auto event
      * 8: edit role groups
+     * 9: edit role templates
      */
 	public int userHasActiveChat(String id) {
 		int actvId = 0;
@@ -258,6 +279,7 @@ public class RaidBot {
 		else if (creationAuto.get(id) != null) actvId = 6;
 		else if (stopAuto.get(id) != null) actvId = 7;
 		else if (editRoleGroups.get(id) != null) actvId = 8;
+		else if (editRoleTemplates.get(id) != null) actvId = 9;
 
 		return actvId;
 	}

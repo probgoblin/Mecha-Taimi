@@ -3,6 +3,7 @@ package me.cbitler.raidbot.server_settings;
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.database.QueryResult;
+import me.cbitler.raidbot.raids.RaidRole;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -27,6 +28,7 @@ public class ServerSettings {
     static HashMap<String, String> autoEventsChannelCache = new HashMap<>();
 
     static HashMap<String, SortedMap<String, List<String>>> permittedDiscordRoles = new HashMap<>();
+    static HashMap<String, SortedMap<String, List<RaidRole>>> roleTemplates = new HashMap<>();
 
 
     /**
@@ -288,6 +290,8 @@ public class ServerSettings {
     }
 
 
+    /** FUNCTIONS FOR ROLE GROUPS */
+    
     public static void removeRoleGroup(String serverId, int groupId) {
     	SortedMap<String, List<String>> serverRoleGroups = permittedDiscordRoles.get(serverId);
     	if (serverRoleGroups != null)
@@ -467,6 +471,209 @@ public class ServerSettings {
     		result.add(it.next());
     	return result;
     }
+    
+    /*********************************/
+    
+    /** FUNCTIONS FOR ROLE TEMAPLTES */
+    
+    public static void removeRoleTemplate(String serverId, int templateId) {
+    	SortedMap<String, List<RaidRole>> serverRoleTemplates = roleTemplates.get(serverId);
+    	if (serverRoleTemplates != null)
+    	{
+    		Iterator<String> templateNames = serverRoleTemplates.keySet().iterator();
+    		try {
+    			while (templateId >= 0)
+    			{
+    				templateNames.next();
+    				templateId--;
+    			}
+    			templateNames.remove();
+    		} catch (Exception e) { }
+    		updateRoleTemplatesDB(serverId);
+    	}
+    }
+    
+    public static boolean addRoleTemplate(String serverId, String templateName, List<RaidRole> roles) {
+    	// add role template
+    	SortedMap<String, List<RaidRole>> serverRoleTemplates = roleTemplates.get(serverId);
+    	if (serverRoleTemplates == null)
+    		serverRoleTemplates = new TreeMap<>();
+    	serverRoleTemplates.put(templateName, roles);
+    	roleTemplates.put(serverId, serverRoleTemplates);
+    	updateRoleTemplatesDB(serverId);
+
+    	return true;
+    }
+
+
+    private static void updateRoleTemplatesDB(String serverId) {
+    	SortedMap<String, List<RaidRole>> serverRoleTemplates = roleTemplates.get(serverId);
+    	Database db = RaidBot.getInstance().getDatabase();
+    	if (serverRoleTemplates == null)
+    	{
+    		try {
+    			db.update("UPDATE `serverSettings` SET `role_templates` = NULL WHERE `serverId` = ?",
+    					new String[]{ serverId });
+    		} catch (SQLException e_remove) { }
+    	}
+    	else
+    	{
+    		String dbString = convertRoleTemplatesToString(serverRoleTemplates);
+    		try {
+    			db.update("INSERT INTO `serverSettings` (`serverId`,`role_templates`) VALUES (?,?)",
+                    new String[] { serverId, dbString});
+    		} catch (SQLException e) {
+    			//TODO: There is probably a much better way of doing this
+    			try {
+    				db.update("UPDATE `serverSettings` SET `role_templates` = ? WHERE `serverId` = ?",
+    						new String[] { dbString, serverId });
+    			} catch (SQLException e1) {
+    				// Not much we can do if there is also an update error
+    			}
+    		}
+    	}
+    }
+    
+    private static String convertRoleTemplatesToString(SortedMap<String, List<RaidRole>> roleTemplates) {
+    	String result = "";
+    	if (roleTemplates == null)
+    		return result;
+    	Iterator<String> templateNamesIt = roleTemplates.keySet().iterator();
+    	Iterator<List<RaidRole>> roleNamesIt = roleTemplates.values().iterator();
+    	for (int g = 0; g < roleTemplates.size(); g++)
+    	{
+    		result += templateNamesIt.next() + ";";
+    		List<RaidRole> roles = roleNamesIt.next();
+    		for (int r = 0; r < roles.size(); r++)
+    		{
+    			result += roles.get(r).getName() + ":" + Integer.toString(roles.get(r).getAmount());
+    			if (r < roles.size() - 1)
+    				result += ",";
+    		}
+
+    		if (g < roleTemplates.size() - 1)
+    			result += "/";
+    	}
+    	return result;
+    }
+    
+    private static SortedMap<String, List<RaidRole>> convertRoleTemplatesFromString(String input) {
+    	SortedMap<String, List<RaidRole>> result = new TreeMap<>();
+    	String[] templateSplits = input.split("/");
+    	for (int t = 0; t < templateSplits.length; t++)
+    	{
+    		String[] nameSplits = templateSplits[t].split(";");
+    		if (nameSplits.length != 2)
+    			continue;
+    		String[] roleSplits = nameSplits[1].split(",");
+    		List<RaidRole> roleNames = new ArrayList<RaidRole>();
+    		for (int r = 0; r < roleSplits.length; r++)
+    		{
+    			String[] amountSplits = roleSplits[r].split(":"); // roles are saved as name:amount
+        		if (amountSplits.length != 2)
+        			continue;
+    			roleNames.add(new RaidRole(Integer.parseInt(amountSplits[1]), amountSplits[0]));
+    		}
+    		result.put(nameSplits[0], roleNames);
+    	}
+    	return result;
+    }
+    
+    /**
+     * Loads the role templates for a server from the database if not already cached
+     * @param serverId
+     */
+    private static void loadRoleTemplates(String serverId) {
+    	if (roleTemplates.get(serverId) != null)
+    		return;
+    	try {
+            Database db = RaidBot.getInstance().getDatabase();
+            QueryResult results = db.query("SELECT `role_templates` FROM `serverSettings` WHERE `serverId` = ?",
+                    new String[]{serverId});
+            if (results.getResults().next()) {
+            	String result = results.getResults().getString("role_templates");
+            	if (result != null) {
+            		// construct sorted map
+            		roleTemplates.put(serverId, convertRoleTemplatesFromString(result));
+                }
+            }
+        } catch (Exception e) { }
+    }
+    
+    /**
+     * Returns the set of role templates on this server
+     * @param serverId
+     * @return list of role templates
+     */
+    public static Set<String> getRoleTemplateNames(String serverId) {
+    	loadRoleTemplates(serverId);
+    	SortedMap<String, List<RaidRole>> roleTemplatesServer = roleTemplates.get(serverId);
+    	if (roleTemplatesServer == null)
+    		return new HashSet<String>();
+    	return roleTemplatesServer.keySet();
+    }
+
+    /**
+     * Returns the list of raid roles corresponding to a template name
+     * @param serverId
+     * @param templateId
+     * @return list of raid roles
+     */
+    public static List<RaidRole> getRolesForTemplate(String serverId, int templateId) {
+    	loadRoleTemplates(serverId);
+    	SortedMap<String, List<RaidRole>> roleTemplatesServer = roleTemplates.get(serverId);
+    	List<RaidRole> result = new ArrayList<RaidRole>();
+    	if (roleTemplatesServer == null)
+    		return result;
+    	Iterator<List<RaidRole>> it = roleTemplatesServer.values().iterator();
+    	try {
+    		for (int i = 0; i < templateId; i++)
+    			it.next();
+    		return it.next();
+    	} catch (Exception exc) {
+    		return result;
+    	}
+    }
+
+    /**
+     * Returns a list of lists of raid roles corresponding to a all template names
+     * @param serverId
+     * @return list of lists of raid roles
+     */
+    public static List<List<RaidRole>> getAllRolesForTemplates(String serverId) {
+    	loadRoleTemplates(serverId);
+    	SortedMap<String, List<RaidRole>> roleTemplatesServer = roleTemplates.get(serverId);
+    	List<List<RaidRole>> result = new ArrayList<>();
+    	if (roleTemplatesServer == null)
+    		return result;
+    	Iterator<List<RaidRole>> it = roleTemplatesServer.values().iterator();
+    	while (it.hasNext())
+    		result.add(it.next());
+    	return result;
+    }
+    
+    /**
+     * Converts a template to a string for e.g. printing / displaying
+     * @param template The template for which a string should be produced
+     * @return The string representation of the template
+     */
+    public static String templateToString(String name, List<RaidRole> template) {
+    	String message = "";
+    	if (name != null)
+    		message += name + " (";
+        for (int r = 0; r < template.size(); r ++) {
+            message += template.get(r).getAmount() + " x " + template.get(r).getName();
+            if (r != template.size() - 1) {
+               message += ", ";
+            }
+        }
+        if (name != null)
+        	message += ")";
+    	return message;
+    }
+    
+    
+    /*********************************/
 
     /**
      * checks if a given channel exists

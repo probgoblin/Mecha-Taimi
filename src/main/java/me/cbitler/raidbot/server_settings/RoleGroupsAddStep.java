@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Add a role to an event
+ * Add a role group
  * @author Franziska Mueller
  */
 public class RoleGroupsAddStep implements RoleGroupsEditStep {
@@ -22,7 +22,7 @@ public class RoleGroupsAddStep implements RoleGroupsEditStep {
     }
 
     /**
-     * Handle adding a role to the event
+     * Handle adding a role group
      * @param e The direct message event
      * @return True if a role is added, false otherwise
      */

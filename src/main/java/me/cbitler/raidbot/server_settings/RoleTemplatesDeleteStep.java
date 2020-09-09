@@ -6,35 +6,37 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import me.cbitler.raidbot.raids.RaidRole;
+
 /**
- * Delete a role group
+ * Delete a role template
  * @author Franziska Mueller
  */
-public class RoleGroupsDeleteStep implements RoleGroupsEditStep {
+public class RoleTemplatesDeleteStep implements RoleTemplatesEditStep {
 
 	private String serverId;
-	private Set<String> availableRoleGroups;
-	private List<List<String>> correspondingRoles;
+	private Set<String> availableRoleTemplates;
+	private List<List<RaidRole>> correspondingRoles;
 
-	public RoleGroupsDeleteStep(String serverId, Set<String> availableRoleGroups, List<List<String>> correspondingRoles) {
+	public RoleTemplatesDeleteStep(String serverId, Set<String> availableRoleTemplates, List<List<RaidRole>> correspondingRoles) {
 		this.serverId = serverId;
-		this.availableRoleGroups = availableRoleGroups;
+		this.availableRoleTemplates = availableRoleTemplates;
 		this.correspondingRoles = correspondingRoles;
 	}
 
     /**
-     * Handle deleting a role from the event
+     * Handle deleting a role template
      * @param e The direct message event
      * @return True if a role is deleted, false otherwise
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
     	boolean valid = true;
-    	int groupId = -1;
+    	int templateId = -1;
 
     	// try to parse an integer
     	try {
-    		groupId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
-    		if (groupId < 0 || groupId >= availableRoleGroups.size())
+    		templateId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
+    		if (templateId < 0 || templateId >= availableRoleTemplates.size())
     			valid = false;
     	} catch (Exception excp) {
     		valid = false;
@@ -42,8 +44,8 @@ public class RoleGroupsDeleteStep implements RoleGroupsEditStep {
     	if (valid == false)
         	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Try again.").queue());
     	else {
-    		ServerSettings.removeRoleGroup(serverId, groupId);
-    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully deleted role group.").queue());
+    		ServerSettings.removeRoleTemplate(serverId, templateId);
+    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully deleted role template.").queue());
     	}
     	return valid;
     }
@@ -55,14 +57,14 @@ public class RoleGroupsDeleteStep implements RoleGroupsEditStep {
         String message;
         message = "Which role group do you want to delete? \n";
 
-        Iterator<String> groupsIt = availableRoleGroups.iterator();
-        for (int g = 0; g < availableRoleGroups.size(); g++)
+        Iterator<String> groupsIt = availableRoleTemplates.iterator();
+        for (int g = 0; g < availableRoleTemplates.size(); g++)
         {
         	message += "`"+(g+1)+"` "+groupsIt.next()+" [ ";
         	int numRolesInGroup = correspondingRoles.get(g).size();
         	for (int r = 0; r < numRolesInGroup; r++)
         	{
-        		message += correspondingRoles.get(g).get(r);
+        		message += Integer.toString(correspondingRoles.get(g).get(r).getAmount()) + " x " + correspondingRoles.get(g).get(r);
         		if (r < numRolesInGroup - 1)
         			message += ", ";
         	}
@@ -75,8 +77,8 @@ public class RoleGroupsDeleteStep implements RoleGroupsEditStep {
     /**
      * {@inheritDoc}
      */
-    public RoleGroupsEditStep getNextStep() {
-        return new RoleGroupsIdleStep(serverId);
+    public RoleTemplatesEditStep getNextStep() {
+        return new RoleTemplatesIdleStep(serverId);
     }
 
     @Override

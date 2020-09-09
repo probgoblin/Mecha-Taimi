@@ -20,6 +20,7 @@ public class HelpCommand implements Command {
             "**!setEventManagerRole [role]** - Set the role that serves as an event manager. This is only usable by people with the manage server permission.\n" +
             "**!setArchiveChannel [channel]** - Set the archive channel. This is only usable by people with the manage server permission.\n" +
             "**!editRoleGroups** - Start the edit process for role groups. Role groups make it easy to grant sign-up permissions to a set of discord roles. Usable by people with the event manager role.\n" +
+            "**!editRoleTemplates** - Start the edit process for role templates. Role templates make it easy to save squad compositions for events. Usable by people with the event manager role.\n" +
             "\n_ _";
 
     private final String helpMessageFractals =

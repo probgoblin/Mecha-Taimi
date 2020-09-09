@@ -12,6 +12,7 @@ import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.selection.SelectionStep;
 import me.cbitler.raidbot.server_settings.RoleGroupsEditStep;
+import me.cbitler.raidbot.server_settings.RoleTemplatesEditStep;
 import me.cbitler.raidbot.swap.SwapStep;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
@@ -214,6 +215,29 @@ public class DMHandler extends ListenerAdapter {
                     e.getChannel().sendMessage("Finished editing role groups for server.").queue();
                 }
             }
+        } else if (bot.getEditRoleTemplatesMap().containsKey(author.getId())) {
+        	if(e.getMessage().getContentRaw().equalsIgnoreCase("cancel")) {
+                cancelEditRoleTemplates(author);
+                return;
+            }
+
+            RoleTemplatesEditStep step = bot.getEditRoleTemplatesMap().get(author.getId());
+            boolean done = step.handleDM(e);
+
+            // If this step is done, move onto the next one or finish
+            if (done) {
+                RoleTemplatesEditStep nextStep = step.getNextStep();
+                if(nextStep != null) {
+                    bot.getEditRoleTemplatesMap().put(author.getId(), nextStep);
+                    e.getChannel().sendMessage(nextStep.getStepText()).queue();
+                } else {
+                    // finish editing
+                    String serverId = step.getServerID();
+                    bot.getEditRoleTemplatesMap().remove(author.getId());
+                    bot.getEditRoleTemplatesList().remove(serverId);
+                    e.getChannel().sendMessage("Finished editing role templates for server.").queue();
+                }
+            }
         } else if (bot.getRoleDeselectionMap().containsKey(author.getId())) {
         	DeselectionStep step = bot.getRoleDeselectionMap().get(author.getId());
         	boolean done = step.handleDM(e);
@@ -283,6 +307,17 @@ public class DMHandler extends ListenerAdapter {
         bot.getEditRoleGroupsMap().remove(author.getId());
 
         author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Editing role groups cancelled.").queue());
+    }
+    
+    /**
+     * cancels role templates editing, i.e. removes the user from the edit role templates map, removes edit block, and sends notification
+     * @param author the user who started the editing process
+     */
+    private void cancelEditRoleTemplates(User author) {
+    	bot.getEditRoleTemplatesList().remove(bot.getEditRoleTemplatesMap().get(author.getId()).getServerID());
+        bot.getEditRoleTemplatesMap().remove(author.getId());
+
+        author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Editing role templates cancelled.").queue());
     }
 
     /**
