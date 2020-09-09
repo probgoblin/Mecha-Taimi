@@ -605,12 +605,17 @@ public class ServerSettings {
      * @param serverId
      * @return list of role templates
      */
-    public static Set<String> getRoleTemplateNames(String serverId) {
+    public static List<String> getRoleTemplateNames(String serverId) {
     	loadRoleTemplates(serverId);
     	SortedMap<String, List<RaidRole>> roleTemplatesServer = roleTemplates.get(serverId);
+    	List<String> result = new ArrayList<String>();
     	if (roleTemplatesServer == null)
-    		return new HashSet<String>();
-    	return roleTemplatesServer.keySet();
+    		return result;
+    	Iterator<String> it = roleTemplatesServer.keySet().iterator();
+    	while (it.hasNext())
+    		result.add(it.next());    	
+    	
+    	return result;
     }
 
     /**

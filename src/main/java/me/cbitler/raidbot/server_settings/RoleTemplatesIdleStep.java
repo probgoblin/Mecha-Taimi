@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import me.cbitler.raidbot.raids.RaidRole;
 
@@ -16,7 +15,7 @@ public class RoleTemplatesIdleStep implements RoleTemplatesEditStep {
 
 	private String serverId;
 	private RoleTemplatesEditStep nextStep;
-	private Set<String> availableRoleTemplates;
+	private List<String> availableRoleTemplates;
 	private List<List<RaidRole>> correspondingRoles;
 
 	public RoleTemplatesIdleStep(String serverId) {

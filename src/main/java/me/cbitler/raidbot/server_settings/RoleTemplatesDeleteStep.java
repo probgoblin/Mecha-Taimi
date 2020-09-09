@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import me.cbitler.raidbot.raids.RaidRole;
 
@@ -15,10 +14,10 @@ import me.cbitler.raidbot.raids.RaidRole;
 public class RoleTemplatesDeleteStep implements RoleTemplatesEditStep {
 
 	private String serverId;
-	private Set<String> availableRoleTemplates;
+	private List<String> availableRoleTemplates;
 	private List<List<RaidRole>> correspondingRoles;
 
-	public RoleTemplatesDeleteStep(String serverId, Set<String> availableRoleTemplates, List<List<RaidRole>> correspondingRoles) {
+	public RoleTemplatesDeleteStep(String serverId, List<String> availableRoleTemplates, List<List<RaidRole>> correspondingRoles) {
 		this.serverId = serverId;
 		this.availableRoleTemplates = availableRoleTemplates;
 		this.correspondingRoles = correspondingRoles;

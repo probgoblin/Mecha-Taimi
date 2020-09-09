@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import me.cbitler.raidbot.raids.RaidRole;
 
@@ -15,9 +14,9 @@ import me.cbitler.raidbot.raids.RaidRole;
 public class RoleTemplatesAddStep implements RoleTemplatesEditStep {
 
     private String serverId;
-	private Set<String> availableRoleTemplates;
+	private List<String> availableRoleTemplates;
 
-    public RoleTemplatesAddStep(String serverId, Set<String> availableRoleTemplates) {
+    public RoleTemplatesAddStep(String serverId, List<String> availableRoleTemplates) {
         this.serverId = serverId;
         this.availableRoleTemplates = availableRoleTemplates;
     }

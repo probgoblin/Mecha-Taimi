@@ -3,7 +3,7 @@ package me.cbitler.raidbot.creation;
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidRole;
-import me.cbitler.raidbot.utility.RoleTemplates;
+import me.cbitler.raidbot.server_settings.ServerSettings;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 import java.util.List;
@@ -16,12 +16,12 @@ import java.util.List;
 public class RunRoleSetupTemplateStep implements CreationStep {
 
     CreationStep nextStep;
-    List<RaidRole[]> templates;
+    List<List<RaidRole>> templates;
     List<String> templateNames;
 
-    public RunRoleSetupTemplateStep() {
-		this.templates = RoleTemplates.getAllTemplates();
-		this.templateNames = RoleTemplates.getAllTemplateNames();
+    public RunRoleSetupTemplateStep(String serverId) {
+    	this.templates = ServerSettings.getAllRolesForTemplates(serverId);
+		this.templateNames = ServerSettings.getRoleTemplateNames(serverId);
 	}
 
     /**
@@ -36,6 +36,7 @@ public class RunRoleSetupTemplateStep implements CreationStep {
         	// this will be caught in the handler
         	throw new RuntimeException();
         }
+        
         nextStep = new RunPermDiscRoleSetupStep(raid.getServerId());
 
         try {
@@ -59,7 +60,7 @@ public class RunRoleSetupTemplateStep implements CreationStep {
     public String getStepText() {
         String message = "Choose from these available role templates or go back to manual role creation: \n";
         for (int i = 0; i < templateNames.size(); i++) {
-        	message += "`" + (i+1) + "` " + RoleTemplates.templateToString(templateNames.get(i), templates.get(i)) + "\n";
+        	message += "`" + (i+1) + "` " + ServerSettings.templateToString(templateNames.get(i), templates.get(i)) + "\n";
         }
 
         return message + "`" + (templateNames.size()+1) + "` add roles manually";

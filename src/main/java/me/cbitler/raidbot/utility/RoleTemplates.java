@@ -2,41 +2,43 @@ package me.cbitler.raidbot.utility;
 
 import me.cbitler.raidbot.raids.RaidRole;
 
-import java.util.ArrayList;
-import java.util.List;
+//import java.util.ArrayList;
+//import java.util.List;
 
 public class RoleTemplates {
 
-	static RaidRole[][] raidTemplates =
-	    {
-	    	{	new RaidRole(1, "Tank"),
-	            new RaidRole(1, "Supporter"),
-	            new RaidRole(1, "Druid"),
-	            new RaidRole(1, "Off-Healer"),
-	            new RaidRole(1, "BS"),
-	            new RaidRole(5, "DPS")
-	        },
-	    	{	new RaidRole(2, "Chronotank"),
-	            new RaidRole(1, "Push Druid"),
-	            new RaidRole(1, "Off-Healer"),
-	            new RaidRole(1, "BS"),
-	            new RaidRole(1, "Epi Scourge"),
-	            new RaidRole(4, "DPS")
-	        },
-	    	{	new RaidRole(1, "Tank"),
-	            new RaidRole(1, "BS (G1)"),
-	            new RaidRole(1, "Off-Heal Kiter (G2)"),
-	            new RaidRole(1, "Off-Chrono (G3)"),
-	            new RaidRole(1, "Stack Druid"),
-	            new RaidRole(5, "DPS")
-	        }
-	    };
-
-	static String[] raidTemplateNames = {
-	            "default raid",
-	            "Desmina",
-	            "Dhuum"
-	    };
+// DEPRECATED: THIS IS NOW HANDLED BY DYNAMIC ROLE TEMPLATES (see ServerSettings)
+	
+//	static RaidRole[][] raidTemplates =
+//	    {
+//	    	{	new RaidRole(1, "Tank"),
+//	            new RaidRole(1, "Supporter"),
+//	            new RaidRole(1, "Druid"),
+//	            new RaidRole(1, "Off-Healer"),
+//	            new RaidRole(1, "BS"),
+//	            new RaidRole(5, "DPS")
+//	        },
+//	    	{	new RaidRole(2, "Chronotank"),
+//	            new RaidRole(1, "Push Druid"),
+//	            new RaidRole(1, "Off-Healer"),
+//	            new RaidRole(1, "BS"),
+//	            new RaidRole(1, "Epi Scourge"),
+//	            new RaidRole(4, "DPS")
+//	        },
+//	    	{	new RaidRole(1, "Tank"),
+//	            new RaidRole(1, "BS (G1)"),
+//	            new RaidRole(1, "Off-Heal Kiter (G2)"),
+//	            new RaidRole(1, "Off-Chrono (G3)"),
+//	            new RaidRole(1, "Stack Druid"),
+//	            new RaidRole(5, "DPS")
+//	        }
+//	    };
+//
+//	static String[] raidTemplateNames = {
+//	            "default raid",
+//	            "Desmina",
+//	            "Dhuum"
+//	    };
 
 	static RaidRole[][] fractalTemplates =
 	    { 	{	new RaidRole(1, "Chrono"),
@@ -62,39 +64,39 @@ public class RoleTemplates {
 	            "fractal (general)"
 	    };
 
-	private static List<RaidRole[]> templates = new ArrayList<RaidRole[]>();
-
-	private static List<String> templateNames = new ArrayList<String>();
-
-    /**
-     * Get all role templates (merges raid and fractal templates first if not done already)
-     *
-     * @return The array of all available role templates
-     */
-    public static List<RaidRole[]> getAllTemplates() {
-    	if (templates.isEmpty()) {
-    		for (int t = 0; t < raidTemplates.length; t++)
-    			templates.add(raidTemplates[t]);
-    		for (int t = 0; t < fractalTemplates.length; t++)
-    			templates.add(fractalTemplates[t]);
-    	}
-    	return templates;
-    }
-
-    /**
-     * Get all template names (merges raid and fractal template names first if not done already)
-     *
-     * @return The array of all template names
-     */
-    public static List<String> getAllTemplateNames() {
-    	if (templateNames.isEmpty()) {
-    		for (int t = 0; t < raidTemplateNames.length; t++)
-    			templateNames.add(raidTemplateNames[t]);
-    		for (int t = 0; t < fractalTemplateNames.length; t++)
-    			templateNames.add(fractalTemplateNames[t]);
-    	}
-    	return templateNames;
-    }
+//	private static List<RaidRole[]> templates = new ArrayList<RaidRole[]>();
+//
+//	private static List<String> templateNames = new ArrayList<String>();
+//
+//    /**
+//     * Get all role templates (merges raid and fractal templates first if not done already)
+//     *
+//     * @return The array of all available role templates
+//     */
+//    public static List<RaidRole[]> getAllTemplates() {
+//    	if (templates.isEmpty()) {
+//    		for (int t = 0; t < raidTemplates.length; t++)
+//    			templates.add(raidTemplates[t]);
+//    		for (int t = 0; t < fractalTemplates.length; t++)
+//    			templates.add(fractalTemplates[t]);
+//    	}
+//    	return templates;
+//    }
+//
+//    /**
+//     * Get all template names (merges raid and fractal template names first if not done already)
+//     *
+//     * @return The array of all template names
+//     */
+//    public static List<String> getAllTemplateNames() {
+//    	if (templateNames.isEmpty()) {
+//    		for (int t = 0; t < raidTemplateNames.length; t++)
+//    			templateNames.add(raidTemplateNames[t]);
+//    		for (int t = 0; t < fractalTemplateNames.length; t++)
+//    			templateNames.add(fractalTemplateNames[t]);
+//    	}
+//    	return templateNames;
+//    }
 
     /**
      * Get fractal templates

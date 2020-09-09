@@ -135,6 +135,13 @@ public class PendingRaid {
             rolesWithNumbers.add(new RaidRole(role.getAmount(), role.getName()));
         }
 	}
+	
+	public void addTemplateRoles(List<RaidRole> raidRoles) {
+		for (int r = 0; r < raidRoles.size(); r++) {
+        	RaidRole role = raidRoles.get(r);
+            rolesWithNumbers.add(new RaidRole(role.getAmount(), role.getName()));
+        }
+	}
 
 	public void addPermittedDiscordRoles(String role) {
 		if (permittedDiscordRoles.contains(role) == false)

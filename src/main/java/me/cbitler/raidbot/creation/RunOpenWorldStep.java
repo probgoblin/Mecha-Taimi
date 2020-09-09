@@ -31,7 +31,7 @@ public class RunOpenWorldStep implements CreationStep {
     			nextStep = new RunOpenWorldSizeStep();
         		return true;
     		} else if (choiceId == 2) { // structured
-    			nextStep = new RunRoleSetupStep();
+    			nextStep = new RunRoleSetupStep(raid.getServerId());
         		return true;
     		} else {
     			e.getChannel().sendMessage("Please choose a valid option.").queue();

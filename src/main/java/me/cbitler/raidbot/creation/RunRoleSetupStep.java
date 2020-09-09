@@ -10,6 +10,11 @@ import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 public class RunRoleSetupStep implements CreationStep {
 
 	CreationStep nextStep;
+	String serverId;
+	
+	public RunRoleSetupStep(String serverId) {
+		this.serverId = serverId;
+	}
 
     /**
      * Handle user input.
@@ -20,7 +25,7 @@ public class RunRoleSetupStep implements CreationStep {
         try {
     		int choiceId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
     		if (choiceId == 0) { // role template
-    			nextStep = new RunRoleSetupTemplateStep();
+    			nextStep = new RunRoleSetupTemplateStep(serverId);
         		return true;
     		} else if (choiceId == 1) {
     			nextStep = new RunRoleSetupManualStep();
