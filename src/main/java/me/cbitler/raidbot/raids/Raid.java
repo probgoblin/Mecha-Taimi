@@ -848,7 +848,19 @@ public class Raid {
         builder.addField("Time: ", getTime(), true);
         builder.addBlankField(false);
         builder.addField("Roles:", buildRolesText(), true);
-        builder.addField(flexRolesName + ":", buildFlexRolesText(), true);
+        List<String> flexRolesText = buildFlexRolesText();
+        String currentFlexText = "";
+        String nextFieldName = flexRolesName + ":";
+        for (int s = 0; s < flexRolesText.size(); ++s) {
+        	if (currentFlexText.length() + flexRolesText.get(s).length() <= 1024) {
+        		currentFlexText += flexRolesText.get(s);
+        	} else {
+        		builder.addField(nextFieldName, currentFlexText, true);
+        		nextFieldName = null;
+        		currentFlexText = flexRolesText.get(s);
+        	}
+        }
+        //builder.addField(flexRolesName + ":", "", true);
         if (provide_instr && this.isOpenWorld == false) {
         	builder.addBlankField(false);
         	builder.addField("How to sign up:",
@@ -935,9 +947,10 @@ public class Raid {
      *
      * @return The flex role text
      */
-    private String buildFlexRolesText() {
-        String text = "";
+    private List<String> buildFlexRolesText() {
+        List<String> textList = new ArrayList<String>();
         if (isOpenWorld) {
+        	String text = "";
             for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
                 if (flex.getKey() != null && flex.getValue().isEmpty() == false) {
                 	String username = userIDsToNicknames.get(flex.getKey().getId());
@@ -946,9 +959,10 @@ public class Raid {
                     text += ("- " + username + "\n");
                 }
             }
+            textList.add(text);
         } else {
         	Map<String, List<RaidUser>> flexUsersByRole = collectFlexUsersByRole(null);
-
+        	String text = "";
             for (int r = 0; r < roles.size(); r++) {
                 String roleName = roles.get(r).getName();
                 text += (roleName + ": \n");
@@ -965,9 +979,10 @@ public class Raid {
                 }
                 text += "\n";
             }
+            textList.add(text);
         }
 
-        return text;
+        return textList;
     }
 
     /**

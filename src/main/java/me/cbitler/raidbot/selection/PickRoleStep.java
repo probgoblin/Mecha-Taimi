@@ -88,32 +88,32 @@ public class PickRoleStep implements SelectionStep {
             if(role.isFlexOnly() || forceFlex) {
                 // case 1: there are no spots for the role to be a main role, so it can only be added as flex!
             	// case 2: the user clicked the flex icon for sign up
-                raid.addUserFlexRole(userID, username, spec, roleName, true, true);
-                user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster as flex role.").queue());
+                if (raid.addUserFlexRole(userID, username, spec, roleName, true, true))
+                	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster as flex role.").queue());
+                else
+                	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("An error occured while trying to add your role. Please complain to your bot admin.").queue());
             } else if (raid.isUserInRaid(userID) == false) {
                 // check if we can add it as main role
                 if(raid.isValidNotFullRole(roleName)) {
-                    raid.addUser(userID, username, spec, roleName, true, true);
-                    user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster.").queue());
+                    if (raid.addUser(userID, username, spec, roleName, true, true))
+                    	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster.").queue());
+                    else
+                    	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("An error occured while trying to add your role. Please complain to your bot admin.").queue());
                 } else {
                     // the role is already full
-                    // check if we can add as flex role
-                    if (raid.getUserNumFlexRoles(userID) < 2) {
-                        raid.addUserFlexRole(userID, username, spec, roleName, true, true);
-                        user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster as flex role since the role you selected is full.").queue());
-                    } else {
-                        // role is full and user already has 2 flex roles
-                        success = false;
-                        user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Could not add since the role you selected is full and you reached the maximum number of flex roles.\n"
-                                + "Please choose a non-full role or write *cancel* to quit selection.").queue());
-                    }
+                    if (raid.addUserFlexRole(userID, username, spec, roleName, true, true))
+                    	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster as flex role since the role you selected is full.").queue());
+                    else
+                    	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("An error occured while trying to add your role. Please complain to your bot admin.").queue());           
                 }
             } else {
                 // user has a main role already,
                 // i.e., there has to be a flex role slot available
                 // since we checked this in the ReactionHandler
-                raid.addUserFlexRole(userID, username, spec, roleName, true, true);
-                user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster as flex role.").queue());
+                if (raid.addUserFlexRole(userID, username, spec, roleName, true, true))
+                	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Added to event roster as flex role.").queue());
+                else
+                	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("An error occured while trying to add your role. Please complain to your bot admin.").queue()); 
             }
         } else {
             success = false;

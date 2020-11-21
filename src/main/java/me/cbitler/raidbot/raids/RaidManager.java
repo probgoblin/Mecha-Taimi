@@ -464,6 +464,6 @@ public class RaidManager {
      * @return the maximum number of roles per user
      */
     public static int getMaxNumRoles() {
-    	return 4;
+    	return 15;
     }
 }
