@@ -851,12 +851,12 @@ public class Raid {
         List<String> flexRolesText = buildFlexRolesText();
         String currentFlexText = "";
         String nextFieldName = flexRolesName + ":";
-        for (int s = 0; s < flexRolesText.size(); ++s) {
+        for (int s = 0; s < flexRolesText.size(); s++) {
         	if (currentFlexText.length() + flexRolesText.get(s).length() <= 1024) {
         		currentFlexText += flexRolesText.get(s);
         	} else {
         		builder.addField(nextFieldName, currentFlexText, true);
-        		nextFieldName = null;
+        		nextFieldName = "";
         		currentFlexText = flexRolesText.get(s);
         	}
         }
@@ -962,8 +962,8 @@ public class Raid {
             textList.add(text);
         } else {
         	Map<String, List<RaidUser>> flexUsersByRole = collectFlexUsersByRole(null);
-        	String text = "";
             for (int r = 0; r < roles.size(); r++) {
+            	String text = "";
                 String roleName = roles.get(r).getName();
                 text += (roleName + ": \n");
 
@@ -978,8 +978,8 @@ public class Raid {
                         text += ("<:"+userEmote.getName()+":"+userEmote.getId()+"> " + username + " (" + user.getSpec() + ")\n");
                 }
                 text += "\n";
+                textList.add(text);
             }
-            textList.add(text);
         }
 
         return textList;
