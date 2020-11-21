@@ -860,7 +860,7 @@ public class Raid {
         		currentFlexText = flexRolesText.get(s);
         	}
         }
-        //builder.addField(flexRolesName + ":", "", true);
+        builder.addField(nextFieldName, currentFlexText, true);
         if (provide_instr && this.isOpenWorld == false) {
         	builder.addBlankField(false);
         	builder.addField("How to sign up:",
