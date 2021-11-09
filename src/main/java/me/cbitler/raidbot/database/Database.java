@@ -81,7 +81,6 @@ public class Database {
             tableInits();
         } catch (SQLException e) {
             log.error("Couldn't create tables.", e);
-            e.printStackTrace();
             System.exit(1);
         }
     }
