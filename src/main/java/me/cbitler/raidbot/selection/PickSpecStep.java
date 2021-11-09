@@ -30,7 +30,7 @@ public class PickSpecStep implements SelectionStep {
         this.forceFlex = forceFlex;
         this.coreClass = coreclass;
         this.nextStep = null;
-    	this.allSpecs = ClassesSpecs.getSpecsForCore(coreClass);
+        this.allSpecs = ClassesSpecs.getSpecsForCore(coreClass);
     }
 
     /**
@@ -41,22 +41,22 @@ public class PickSpecStep implements SelectionStep {
      */
     @Override
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-    	try {
-    		int specId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
-    		String spec = allSpecs[specId];
-    		if (raid.getRoles().size() == 1) { // if there is only one role, skip PickRoleStep
-    			PickRoleStep autoRoleStep = new PickRoleStep(raid, spec, user, forceFlex);
-    			if (false == autoRoleStep.pickRole(e.getAuthor().getId(), e.getAuthor().getName(), raid.getRoles().get(0).getName())) {
-    			    e.getChannel().sendMessage("Since there is only one role, selection was cancelled automatically.").queue();
-    		    }
-    		} else {
-    			nextStep = new PickRoleStep(raid, spec, user, forceFlex);
-    		}
-    		return true;
-    	} catch (Exception exp) {
+        try {
+            int specId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
+            String spec = allSpecs[specId];
+            if (raid.getRoles().size() == 1) { // if there is only one role, skip PickRoleStep
+                PickRoleStep autoRoleStep = new PickRoleStep(raid, spec, user, forceFlex);
+                if (false == autoRoleStep.pickRole(e.getAuthor().getId(), e.getAuthor().getName(), raid.getRoles().get(0).getName())) {
+                    e.getChannel().sendMessage("Since there is only one role, selection was cancelled automatically.").queue();
+                }
+            } else {
+                nextStep = new PickRoleStep(raid, spec, user, forceFlex);
+            }
+            return true;
+        } catch (Exception exp) {
             e.getChannel().sendMessage("Please choose a valid specialization.").queue();
             return false;
-    	}
+        }
     }
 
     /**
@@ -74,14 +74,14 @@ public class PickSpecStep implements SelectionStep {
      */
     @Override
     public String getStepText() {
-    	String text = "Pick a specialization:\n";
+        String text = "Pick a specialization:\n";
         for (int i = 0; i < allSpecs.length; i++) {
-        	Emote specEmote = Reactions.getEmoteByName(allSpecs[i]);
-        	if (specEmote != null) {
-        		text += "`" + (i+1) + "` <:" + specEmote.getName() + ":" + specEmote.getId() + "> " + allSpecs[i] + "\n";
-        	} else {
-        		text += "`" + (i+1) + "` " + allSpecs[i] + "\n";
-        	}
+            Emote specEmote = Reactions.getEmoteByName(allSpecs[i]);
+            if (specEmote != null) {
+                text += "`" + (i+1) + "` <:" + specEmote.getName() + ":" + specEmote.getId() + "> " + allSpecs[i] + "\n";
+            } else {
+                text += "`" + (i+1) + "` " + allSpecs[i] + "\n";
+            }
         }
         text += "or type *cancel* to cancel role selection.";
 
