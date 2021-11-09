@@ -1,35 +1,31 @@
 package me.cbitler.raidbot.utility;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.DotenvEntry;
 
 /**
  * Class for loading variables from .env file
  * @author Christopher Bitler
  */
 public class EnvVariables {
-    private HashMap<String,String> variables = new HashMap<>();
+    private static final Logger log = LogManager.getLogger(EnvVariables.class);
+
+    private static HashMap<String,String> variables = loadEnvVars();
 
     /**
-     * Load variables from .env file
-     * @throws IOException
+     * Set a variable for usage within the application.
+     * Attempts to register an empty or null variable name will be ignored.
+     * @param key The variable name to register a value for
+     * @param value The variable value to register for the given name
      */
-    public void loadFromEnvFile() throws IOException {
-        File file = new File(".env");
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String line;
-        while((line = reader.readLine()) != null) {
-            String[] parts = line.split("=");
-            if(parts.length >= 2) {
-                String name = parts[0].trim();
-                String value = parts[1].trim();
-                variables.put(name, value);
-            }
-        }
-        reader.close();
+    public static void setValue(String key, String value) {
+        if(key == null || key == "") return;
+        variables.put(key, value);
     }
 
     /**
@@ -37,7 +33,34 @@ public class EnvVariables {
      * @param key The variable name to get the value of
      * @return The value of the variable
      */
-    public String getValue(String key) {
-        return variables.get(key);
+    public static String getValue(String key) {
+        // remove sensitive token from static context once it has been retrieved
+        if(key=="DISCORD_TOKEN") {
+            String value = variables.get(key);
+            variables.put(key, "<removed>");
+            return value;
+        }
+        if(variables.containsKey(key)) return variables.get(key);
+        else return null;
+    }
+
+    /**
+     * Load variables from .env file and token file to write them to the EnvVariables static context on startup
+     */
+    private static HashMap<String,String> loadEnvVars() {
+        log.debug("loading env vars");
+        Dotenv env;
+        try{
+            env = Dotenv.load();
+        }catch(Exception e){
+            log.error("Loading env vars failed.");
+            log.debug("Loading env vars failed with error.", e);
+            throw new RuntimeException("Loading env vars failed.");
+        }
+        HashMap<String,String> vars = new HashMap<>();
+        for (DotenvEntry e : env.entries()) {
+            vars.put(e.getKey(), e.getValue());
+        }
+        return vars;
     }
 }
