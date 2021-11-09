@@ -12,6 +12,15 @@ public class Reactions {
      * List of reactions representing classes
      */
     static String[] specs = {
+            "Willbender",
+            "Vindicator",
+            "Bladesworn",
+            "Mechanist",
+            "Untamed",
+            "Specter",
+            "Catalyst",
+            "Virtuoso",
+            "Harbinger",
             "Dragonhunter",
             "Firebrand",
             "Herald",
@@ -54,6 +63,15 @@ public class Reactions {
     };
 
     static Emote[] reactions = {
+            getEmojiFromEnvVar("EMOTE_WILLBENDER"),
+            getEmojiFromEnvVar("EMOTE_VINDICATOR"),
+            getEmojiFromEnvVar("EMOTE_BLADESWORN"),
+            getEmojiFromEnvVar("EMOTE_MECHANIST"),
+            getEmojiFromEnvVar("EMOTE_UNTAMED"),
+            getEmojiFromEnvVar("EMOTE_SPECTER"),
+            getEmojiFromEnvVar("EMOTE_CATALYST"),
+            getEmojiFromEnvVar("EMOTE_VIRTUOSO"),
+            getEmojiFromEnvVar("EMOTE_HARBINGER"),
             getEmojiFromEnvVar("EMOTE_DRAGONHUNTER"),
             getEmojiFromEnvVar("EMOTE_FIREBRAND"),
             getEmojiFromEnvVar("EMOTE_HERALD"),
