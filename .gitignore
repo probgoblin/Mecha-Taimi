@@ -2,6 +2,7 @@
 target/*
 *.iml
 *.db
+.vscode
 token*
 Reactions
 dependency-reduced-pom.xml
