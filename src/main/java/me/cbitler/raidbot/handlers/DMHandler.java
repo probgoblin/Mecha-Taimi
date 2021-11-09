@@ -1,5 +1,8 @@
 package me.cbitler.raidbot.handlers;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.auto_events.AutoCreationStep;
 import me.cbitler.raidbot.auto_events.AutoStopStep;
@@ -26,6 +29,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
  * @author Franziska Mueller
  */
 public class DMHandler extends ListenerAdapter {
+    private static final Logger log = LogManager.getLogger(DMHandler.class);
+
     RaidBot bot;
 
     /**
@@ -55,11 +60,11 @@ public class DMHandler extends ListenerAdapter {
             CreationStep step = bot.getCreationMap().get(author.getId());
             boolean done = false;
             try {
-            	done = step.handleDM(e);
+                done = step.handleDM(e);
             } catch (RuntimeException excp) {
-            	e.getChannel().sendMessage("I could not find any pending event associated with you. I'm sorry.").queue();
-            	cancelCreation(author);
-            	return;
+                e.getChannel().sendMessage("I could not find any pending event associated with you. I'm sorry.").queue();
+                cancelCreation(author);
+                return;
             }
 
             // If this step is done, move onto the next one or finish
@@ -101,7 +106,7 @@ public class DMHandler extends ListenerAdapter {
                 }
             }
         } else if (bot.getEditMap().containsKey(author.getId())) {
-        	if(e.getMessage().getContentRaw().equalsIgnoreCase("cancel")) {
+            if(e.getMessage().getContentRaw().equalsIgnoreCase("cancel")) {
                 cancelEdit(author);
                 return;
             }
@@ -132,11 +137,11 @@ public class DMHandler extends ListenerAdapter {
             AutoCreationStep step = bot.getAutoCreationMap().get(author.getId());
             boolean done = false;
             try {
-            	done = step.handleDM(e);
+                done = step.handleDM(e);
             } catch (RuntimeException excp) {
-            	e.getChannel().sendMessage("Something went wrong. I'm sorry.").queue();
-            	cancelAutoCreation(author);
-            	return;
+                e.getChannel().sendMessage("Something went wrong. I'm sorry.").queue();
+                cancelAutoCreation(author);
+                return;
             }
 
             // If this step is done, move onto the next one or finish
@@ -147,25 +152,25 @@ public class DMHandler extends ListenerAdapter {
                     e.getChannel().sendMessage(nextStep.getStepText()).queue();
                 } else {
                     // create automated task
-                	bot.getAutoCreationMap().remove(author.getId());
+                    bot.getAutoCreationMap().remove(author.getId());
                     AutoPendingRaid event = step.getEventTemplate();
                     boolean success = true;
                     try {
-                    	success = bot.createAutoEvent(event);
+                        success = bot.createAutoEvent(event);
                     } catch (Exception exception) {
-                    	System.out.println("Exception caught: "+exception.getMessage());
-                    	success = false;
+                        log.error("Automatic event creation failed.", exception);
+                        success = false;
                     }
                     if (success)
-                    	e.getChannel().sendMessage("Automated event successfully created.").queue();
+                        e.getChannel().sendMessage("Automated event successfully created.").queue();
                     else
-                    	e.getChannel().sendMessage("Automated event could not be created. Make sure the maximum number of auto events is not reached yet.").queue();
+                        e.getChannel().sendMessage("Automated event could not be created. Make sure the maximum number of auto events is not reached yet.").queue();
 
                 }
             }
         } else if (bot.getAutoStopMap().containsKey(author.getId())) {
             if(e.getMessage().getContentRaw().equalsIgnoreCase("cancel")) {
-            	bot.getAutoStopMap().remove(author.getId());
+                bot.getAutoStopMap().remove(author.getId());
                 author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Removal of automated event cancelled.").queue());
                 return;
             }
@@ -173,9 +178,9 @@ public class DMHandler extends ListenerAdapter {
             AutoStopStep step = bot.getAutoStopMap().get(author.getId());
             boolean done = false;
             try {
-            	done = step.handleDM(e);
+                done = step.handleDM(e);
             } catch (RuntimeException excp) {
-            	bot.getAutoStopMap().remove(author.getId());
+                bot.getAutoStopMap().remove(author.getId());
                 author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Something went wrong. Removal of automated event cancelled.").queue());
                 return;
             }
@@ -188,12 +193,12 @@ public class DMHandler extends ListenerAdapter {
                     e.getChannel().sendMessage(nextStep.getStepText()).queue();
                 } else {
                     // finish
-                	bot.getAutoStopMap().remove(author.getId());
+                    bot.getAutoStopMap().remove(author.getId());
                     e.getChannel().sendMessage("Automated event successfully stopped.").queue();
                 }
             }
         } else if (bot.getEditRoleGroupsMap().containsKey(author.getId())) {
-        	if(e.getMessage().getContentRaw().equalsIgnoreCase("cancel")) {
+            if(e.getMessage().getContentRaw().equalsIgnoreCase("cancel")) {
                 cancelEditRoleGroups(author);
                 return;
             }
@@ -216,7 +221,7 @@ public class DMHandler extends ListenerAdapter {
                 }
             }
         } else if (bot.getEditRoleTemplatesMap().containsKey(author.getId())) {
-        	if(e.getMessage().getContentRaw().equalsIgnoreCase("cancel")) {
+            if(e.getMessage().getContentRaw().equalsIgnoreCase("cancel")) {
                 cancelEditRoleTemplates(author);
                 return;
             }
@@ -239,34 +244,34 @@ public class DMHandler extends ListenerAdapter {
                 }
             }
         } else if (bot.getRoleDeselectionMap().containsKey(author.getId())) {
-        	DeselectionStep step = bot.getRoleDeselectionMap().get(author.getId());
-        	boolean done = step.handleDM(e);
+            DeselectionStep step = bot.getRoleDeselectionMap().get(author.getId());
+            boolean done = step.handleDM(e);
 
-        	// If this step is done, move onto the next one or finish
-        	if (done) {
-        		DeselectionStep nextStep = step.getNextStep();
-        		if(nextStep != null) {
-        			bot.getRoleDeselectionMap().put(author.getId(), nextStep);
-        			e.getChannel().sendMessage(nextStep.getStepText()).queue();
-        		} else {
-        			// finish deselection
-        			bot.getRoleDeselectionMap().remove(author.getId());
-        			e.getChannel().sendMessage("Finished deselection.").queue();
-        		}
-        	}
+            // If this step is done, move onto the next one or finish
+            if (done) {
+                DeselectionStep nextStep = step.getNextStep();
+                if(nextStep != null) {
+                    bot.getRoleDeselectionMap().put(author.getId(), nextStep);
+                    e.getChannel().sendMessage(nextStep.getStepText()).queue();
+                } else {
+                    // finish deselection
+                    bot.getRoleDeselectionMap().remove(author.getId());
+                    e.getChannel().sendMessage("Finished deselection.").queue();
+                }
+            }
         } else if (bot.getRoleSwapMap().containsKey(author.getId())) {
-        	SwapStep step = bot.getRoleSwapMap().get(author.getId());
-        	// the swap step does not have a next step
-        	if (step.handleDM(e)) {
-        		// finish role swap
-    			bot.getRoleSwapMap().remove(author.getId());
-    			e.getChannel().sendMessage("Finished role swap.").queue();
-        	}
+            SwapStep step = bot.getRoleSwapMap().get(author.getId());
+            // the swap step does not have a next step
+            if (step.handleDM(e)) {
+                // finish role swap
+                bot.getRoleSwapMap().remove(author.getId());
+                e.getChannel().sendMessage("Finished role swap.").queue();
+            }
         }
 
         if(e.getMessage().getAttachments().size() > 0 && e.getChannel().getType() == ChannelType.PRIVATE) {
             for(Message.Attachment attachment : e.getMessage().getAttachments()) {
-                System.out.println(attachment.getFileName());
+                log.info("Processing attached file from DM '{}'", attachment.getFileName());
                 if(attachment.getFileName().endsWith(".evtc") || attachment.getFileName().endsWith(".evtc.zip")) {
                     new Thread(new LogParser(e.getChannel(), attachment)).start();
                 }
@@ -279,7 +284,7 @@ public class DMHandler extends ListenerAdapter {
      * @param author the user who started the creation process
      */
     private void cancelCreation(User author) {
-    	bot.getCreationMap().remove(author.getId());
+        bot.getCreationMap().remove(author.getId());
 
         if(bot.getPendingRaids().get(author.getId()) != null) {
             bot.getPendingRaids().remove(author.getId());
@@ -292,7 +297,7 @@ public class DMHandler extends ListenerAdapter {
      * @param author the user who started the editing process
      */
     private void cancelEdit(User author) {
-    	bot.getEditList().remove(bot.getEditMap().get(author.getId()).getMessageID());
+        bot.getEditList().remove(bot.getEditMap().get(author.getId()).getMessageID());
         bot.getEditMap().remove(author.getId());
 
         author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Event editing cancelled.").queue());
@@ -303,18 +308,18 @@ public class DMHandler extends ListenerAdapter {
      * @param author the user who started the editing process
      */
     private void cancelEditRoleGroups(User author) {
-    	bot.getEditRoleGroupsList().remove(bot.getEditRoleGroupsMap().get(author.getId()).getServerID());
+        bot.getEditRoleGroupsList().remove(bot.getEditRoleGroupsMap().get(author.getId()).getServerID());
         bot.getEditRoleGroupsMap().remove(author.getId());
 
         author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Editing role groups cancelled.").queue());
     }
-    
+
     /**
      * cancels role templates editing, i.e. removes the user from the edit role templates map, removes edit block, and sends notification
      * @param author the user who started the editing process
      */
     private void cancelEditRoleTemplates(User author) {
-    	bot.getEditRoleTemplatesList().remove(bot.getEditRoleTemplatesMap().get(author.getId()).getServerID());
+        bot.getEditRoleTemplatesList().remove(bot.getEditRoleTemplatesMap().get(author.getId()).getServerID());
         bot.getEditRoleTemplatesMap().remove(author.getId());
 
         author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Editing role templates cancelled.").queue());
@@ -325,7 +330,7 @@ public class DMHandler extends ListenerAdapter {
      * @param author the user who started the auto creation process
      */
     private void cancelAutoCreation(User author) {
-    	bot.getAutoCreationMap().remove(author.getId());
+        bot.getAutoCreationMap().remove(author.getId());
 
         author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Creation of automated event cancelled.").queue());
     }

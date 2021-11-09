@@ -11,6 +11,8 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -19,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +31,8 @@ import java.util.Map;
  * @author Christopher Bitler
  */
 public class LogParser implements Runnable {
+    private static final Logger log = LogManager.getLogger(LogParser.class);
+
     private PrivateChannel channel;
     private Message.Attachment attachment;
     private HashMap<String, String> invalidCharacters = new HashMap<>();
@@ -68,7 +73,7 @@ public class LogParser implements Runnable {
 
         try {
             Process p = Runtime.getRuntime().exec("dotnet parser/GuildWars2EliteInsights.dll \"parser/" + attachment.getFileName() + "\" \"/var/www/html/logs/\"");
-            System.out.println("dotnet parser/GuildWars2EliteInsights.dll \"parser/" + attachment.getFileName() + "\" \"/var/www/html/logs/\"");
+            log.info("Attempting to parse DPS log file '{}'.", attachment.getFileName());
             String line;
             BufferedReader bri = new BufferedReader
                     (new InputStreamReader(p.getInputStream()));
@@ -101,7 +106,7 @@ public class LogParser implements Runnable {
             fileUpload.setEntity(multipart);
             CloseableHttpResponse response = client.execute(fileUpload);
             HttpEntity responseEntity = response.getEntity();
-            String responseText = IOUtils.toString(responseEntity.getContent());
+            String responseText = IOUtils.toString(responseEntity.getContent(), StandardCharsets.UTF_8);
 
             JSONParser parser = new JSONParser();
 
@@ -109,15 +114,13 @@ public class LogParser implements Runnable {
                 JSONObject dpsReportResponse = (JSONObject) parser.parse(responseText);
                 dpsReportUrl = (String) dpsReportResponse.get("permalink");
             } catch (ParseException e) {
-                e.printStackTrace();
+                log.error("Error parsing DPS report response.",e);
             }
 
-            EnvVariables variables = new EnvVariables();
-            variables.loadFromEnvFile();
             channel.sendMessage("dps.report done. Uploading to gw2raidar").queue();
             String tokenResponse =
-                    this.handleCurl(new String[] {"curl", "-s", "-F", "username=" + variables.getValue("RAIDAR_USERNAME"), "-F", "password=" + variables.getValue("RAIDAR_PASSWORD"), "https://www.gw2raidar.com/api/v2/token"});
-            System.out.println(tokenResponse);
+                    this.handleCurl(new String[] {"curl", "-s", "-F", "username=" + EnvVariables.getValue("RAIDAR_USERNAME"), "-F", "password=" + EnvVariables.getValue("RAIDAR_PASSWORD"), "https://www.gw2raidar.com/api/v2/token"});
+            log.info("DPS report submitted as '{}', saved as '{}' was uploaded to GW2Raidar as '{}'", attachment.getFileName(), file.getName(), tokenResponse);
             JSONObject token =
                     (JSONObject) parser.parse(tokenResponse);
             String tokenString = (String) token.get("token");
@@ -132,7 +135,7 @@ public class LogParser implements Runnable {
                 channel.sendMessage("Uploaded to GW2Raidar (no url provided)").queue();
             }
         } catch (IOException | InterruptedException | ParseException e) {
-            e.printStackTrace();
+            log.warn("Error while processing the DPS log.", e);
         }
     }
 

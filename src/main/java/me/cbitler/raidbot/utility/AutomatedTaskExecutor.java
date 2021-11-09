@@ -8,25 +8,29 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 // -----------------------------------------
 // adapted from https://stackoverflow.com/questions/20387881/how-to-run-certain-task-every-day-at-a-particular-time-using-scheduledexecutorse
 // -----------------------------------------
 
 
-public class AutomatedTaskExecutor
-{
+public class AutomatedTaskExecutor {
+    private static final Logger log = LogManager.getLogger(AutomatedTaskExecutor.class);
+
     ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     ExecutableTask task;
     volatile boolean isStopIssued;
 
-    public AutomatedTaskExecutor(ExecutableTask task) 
+    public AutomatedTaskExecutor(ExecutableTask task)
     {
         this.task = task;
     }
-    
+
     public String getName()
     {
-    	return task.getName();
+        return task.getName();
     }
 
     public void startExecution()
@@ -34,19 +38,19 @@ public class AutomatedTaskExecutor
         Runnable taskWrapper = new Runnable(){
 
             @Override
-            public void run() 
+            public void run()
             {
-            	task.execute();
+                task.execute();
                 startExecution();
             }
 
         };
         long delay = computeNextDelay(task.getNextTargetHour(), task.getNextTargetMin(), 0);
-        //System.out.println("Next task scheduled in "+Long.toString(delay)+" seconds.");
+        log.trace("Next task scheduled in "+Long.toString(delay)+" seconds.");
         executorService.schedule(taskWrapper, delay, TimeUnit.SECONDS);
     }
 
-    private long computeNextDelay(int targetHour, int targetMin, int targetSec) 
+    private long computeNextDelay(int targetHour, int targetMin, int targetSec)
     {
         LocalDateTime localNow = LocalDateTime.now();
         ZoneId currentZone = ZoneId.systemDefault();
@@ -61,16 +65,16 @@ public class AutomatedTaskExecutor
 
     public void stop()
     {
-    	// use shutdownNow instead of shutdown because the latter waits for scheduled tasks to be executed (roughly one day usually!)
+        // use shutdownNow instead of shutdown because the latter waits for scheduled tasks to be executed (roughly one day usually!)
         // see: https://stackoverflow.com/questions/11520189/difference-between-shutdown-and-shutdownnow-of-executor-service
-    	executorService.shutdownNow();
+        executorService.shutdownNow();
         try {
             if (!executorService.awaitTermination(10, TimeUnit.SECONDS))
             {
-            	System.out.println("awaitTermination in AutomatedTaskExecutor timed out.");
+                log.error("awaitTermination in AutomatedTaskExecutor timed out.");
             }
         } catch (InterruptedException ex) {
-        	System.out.println("awaitTermination in AutomatedTaskExecutor did not succeed.");
+            log.error("awaitTermination in AutomatedTaskExecutor did not succeed.", ex);
         }
     }
 }

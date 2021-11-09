@@ -2,12 +2,17 @@ package me.cbitler.raidbot.database;
 
 import java.sql.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Class for managing the SQLite database for this bot
  * @author Christopher Bitler
  * @author Franziska Mueller
  */
 public class Database {
+    private static final Logger log = LogManager.getLogger(Database.class);
+
     String databaseName;
     Connection connection;
 
@@ -68,14 +73,14 @@ public class Database {
         try {
             connection = DriverManager.getConnection(url);
         } catch (SQLException e) {
-            System.out.println("Database connection error");
+            log.error("Database connection error.", e);
             System.exit(1);
         }
 
         try {
             tableInits();
         } catch (SQLException e) {
-            System.out.println("Couldn't create tables");
+            log.error("Couldn't create tables.", e);
             e.printStackTrace();
             System.exit(1);
         }
@@ -130,40 +135,40 @@ public class Database {
         connection.createStatement().execute(botServerSettingsInit);
 
         try {
-        	connection.createStatement().execute("ALTER TABLE raids ADD COLUMN leader text");
+            connection.createStatement().execute("ALTER TABLE raids ADD COLUMN leader text");
         } catch (Exception e) { }
         try {
-        	connection.createStatement().execute("ALTER TABLE raids ADD COLUMN `description` text");
+            connection.createStatement().execute("ALTER TABLE raids ADD COLUMN `description` text");
         } catch (Exception e) { }
         try {
-        	connection.createStatement().execute("ALTER TABLE raids ADD COLUMN isOpenWorld text");
+            connection.createStatement().execute("ALTER TABLE raids ADD COLUMN isOpenWorld text");
         } catch (Exception e) { }
         try {
-        	connection.createStatement().execute("ALTER TABLE raids ADD COLUMN isDisplayShort text");
+            connection.createStatement().execute("ALTER TABLE raids ADD COLUMN isDisplayShort text");
         } catch (Exception e) { }
         try {
-        	connection.createStatement().execute("ALTER TABLE raids ADD COLUMN isFractalEvent text");
+            connection.createStatement().execute("ALTER TABLE raids ADD COLUMN isFractalEvent text");
         } catch (Exception e) { }
         try {
-        	connection.createStatement().execute("ALTER TABLE raids ADD COLUMN permittedRoles text");
+            connection.createStatement().execute("ALTER TABLE raids ADD COLUMN permittedRoles text");
         } catch (Exception e) { }
         try {
-        	connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN fractal_creator_role text");
+            connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN fractal_creator_role text");
         } catch (Exception e) { }
         try {
-        	connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN fractal_channel text");
+            connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN fractal_channel text");
         } catch (Exception e) { }
         try {
-        	connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN archive_channel text");
+            connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN archive_channel text");
         } catch (Exception e) { }
         try {
-        	connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN auto_events_channel text");
+            connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN auto_events_channel text");
         } catch (Exception e) { }
         try {
-        	connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN predef_role_groups text");
+            connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN predef_role_groups text");
         } catch (Exception e) { }
         try {
-        	connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN role_templates text");
+            connection.createStatement().execute("ALTER TABLE serverSettings ADD COLUMN role_templates text");
         } catch (Exception e) { }
     }
 }
