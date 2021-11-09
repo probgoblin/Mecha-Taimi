@@ -73,10 +73,10 @@ public class RaidBot {
         instance = this;
 
         Collection<GatewayIntent> intents = GatewayIntent.getIntents(GatewayIntent.DIRECT_MESSAGES.getRawValue() +
-                                                                      GatewayIntent.GUILD_MESSAGE_REACTIONS.getRawValue() +
-                                                                      GatewayIntent.GUILD_MEMBERS.getRawValue() +
-                                                                      GatewayIntent.GUILD_EMOJIS.getRawValue() +
-                                                                      GatewayIntent.GUILD_MESSAGES.getRawValue());
+                                                                     GatewayIntent.GUILD_MESSAGE_REACTIONS.getRawValue() +
+                                                                     GatewayIntent.GUILD_MEMBERS.getRawValue() +
+                                                                     GatewayIntent.GUILD_EMOJIS.getRawValue() +
+                                                                     GatewayIntent.GUILD_MESSAGES.getRawValue());
 
         JDA jda = JDABuilder.create(token, intents)
                             .addEventListeners(new DMHandler(this),
@@ -158,7 +158,7 @@ public class RaidBot {
     public HashMap<String, RoleGroupsEditStep> getEditRoleGroupsMap() {
         return editRoleGroups;
     }
-    
+
     /**
      * Map of UserId -> role templates edit step for people editing role templates
      * @return The map of UserId -> role templates edit step
@@ -188,15 +188,15 @@ public class RaidBot {
      * @return List of serverIDs for servers in the edit role groups process
      */
     public Set<String> getEditRoleGroupsList() {
-    	return editRoleGroupsList;
+        return editRoleGroupsList;
     }
-    
+
     /**
      * List of serverIDs for servers in the edit role templates process
      * @return List of serverIDs for servers in the edit role templates process
      */
     public Set<String> getEditRoleTemplatesList() {
-    	return editRoleTemplatesList;
+        return editRoleTemplatesList;
     }
 
     /**
@@ -239,19 +239,19 @@ public class RaidBot {
      * @param actvId the type of active acticity
      */
     public static void writeNotificationActiveChat(User user, int actvId) {
-    	String actvName;
-    	if (actvId == 1) actvName = "role selection";
-    	else if (actvId == 2) actvName = "role deselection";
-    	else if (actvId == 3) actvName = "create event";
-    	else if (actvId == 4) actvName = "edit event";
-    	else if (actvId == 5) actvName = "swap role";
-    	else if (actvId == 6) actvName = "create auto event";
-    	else if (actvId == 7) actvName = "stop auto event";
-    	else if (actvId == 8) actvName = "edit role groups";
-    	else if (actvId == 9) actvName = "edit role templates";
-    	else actvName = "";
+        String actvName;
+        if (actvId == 1) actvName = "role selection";
+        else if (actvId == 2) actvName = "role deselection";
+        else if (actvId == 3) actvName = "create event";
+        else if (actvId == 4) actvName = "edit event";
+        else if (actvId == 5) actvName = "swap role";
+        else if (actvId == 6) actvName = "create auto event";
+        else if (actvId == 7) actvName = "stop auto event";
+        else if (actvId == 8) actvName = "edit role groups";
+        else if (actvId == 9) actvName = "edit role templates";
+        else actvName = "";
 
-    	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You already have an active chat with me (" + actvName + "). Finish it first!").queue());
+        user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You already have an active chat with me (" + actvName + "). Finish it first!").queue());
     }
 
     /**
@@ -269,128 +269,128 @@ public class RaidBot {
      * 8: edit role groups
      * 9: edit role templates
      */
-	public int userHasActiveChat(String id) {
-		int actvId = 0;
-		if (roleSelection.get(id) != null) actvId = 1;
-		else if (roleDeselection.get(id) != null) actvId = 2;
-		else if (creation.get(id) != null) actvId = 3;
-		else if (edits.get(id) != null) actvId = 4;
-		else if (roleSwap.get(id) != null) actvId = 5;
-		else if (creationAuto.get(id) != null) actvId = 6;
-		else if (stopAuto.get(id) != null) actvId = 7;
-		else if (editRoleGroups.get(id) != null) actvId = 8;
-		else if (editRoleTemplates.get(id) != null) actvId = 9;
+    public int userHasActiveChat(String id) {
+        int actvId = 0;
+        if (roleSelection.get(id) != null) actvId = 1;
+        else if (roleDeselection.get(id) != null) actvId = 2;
+        else if (creation.get(id) != null) actvId = 3;
+        else if (edits.get(id) != null) actvId = 4;
+        else if (roleSwap.get(id) != null) actvId = 5;
+        else if (creationAuto.get(id) != null) actvId = 6;
+        else if (stopAuto.get(id) != null) actvId = 7;
+        else if (editRoleGroups.get(id) != null) actvId = 8;
+        else if (editRoleTemplates.get(id) != null) actvId = 9;
 
-		return actvId;
-	}
+        return actvId;
+    }
 
 
-	/**
+    /**
      * returns the maximum allowed number of auto events per server
      *
      * @return maximum allowed number of auto events per server
      */
-	public int getMaxNumAutoEvents() {
-		return maxNumAutoEvents;
-	}
+    public int getMaxNumAutoEvents() {
+        return maxNumAutoEvents;
+    }
 
 
-	/**
+    /**
      * returns the number of currently active auto events for a server
      *
      * @param serverId
      * @return the number of auto events currently active for this server
      */
-	public int getNumAutoEvents(String serverId) {
-		List<AutomatedTaskExecutor> tasks = autoEventCreator.get(serverId);
-		if (tasks == null)
-			return 0;
-		else
-			return tasks.size();
-	}
+    public int getNumAutoEvents(String serverId) {
+        List<AutomatedTaskExecutor> tasks = autoEventCreator.get(serverId);
+        if (tasks == null)
+            return 0;
+        else
+            return tasks.size();
+    }
 
 
-	/**
+    /**
      * creates an auto event
      *
      * @param event The event template for the auto event
      * @return whether the auto event was successfully created
      */
-	public boolean createAutoEvent(AutoPendingRaid event) {
-		// check if the maximum number of events is reached for this server
-		String serverId = event.getServerId();
-		List<AutomatedTaskExecutor> tasks = autoEventCreator.get(serverId);
-		if (tasks != null && tasks.size() >= maxNumAutoEvents)
-			return false;
-		if (tasks == null)
-			tasks = new ArrayList<AutomatedTaskExecutor>();
-		AutomatedTaskExecutor taskExec = new AutomatedTaskExecutor(new EventCreator(event, tasks.size()));
-		tasks.add(taskExec);
-		autoEventCreator.put(serverId, tasks);
-		taskExec.startExecution();
+    public boolean createAutoEvent(AutoPendingRaid event) {
+        // check if the maximum number of events is reached for this server
+        String serverId = event.getServerId();
+        List<AutomatedTaskExecutor> tasks = autoEventCreator.get(serverId);
+        if (tasks != null && tasks.size() >= maxNumAutoEvents)
+            return false;
+        if (tasks == null)
+            tasks = new ArrayList<AutomatedTaskExecutor>();
+        AutomatedTaskExecutor taskExec = new AutomatedTaskExecutor(new EventCreator(event, tasks.size()));
+        tasks.add(taskExec);
+        autoEventCreator.put(serverId, tasks);
+        taskExec.startExecution();
 
-		return true;
-	}
+        return true;
+    }
 
 
-	/**
+    /**
      * stops an auto event
      *
      * @param serverId
      * @param taskId
      */
-	public void stopAutoEvent(String serverId, int taskId) {
-		List<AutomatedTaskExecutor> tasks = autoEventCreator.get(serverId);
-		if (tasks != null)
-		{
-			AutomatedTaskExecutor task = tasks.remove(taskId);
-			task.stop();
-		}
-	}
+    public void stopAutoEvent(String serverId, int taskId) {
+        List<AutomatedTaskExecutor> tasks = autoEventCreator.get(serverId);
+        if (tasks != null)
+        {
+            AutomatedTaskExecutor task = tasks.remove(taskId);
+            task.stop();
+        }
+    }
 
 
-	/**
+    /**
      * returns the list of automated tasks for a server
      *
      * @param serverId
      * @return list of automated tasks for this server (empty list if there are none)
      */
-	public List<AutomatedTaskExecutor> getAutoTasks(String serverId) {
-		List<AutomatedTaskExecutor> result = autoEventCreator.get(serverId);
-		if (result == null)
-			result = new ArrayList<>();
-		return result;
-	}
+    public List<AutomatedTaskExecutor> getAutoTasks(String serverId) {
+        List<AutomatedTaskExecutor> result = autoEventCreator.get(serverId);
+        if (result == null)
+            result = new ArrayList<>();
+        return result;
+    }
 
 
-	/**
-	 * initiates event editing if user has correct permissions
-	 * @param messageId message id of the event message
-	 * @param member object that holds information about the discord user within a server
-	 * @param user the discord user
-	 * @param leaderId leader id for the event that should be edited
-	 */
-	public void startEditEvent(String messageId, Member member, User user, String leaderId) {
-		// check permissions here since raid leader should also be able to edit
+    /**
+     * initiates event editing if user has correct permissions
+     * @param messageId message id of the event message
+     * @param member object that holds information about the discord user within a server
+     * @param user the discord user
+     * @param leaderId leader id for the event that should be edited
+     */
+    public void startEditEvent(String messageId, Member member, User user, String leaderId) {
+        // check permissions here since raid leader should also be able to edit
         if (PermissionsUtil.hasRaidLeaderRole(member) || user.getId().contentEquals(leaderId)) {
-        	// check if this user already has an active chat
-        	int actvId = userHasActiveChat(user.getId());
-			if (actvId != 0) {
-				RaidBot.writeNotificationActiveChat(user, actvId);
-				return;
-			}
-        	// check if the raid is being edited by someone else
-        	if (getEditList().contains(messageId)) {
-        		user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The selected event is already being edited.").queue());
-        	} else {
-        		// start editing process
-        		EditStep editIdleStep = new EditIdleStep(messageId);
-        		user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(editIdleStep.getStepText()).queue());
-        		getEditMap().put(user.getId(), editIdleStep);
-        		getEditList().add(messageId);
-        	}
+            // check if this user already has an active chat
+            int actvId = userHasActiveChat(user.getId());
+            if (actvId != 0) {
+                RaidBot.writeNotificationActiveChat(user, actvId);
+                return;
+            }
+            // check if the raid is being edited by someone else
+            if (getEditList().contains(messageId)) {
+                user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The selected event is already being edited.").queue());
+            } else {
+                // start editing process
+                EditStep editIdleStep = new EditIdleStep(messageId);
+                user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(editIdleStep.getStepText()).queue());
+                getEditMap().put(user.getId(), editIdleStep);
+                getEditList().add(messageId);
+            }
         } else {
-        	user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You do not have permissions to edit this event. If you think this is wrong, please contact your friendly IT person <3").queue());
+            user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You do not have permissions to edit this event. If you think this is wrong, please contact your friendly IT person <3").queue());
         }
-	}
+    }
 }
