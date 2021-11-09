@@ -146,6 +146,15 @@ The variables the bot reads from the environment are explained in the following 
 | EMOTE_ELEMENTALIST | Emoji ID for the Elementalist class.                              |
 | EMOTE_MESMER       | Emoji ID for the Mesmer class.                                    |
 | EMOTE_NECROMANCER  | Emoji ID for the Necromancer class.                               |
+| EMOTE_WILLBENDER   | Emoji ID for the Willbender class.                                |
+| EMOTE_VINDICATOR   | Emoji ID for the Vindicator class.                                |
+| EMOTE_BLADESWORN   | Emoji ID for the Bladesworn class.                                |
+| EMOTE_MECHANIST    | Emoji ID for the Mechanist class.                                 |
+| EMOTE_UNTAMED      | Emoji ID for the Untamed class.                                   |
+| EMOTE_SPECTER      | Emoji ID for the Specter class.                                   |
+| EMOTE_CATALYST     | Emoji ID for the Catalyst class.                                  |
+| EMOTE_VIRTUOSO     | Emoji ID for the Virtuoso class.                                  |
+| EMOTE_HARBINGER    | Emoji ID for the Harbinger class.                                 |
 | EMOTE_FLEX         | Emoji ID for the Flex role reaction.                              |
 | EMOTE_SWAP         | Emoji ID for the Swap reaction.                                   |
 | EMOTE_EDIT         | Emoji ID for the Edit reaction.                                   |
