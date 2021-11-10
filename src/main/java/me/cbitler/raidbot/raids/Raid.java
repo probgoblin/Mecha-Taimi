@@ -11,11 +11,16 @@ import net.dv8tion.jda.api.entities.*;
 import java.sql.SQLException;
 import java.util.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Represents a raid and has methods for adding/removing users, user flex roles,
  * etc
  */
 public class Raid {
+    private static final Logger log = LogManager.getLogger(Raid.class);
+
     String messageId, name, description, date, time, serverId, channelId, raidLeaderId;
     List<RaidRole> roles = new ArrayList<RaidRole>();
     HashMap<RaidUser, String> userToRole = new HashMap<RaidUser, String>();
@@ -74,18 +79,18 @@ public class Raid {
         // --- for compatibility with old format (where leadername was saved in stead of id) ---
         // check if provided leader id is a valid id and treat it as user name otherwise
         try {
-        	RaidBot.getInstance().getJda().getUserById(raidLeaderId);
+            RaidBot.getInstance().getJda().getUserById(raidLeaderId);
         } catch (Exception excp) {
-        	if (setLeader(raidLeaderId) != 0) {
-        		// invalid user, set id to zero
-        		this.raidLeaderId = "";
-        	}
+            if (setLeader(raidLeaderId) != 0) {
+                // invalid user, set id to zero
+                this.raidLeaderId = "";
+            }
         }
         // -------------------------------------
         if (this.raidLeaderId.isEmpty())
-        	userIDsToNicknames.put(this.raidLeaderId, "unknown");
+            userIDsToNicknames.put(this.raidLeaderId, "unknown");
         else
-        	userIDsToNicknames.put(this.raidLeaderId, getNicknameOnServer(this.raidLeaderId, this.serverId));
+            userIDsToNicknames.put(this.raidLeaderId, getNicknameOnServer(this.raidLeaderId, this.serverId));
     }
 
     /**
@@ -159,7 +164,7 @@ public class Raid {
             RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `isDisplayShort`=? WHERE `raidId`=?",
                     new String[] { Boolean.toString(isDisplayShort), messageId });
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error while updating isDisplayShorts for event {} in the database.", messageId, e);
             return false;
         }
         return true;
@@ -188,10 +193,9 @@ public class Raid {
      */
     public boolean updateNameDB() {
         try {
-            RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `name`=? WHERE `raidId`=?",
-                    new String[] { name, messageId });
+            RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `name`=? WHERE `raidId`=?", new String[] { name, messageId });
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error updating name for raid {}.", messageId, e);
             return false;
         }
         return true;
@@ -204,24 +208,24 @@ public class Raid {
      * @return 0 if the provided new leader name is valid i.e. belongs to a unique existing user, 1 no user, 2 more than 1 user
      */
     public int setLeader(String leader) {
-    	if (leader.isEmpty())
-    		return 1;
-    	Guild server = RaidBot.getInstance().getServer(serverId);
-    	// first search by nickname
-    	List<Member> memberList = server.getMembersByNickname(leader, false);
-    	if (memberList.isEmpty()) {
-    		// search discord names
-    		memberList = server.getMembersByName(leader, false);
-    	}
-    	if (memberList.isEmpty())
-    		return 1;
-    	else if (memberList.size() == 1) {
-    		this.raidLeaderId = memberList.get(0).getUser().getId();
+        if (leader.isEmpty())
+            return 1;
+        Guild server = RaidBot.getInstance().getServer(serverId);
+        // first search by nickname
+        List<Member> memberList = server.getMembersByNickname(leader, false);
+        if (memberList.isEmpty()) {
+            // search discord names
+            memberList = server.getMembersByName(leader, false);
+        }
+        if (memberList.isEmpty())
+            return 1;
+        else if (memberList.size() == 1) {
+            this.raidLeaderId = memberList.get(0).getUser().getId();
             userIDsToNicknames.put(this.raidLeaderId, getNicknameOnServer(this.raidLeaderId, this.serverId));
             return 0;
-    	} else { // more than 1
-    		return 2;
-    	}
+        } else { // more than 1
+            return 2;
+        }
     }
 
     /**
@@ -229,10 +233,9 @@ public class Raid {
      */
     public boolean updateLeaderDB() {
         try {
-            RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `leader`=? WHERE `raidId`=?",
-                    new String[] { raidLeaderId, messageId });
+            RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `leader`=? WHERE `raidId`=?", new String[] { raidLeaderId, messageId });
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Failed to update leader id for event {}", messageId, e);
             return false;
         }
         return true;
@@ -264,7 +267,7 @@ public class Raid {
             RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `description`=? WHERE `raidId`=?",
                     new String[] { description, messageId });
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error updating the description of event {}", messageId, e);
             return false;
         }
         return true;
@@ -296,7 +299,7 @@ public class Raid {
             RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `date`=? WHERE `raidId`=?",
                     new String[] { date, messageId });
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error updating date of event {}.", messageId, e);
             return false;
         }
         return true;
@@ -328,7 +331,7 @@ public class Raid {
             RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `time`=? WHERE `raidId`=?",
                     new String[] { time, messageId });
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error updating time for event {}.", messageId, e);
             return false;
         }
         return true;
@@ -380,7 +383,7 @@ public class Raid {
                     new String[] { rolesString, messageId });
             return 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error updating roles for event {}.", messageId, e);
             return 2;
         }
     }
@@ -426,7 +429,7 @@ public class Raid {
 
             return 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error updating role name for role {} to {} on event {}.", oldName, newname, messageId, e);
             return 2;
         }
     }
@@ -454,7 +457,7 @@ public class Raid {
                     new String[] { rolesString, messageId });
             return 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error updating the role amount for role {} to {} on event {}.", roleName, newamount, messageId, e);
             return 2;
         }
     }
@@ -481,7 +484,7 @@ public class Raid {
                     new String[] { rolesString, messageId });
             return 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error flex-only on role {} to {} for event {}.", roleName, newStatus, messageId, e);
             return 2;
         }
     }
@@ -510,7 +513,7 @@ public class Raid {
                     new String[] { rolesString, messageId });
             return 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error deleting role {} from event {}.", roleName, messageId, e);
             return 2;
         }
     }
@@ -632,16 +635,16 @@ public class Raid {
      * @return the user's server nickname
      */
     private String getNicknameOnServer(String userId, String serverId) {
-    	Member member = RaidBot.getInstance().getServer(serverId).getMemberById(userId);
-    	if (member != null) {
-    		String nickname = member.getNickname();
-    		if (nickname == null)
-    			nickname = member.getUser().getName();;
-    		// escape _ in the user names (this will lead to markdown formatting otherwise)
-    		nickname = nickname.replace("_", "\\_");
-    		return nickname;
-    	} else
-    		return null;
+        Member member = RaidBot.getInstance().getServer(serverId).getMemberById(userId);
+        if (member != null) {
+            String nickname = member.getNickname();
+            if (nickname == null)
+                nickname = member.getUser().getName();;
+            // escape _ in the user names (this will lead to markdown formatting otherwise)
+            nickname = nickname.replace("_", "\\_");
+            return nickname;
+        } else
+            return null;
     }
 
     /**
@@ -674,7 +677,7 @@ public class Raid {
         userToRole.put(user, role);
         usersToFlexRoles.computeIfAbsent(new RaidUser(id, name, "", ""), k -> new ArrayList<FlexRole>());
         if (userIDsToNicknames.get(id) == null)
-        	userIDsToNicknames.put(id, getNicknameOnServer(id, serverId));
+            userIDsToNicknames.put(id, getNicknameOnServer(id, serverId));
 
         if (update_message) {
             updateMessage();
@@ -714,7 +717,7 @@ public class Raid {
             usersToFlexRoles.put(user, new ArrayList<FlexRole>());
         }
         if (userIDsToNicknames.get(id) == null)
-        	userIDsToNicknames.put(id, getNicknameOnServer(id, serverId));
+            userIDsToNicknames.put(id, getNicknameOnServer(id, serverId));
 
         usersToFlexRoles.get(user).add(frole);
         if (update_message) {
@@ -790,7 +793,7 @@ public class Raid {
                     "DELETE FROM `raidUsersFlexRoles` WHERE `userId` = ? and `raidId` = ?",
                     new String[] { id, getMessageId() });
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error while removing a user from roles and/or flex roles on event {}.", getMessageId(), e);
         }
 
         if (found)
@@ -852,23 +855,23 @@ public class Raid {
         String currentFlexText = "";
         String nextFieldName = flexRolesName + ":";
         for (int s = 0; s < flexRolesText.size(); s++) {
-        	if (currentFlexText.length() + flexRolesText.get(s).length() <= 1024) {
-        		currentFlexText += flexRolesText.get(s);
-        	} else {
-        		builder.addField(nextFieldName, currentFlexText, true);
-        		nextFieldName = "";
-        		currentFlexText = flexRolesText.get(s);
-        	}
+            if (currentFlexText.length() + flexRolesText.get(s).length() <= 1024) {
+                currentFlexText += flexRolesText.get(s);
+            } else {
+                builder.addField(nextFieldName, currentFlexText, true);
+                nextFieldName = "";
+                currentFlexText = flexRolesText.get(s);
+            }
         }
         builder.addField(nextFieldName, currentFlexText, true);
         if (provide_instr && this.isOpenWorld == false) {
-        	builder.addBlankField(false);
-        	builder.addField("How to sign up:",
-        		"- To choose a main role, click on the reaction of the class you want to play.\n"
-        		+ "- To sign up as a flex role, click on the flex reaction (Fx).\n"
-        		+ "- To remove one or all of your sign-ups, click the red X reaction.\n"
-        		+ "- To swap your main and flex roles, click the swap reaction."
-        		, false);
+            builder.addBlankField(false);
+            builder.addField("How to sign up:",
+                "- To choose a main role, click on the reaction of the class you want to play.\n"
+                + "- To sign up as a flex role, click on the flex reaction (Fx).\n"
+                + "- To remove one or all of your sign-ups, click the red X reaction.\n"
+                + "- To swap your main and flex roles, click the swap reaction."
+                , false);
         }
 
         return builder.build();
@@ -903,15 +906,15 @@ public class Raid {
     private MessageEmbed buildEmbedShort(boolean provide_instr) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle(getName() + " - [" + getDate() + " " + getTime() + "]\t"
-        		+ "||ID: " + messageId + "||");
+                + "||ID: " + messageId + "||");
         Set<String> usersInMain = new HashSet<String>();
         String rolesTxt = buildRolesTextShort(usersInMain);
         builder.addField("Roles:", rolesTxt, true);
 
         String flexText = buildFlexRolesTextShort(usersInMain);
         if (flexText.isEmpty() == false) {
-        	//builder.addBlankField(false);
-        	builder.addField(flexRolesName + ":", flexText, true);
+            //builder.addBlankField(false);
+            builder.addField(flexRolesName + ":", flexText, true);
         }
 
         return builder.build();
@@ -923,7 +926,7 @@ public class Raid {
      * @return the map containing a list of users for each role
      */
     private Map<String, List<RaidUser>> collectFlexUsersByRole(Set<String> excludeUsers) {
-    	// collect names and specializations for each role
+        // collect names and specializations for each role
         Map<String, List<RaidUser>> flexUsersByRole = new HashMap<String, List<RaidUser>>();
         for (int r = 0; r < roles.size(); r++) {
             flexUsersByRole.put(roles.get(r).getName(), new ArrayList<RaidUser>());
@@ -931,11 +934,11 @@ public class Raid {
 
         for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
             if (flex.getKey() != null) {
-            	if (excludeUsers == null || excludeUsers.contains(flex.getKey().getId()) == false) {
-            		for (FlexRole frole : flex.getValue()) {
-            			flexUsersByRole.get(frole.getRole()).add(new RaidUser(flex.getKey().id, flex.getKey().name, frole.spec, null));
-            		}
-            	}
+                if (excludeUsers == null || excludeUsers.contains(flex.getKey().getId()) == false) {
+                    for (FlexRole frole : flex.getValue()) {
+                        flexUsersByRole.get(frole.getRole()).add(new RaidUser(flex.getKey().id, flex.getKey().name, frole.spec, null));
+                    }
+                }
             }
         }
         return flexUsersByRole;
@@ -950,27 +953,27 @@ public class Raid {
     private List<String> buildFlexRolesText() {
         List<String> textList = new ArrayList<String>();
         if (isOpenWorld) {
-        	String text = "";
+            String text = "";
             for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
                 if (flex.getKey() != null && flex.getValue().isEmpty() == false) {
-                	String username = userIDsToNicknames.get(flex.getKey().getId());
-                	if (username == null)
-                		username = flex.getKey().getName();
+                    String username = userIDsToNicknames.get(flex.getKey().getId());
+                    if (username == null)
+                        username = flex.getKey().getName();
                     text += ("- " + username + "\n");
                 }
             }
             textList.add(text);
         } else {
-        	Map<String, List<RaidUser>> flexUsersByRole = collectFlexUsersByRole(null);
+            Map<String, List<RaidUser>> flexUsersByRole = collectFlexUsersByRole(null);
             for (int r = 0; r < roles.size(); r++) {
-            	String text = "";
+                String text = "";
                 String roleName = roles.get(r).getName();
                 text += (roleName + ": \n");
 
                 for (RaidUser user : flexUsersByRole.get(roleName)) {
-                	String username = userIDsToNicknames.get(user.getId());
-                	if (username == null)
-                		username = user.getName();
+                    String username = userIDsToNicknames.get(user.getId());
+                    if (username == null)
+                        username = user.getName();
                     Emote userEmote = Reactions.getEmoteByName(user.getSpec());
                     if(userEmote == null)
                         text += ("- " + username + " (" + user.getSpec() + ")\n");
@@ -996,32 +999,32 @@ public class Raid {
         if (isOpenWorld) {
             for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
                 if (flex.getKey() != null && flex.getValue().isEmpty() == false) {
-                	if (text.isEmpty() == false)
-                    	text += ", ";
-                	String username = userIDsToNicknames.get(flex.getKey().getId());
-                	if (username == null)
-                		username = flex.getKey().getName();
-                	text += username;
+                    if (text.isEmpty() == false)
+                        text += ", ";
+                    String username = userIDsToNicknames.get(flex.getKey().getId());
+                    if (username == null)
+                        username = flex.getKey().getName();
+                    text += username;
                 }
             }
         } else {
-        	Map<String, List<RaidUser>> flexUsersByRole = collectFlexUsersByRole(excludeUsers);
+            Map<String, List<RaidUser>> flexUsersByRole = collectFlexUsersByRole(excludeUsers);
             for (int r = 0; r < roles.size(); r++) {
                 String roleName = roles.get(r).getName();
                 List<RaidUser> usersPerRole = flexUsersByRole.get(roleName);
                 if (usersPerRole.isEmpty() == false) {
-                	text += ("[ **" + roleName + "**: ");
+                    text += ("[ **" + roleName + "**: ");
 
-                	for (int u = 0; u < usersPerRole.size(); u++) {
-                		RaidUser user = usersPerRole.get(u);
-                		if (u != 0)
-                			text += ", ";
-                		String username = userIDsToNicknames.get(user.getId());
-                    	if (username == null)
-                    		username = user.getName();
-                		text += username;
-                	}
-                	text += " ] ";
+                    for (int u = 0; u < usersPerRole.size(); u++) {
+                        RaidUser user = usersPerRole.get(u);
+                        if (u != 0)
+                            text += ", ";
+                        String username = userIDsToNicknames.get(user.getId());
+                        if (username == null)
+                            username = user.getName();
+                        text += username;
+                    }
+                    text += " ] ";
                 }
             }
         }
@@ -1041,9 +1044,9 @@ public class Raid {
             List<RaidUser> raidUsersInRole = getUsersInRole(role.name);
             text += ("**" + role.name + " ( " + raidUsersInRole.size() + " / " + role.amount + " ):** \n");
             for (RaidUser user : raidUsersInRole) {
-            	String username = userIDsToNicknames.get(user.getId());
-            	if (username == null)
-            		username = user.getName();
+                String username = userIDsToNicknames.get(user.getId());
+                if (username == null)
+                    username = user.getName();
                 if (isOpenWorld) {
                     text += ("- " + username + "\n");
                 } else {
@@ -1070,24 +1073,24 @@ public class Raid {
             if(role.isFlexOnly()) continue;
             List<RaidUser> raidUsersInRole = getUsersInRole(role.getName());
             if (isOpenWorld) {
-            	text += ("**" + role.getName() + " ( " + raidUsersInRole.size() + " / " + role.getAmount() + " ):** \n");
-            	for (RaidUser user : raidUsersInRole) {
-                	String username = userIDsToNicknames.get(user.getId());
-                	if (username == null)
-                		username = user.getName();
+                text += ("**" + role.getName() + " ( " + raidUsersInRole.size() + " / " + role.getAmount() + " ):** \n");
+                for (RaidUser user : raidUsersInRole) {
+                    String username = userIDsToNicknames.get(user.getId());
+                    if (username == null)
+                        username = user.getName();
                     text += ("- " + username + "\n");
                 }
                 text += "\n";
             } else {
-            	for (int s = 0; s < role.getAmount(); s++) {
-            		text += "[ **" + role.getName() + "** ] ";
-            		if (s < raidUsersInRole.size()) {
-            			RaidUser user = raidUsersInRole.get(s);
-            			if (usersInMain != null)
-            				usersInMain.add(user.getId());
-            			String username = userIDsToNicknames.get(user.getId());
-                    	if (username == null)
-                    		username = user.getName();
+                for (int s = 0; s < role.getAmount(); s++) {
+                    text += "[ **" + role.getName() + "** ] ";
+                    if (s < raidUsersInRole.size()) {
+                        RaidUser user = raidUsersInRole.get(s);
+                        if (usersInMain != null)
+                            usersInMain.add(user.getId());
+                        String username = userIDsToNicknames.get(user.getId());
+                        if (username == null)
+                            username = user.getName();
 
                         Emote userEmote = Reactions.getEmoteByName(user.getSpec());
                         if(userEmote == null)
@@ -1098,16 +1101,16 @@ public class Raid {
                         // add flex roles for that user
                         List<FlexRole> userFlexRoles = usersToFlexRoles.get(new RaidUser(user.getId(), user.getName(), "", ""));
                         if (userFlexRoles.isEmpty() == false) {
-                        	text += "   (or ";
-                        	Set<String> uniqueFlexRoles = new HashSet<String>();
-                        	for (FlexRole frole : userFlexRoles) {
-                        		uniqueFlexRoles.add(frole.getRole());
-                        	}
-                        	text += uniqueFlexRoles.toString() + ")";
+                            text += "   (or ";
+                            Set<String> uniqueFlexRoles = new HashSet<String>();
+                            for (FlexRole frole : userFlexRoles) {
+                                uniqueFlexRoles.add(frole.getRole());
+                            }
+                            text += uniqueFlexRoles.toString() + ")";
                         }
-            		}
-            		text += "\n";
-            	}
+                    }
+                    text += "\n";
+                }
             }
         }
         text += "\n";
@@ -1192,11 +1195,11 @@ public class Raid {
             RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsers` WHERE `userId` = ? AND `raidId` = ?",
                     new String[] { id, getMessageId() });
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error while removing a user from main roles on event {}.", getMessageId(), e);
         }
 
         if (update_message)
-        	updateMessage();
+            updateMessage();
     }
 
 
@@ -1230,11 +1233,11 @@ public class Raid {
                     "DELETE FROM `raidUsersFlexRoles` WHERE `userId` = ? and `raidId` = ? and `role` = ? and `spec` = ?",
                     new String[] { id, getMessageId(), role, spec });
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error removing user from flex roles on event {}.", getMessageId(), e);
         }
 
         if (update_message)
-        	updateMessage();
+            updateMessage();
         return found;
     }
 
@@ -1262,13 +1265,13 @@ public class Raid {
      *
      * @return whether the message was posted successfully
      */
-	public boolean postToArchive() {
-		if (isFractalEvent) {
-			// fractal events are not archived
-			return false;
-		}
+    public boolean postToArchive() {
+        if (isFractalEvent) {
+            // fractal events are not archived
+            return false;
+        }
 
-		MessageEmbed message = isDisplayShort ? buildEmbedShort(false) : buildEmbed(false);
+        MessageEmbed message = isDisplayShort ? buildEmbedShort(false) : buildEmbed(false);
 
         Guild guild = RaidBot.getInstance().getServer(serverId);
         List<TextChannel> channels = guild.getTextChannelsByName(ServerSettings.getArchiveChannel(serverId), true);
@@ -1277,68 +1280,67 @@ public class Raid {
             try {
                 channels.get(0).sendMessage(message).queue();
             } catch (Exception ecxp) {
-            	return false;
+                return false;
             }
 
             return true;
         } else {
-        	return false;
+            return false;
         }
-	}
+    }
 
-	public List<String> getPermittedDiscordRoles() {
-		return permittedDiscordRoles;
-	}
+    public List<String> getPermittedDiscordRoles() {
+        return permittedDiscordRoles;
+    }
 
-	public void addPermittedDiscordRoles(String role) {
-		if (permittedDiscordRoles.contains(role) == false)
-			permittedDiscordRoles.add(role);
-	}
+    public void addPermittedDiscordRoles(String role) {
+        if (permittedDiscordRoles.contains(role) == false)
+            permittedDiscordRoles.add(role);
+    }
 
-	public void addPermittedDiscordRoles(List<String> roles) {
-		for (int r = 0; r < roles.size(); r++)
-		{
-			if (permittedDiscordRoles.contains(roles.get(r)) == false)
-				permittedDiscordRoles.add(roles.get(r));
-		}
-	}
+    public void addPermittedDiscordRoles(List<String> roles) {
+        for (int r = 0; r < roles.size(); r++)
+        {
+            if (permittedDiscordRoles.contains(roles.get(r)) == false)
+                permittedDiscordRoles.add(roles.get(r));
+        }
+    }
 
-	public void clearPermittedDiscordRoles() {
-		permittedDiscordRoles.clear();
-	}
+    public void clearPermittedDiscordRoles() {
+        permittedDiscordRoles.clear();
+    }
 
-	public boolean updatePermDiscRolesDB() {
-		String permDiscRoles = RaidManager.formatStringListForDatabase(permittedDiscordRoles);
-		try {
-	           RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `permittedRoles`=? WHERE `raidId`=?",
-	                   new String[] { permDiscRoles, messageId });
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return false;
-	    }
-	    return true;
-	}
+    public boolean updatePermDiscRolesDB() {
+        String permDiscRoles = RaidManager.formatStringListForDatabase(permittedDiscordRoles);
+        try {
+            RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `permittedRoles`=? WHERE `raidId`=?", new String[] { permDiscRoles, messageId });
+        } catch (SQLException e) {
+            log.error("Error updating permitted roles for registration on event {}.", messageId, e);
+            return false;
+        }
+        return true;
+    }
 
-	/**
-	 * Checks whether the given user is permitted to sign up for this event
-	 *
-	 * @param userId
-	 * @return whether user has permission
-	 */
-	public boolean isUserPermitted(Member member) {
-		if (permittedDiscordRoles.isEmpty()) {
-			// if there are no restrictions, user has permission
-			return true;
-		}
-		boolean match = false;
-		// iterate over permitted roles
-		for (String permRole : permittedDiscordRoles) {
-			// iterate over user discord roles
-			if (PermissionsUtil.hasRole(member, permRole)) {
-				match = true;
-				break;
-			}
-		}
-		return match;
-	}
+    /**
+     * Checks whether the given user is permitted to sign up for this event
+     *
+     * @param userId
+     * @return whether user has permission
+     */
+    public boolean isUserPermitted(Member member) {
+        if (permittedDiscordRoles.isEmpty()) {
+            // if there are no restrictions, user has permission
+            return true;
+        }
+        boolean match = false;
+        // iterate over permitted roles
+        for (String permRole : permittedDiscordRoles) {
+            // iterate over user discord roles
+            if (PermissionsUtil.hasRole(member, permRole)) {
+                match = true;
+                break;
+            }
+        }
+        return match;
+    }
 }

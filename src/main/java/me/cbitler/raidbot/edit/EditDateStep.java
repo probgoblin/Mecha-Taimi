@@ -8,17 +8,21 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Edit the date for the event
  * @author Franziska Mueller
  */
 public class EditDateStep implements EditStep {
+    private static final Logger log = LogManager.getLogger(EditDateStep.class);
 
-	private String messageID;
+    private String messageID;
 
-	public EditDateStep(String messageId) {
-		this.messageID = messageId;
-	}
+    public EditDateStep(String messageId) {
+        this.messageID = messageId;
+    }
 
     /**
      * Handle changing the date for the event
@@ -34,36 +38,36 @@ public class EditDateStep implements EditStep {
         String[] split = e.getMessage().getContentRaw().split("\\.");
         if (split.length != 3)
         {
-        	valid = false;
+            valid = false;
         }
         else
         {
-        	try {
-        		int day = Integer.parseInt(split[0]);
-        		int month = Integer.parseInt(split[1]);
-        		int year = Integer.parseInt(split[2]);
-        		LocalDate date = LocalDate.of(year, month, day);
-        		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd.MM.yyyy");
-        		formatter = formatter.withLocale(Locale.ENGLISH);
-        		dateString = date.format(formatter);
-        	} catch (Exception exp) {
-        		System.out.println(exp.getMessage());
-        		valid = false;
-        	}
+            try {
+                int day = Integer.parseInt(split[0]);
+                int month = Integer.parseInt(split[1]);
+                int year = Integer.parseInt(split[2]);
+                LocalDate date = LocalDate.of(year, month, day);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd.MM.yyyy");
+                formatter = formatter.withLocale(Locale.ENGLISH);
+                dateString = date.format(formatter);
+            } catch (Exception exp) {
+                log.debug("Trying to parse date in direct message failed for input '{}'.", e.getMessage().getContentRaw(), exp);
+                valid = false;
+            }
         }
 
         if (valid == false)
         {
-        	e.getChannel().sendMessage("Please use the correct format: dd.mm.yyyy, e.g., 29.02.2020").queue();
-    		return false;
+            e.getChannel().sendMessage("Please use the correct format: dd.mm.yyyy, e.g., 29.02.2020").queue();
+            return false;
         }
 
-       	raid.setDate(dateString);
+        raid.setDate(dateString);
 
         if (raid.updateDateDB()) {
-        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Date successfully updated in database.").queue());
+            e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Date successfully updated in database.").queue());
         } else {
-        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Date could not be updated in database.").queue());
+            e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Date could not be updated in database.").queue());
         }
         raid.updateMessage();
 
@@ -84,8 +88,8 @@ public class EditDateStep implements EditStep {
         return new EditIdleStep(messageID);
     }
 
-	@Override
-	public String getMessageID() {
-		return messageID;
-	}
+    @Override
+    public String getMessageID() {
+        return messageID;
+    }
 }

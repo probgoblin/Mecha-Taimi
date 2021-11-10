@@ -35,15 +35,15 @@ public class PickClassStep implements SelectionStep {
      */
     @Override
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-    	try {
-    		int classId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
-    		String coreClass = Reactions.coreClasses[classId];
-    		nextStep = new PickSpecStep(raid, coreClass, user, forceFlex);
-    		return true;
-    	} catch (Exception exp) {
+        try {
+            int classId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
+            String coreClass = Reactions.coreClasses[classId];
+            nextStep = new PickSpecStep(raid, coreClass, user, forceFlex);
+            return true;
+        } catch (Exception exp) {
             e.getChannel().sendMessage("Please choose a valid core class.").queue();
             return false;
-    	}
+        }
     }
 
     /**
@@ -61,14 +61,14 @@ public class PickClassStep implements SelectionStep {
      */
     @Override
     public String getStepText() {
-    	String text = "Pick a core class:\n";
+        String text = "Pick a core class:\n";
         for (int i = 0; i < Reactions.coreClasses.length; i++) {
-        	Emote specEmote = Reactions.getEmoteByName(Reactions.coreClasses[i]);
-        	if (specEmote != null) {
-        		text += "`" + (i+1) + "` <:" + specEmote.getName() + ":" + specEmote.getId() + "> " + Reactions.coreClasses[i] + "\n";
-        	} else {
-        		text += "`" + (i+1) + "` " + Reactions.coreClasses[i] + "\n";
-        	}
+            Emote specEmote = Reactions.getEmoteByName(Reactions.coreClasses[i]);
+            if (specEmote != null) {
+                text += "`" + (i+1) + "` <:" + specEmote.getName() + ":" + specEmote.getId() + "> " + Reactions.coreClasses[i] + "\n";
+            } else {
+                text += "`" + (i+1) + "` " + Reactions.coreClasses[i] + "\n";
+            }
         }
         text += "or type *cancel* to cancel role selection.";
 

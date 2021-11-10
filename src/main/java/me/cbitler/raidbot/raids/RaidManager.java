@@ -12,12 +12,16 @@ import net.dv8tion.jda.api.entities.*;
 import java.sql.SQLException;
 import java.util.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Serves as a manager for all of the raids. This includes creating, loading, and deleting raids
  * @author Christopher Bitler
  * @author Franziska Mueller
  */
 public class RaidManager {
+    private static final Logger log = LogManager.getLogger(RaidManager.class);
 
     static List<Raid> raids = new ArrayList<>();
     static HashMap<String, String> autoCreatorToEventMap = new HashMap<>();
@@ -29,7 +33,7 @@ public class RaidManager {
      * @param taskExecId unique identifier of the task executor, only non-empty for auto events
      */
     public static void createRaid(PendingRaid raid, String taskExecId) {
-    	MessageEmbed message = raid.isDisplayShort() ? buildEmbedShort(raid) : buildEmbed(raid);
+        MessageEmbed message = raid.isDisplayShort() ? buildEmbedShort(raid) : buildEmbed(raid);
 
         Guild guild = RaidBot.getInstance().getServer(raid.getServerId());
         List<TextChannel> channels = guild.getTextChannelsByName(raid.getAnnouncementChannel(), true);
@@ -57,20 +61,23 @@ public class RaidManager {
                     else
                         emoteList = Reactions.getCoreClassEmotes();
 
+                    Integer reactionErrors = 0;
                     for (Emote emote : emoteList) {
                         try {
                             sentMessage.addReaction(emote).complete(); // complete will block until the reaction was added -> reactions are always in same order
                         } catch (Exception e) {
-                            System.out.println("Could not add reaction '" + emote.getName() + "' to message. Threw " + e.getClass().getSimpleName() + ": " + e.getMessage());
-                            System.out.println("Could not add all reactions to the event message. At least one emoji was null.");
+                            log.error("Could not add reaction '{}' to message {}.", emote.getName(), sentMessage.getId(), e);
+                            reactionErrors++;
                         }
+                    }
+                    if(reactionErrors > 0) {
+                        log.error("Could not add all reactions to the event message {}, there were {} errors.", sentMessage.getId(), reactionErrors);
                     }
                 } else {
                     sentMessage.delete().queue();
                 }
             } catch (Exception e) {
-                System.out.println("Error encountered in sending message.");
-                e.printStackTrace();
+                log.error("Error while creating event.", e);
                 throw e;
             }
         }
@@ -83,7 +90,7 @@ public class RaidManager {
      * @param raid The pending raid to create
      */
     public static void createRaid(PendingRaid raid) {
-    	createRaid(raid, "");
+        createRaid(raid, "");
     }
 
     /**
@@ -94,26 +101,26 @@ public class RaidManager {
      * @param teamCompId
      */
     public static void createFractal(User author, String serverId, String name, String date, String time, int teamCompId) {
-		PendingRaid fractalEvent = new PendingRaid();
-		fractalEvent.setLeaderId(author.getId());
+        PendingRaid fractalEvent = new PendingRaid();
+        fractalEvent.setLeaderId(author.getId());
         fractalEvent.setServerId(serverId);
         fractalEvent.setName(name);
-		fractalEvent.setDescription("-");
-		fractalEvent.setDate(date);
-		fractalEvent.setTime(time);
-		fractalEvent.setDisplayShort(true);
-		fractalEvent.setFractalEvent(true);
-		fractalEvent.addTemplateRoles(RoleTemplates.getFractalTemplates()[teamCompId]);
+        fractalEvent.setDescription("-");
+        fractalEvent.setDate(date);
+        fractalEvent.setTime(time);
+        fractalEvent.setDisplayShort(true);
+        fractalEvent.setFractalEvent(true);
+        fractalEvent.addTemplateRoles(RoleTemplates.getFractalTemplates()[teamCompId]);
 
-		String fractalChannel = ServerSettings.getFractalChannel(serverId);
-		if (ServerSettings.checkChannel(fractalEvent.getServerId(), fractalChannel)) {
-			fractalEvent.setAnnouncementChannel(fractalChannel);
-		} else {
-			author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The specified fractal channel is invalid. It needs to be set with !setFractalChannel [channelname without hash] by someone with MANAGE SERVER permissions.").queue());
-			return;
-		}
-		createRaid(fractalEvent);
-	}
+        String fractalChannel = ServerSettings.getFractalChannel(serverId);
+        if (ServerSettings.checkChannel(fractalEvent.getServerId(), fractalChannel)) {
+            fractalEvent.setAnnouncementChannel(fractalChannel);
+        } else {
+            author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The specified fractal channel is invalid. It needs to be set with !setFractalChannel [channelname without hash] by someone with MANAGE SERVER permissions.").queue());
+            return;
+        }
+        createRaid(fractalEvent);
+    }
 
     /**
      * Insert a raid into the database
@@ -131,8 +138,8 @@ public class RaidManager {
         String permDiscRoles = formatStringListForDatabase(raid.getPermittedDiscordRoles());
         try {
             db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `isDisplayShort`, `isOpenWorld`, `isFractalEvent`, "
-            		+ "`leader`, `name`, `description`, `date`, `time`, `roles`, `permittedRoles`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            		new String[] {
+                    + "`leader`, `name`, `description`, `date`, `time`, `roles`, `permittedRoles`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    new String[] {
                     messageId,
                     serverId,
                     channelId,
@@ -148,7 +155,7 @@ public class RaidManager {
                     permDiscRoles
             });
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error creating raid in the database.", e);
             return false;
         }
 
@@ -192,19 +199,19 @@ public class RaidManager {
 
                 boolean isDisplayShort = false;
                 try {
-                	isDisplayShort = results.getResults().getString("isDisplayShort").equals("true");
+                    isDisplayShort = results.getResults().getString("isDisplayShort").equals("true");
                 } catch (Exception e) { }
 
                 boolean isFractalEvent = false;
                 try {
-                	isFractalEvent = results.getResults().getString("isFractalEvent").equals("true");
+                    isFractalEvent = results.getResults().getString("isFractalEvent").equals("true");
                 } catch (Exception e) { }
 
                 List<String> permDiscRoles = new ArrayList<String>();
                 try {
-                	String permRolesText = results.getResults().getString("permittedRoles");
-                	if (permRolesText != null && permRolesText.isEmpty() == false)
-                		permDiscRoles = new ArrayList<String>(Arrays.asList(permRolesText.split(",")));
+                    String permRolesText = results.getResults().getString("permittedRoles");
+                    if (permRolesText != null && permRolesText.isEmpty() == false)
+                        permDiscRoles = new ArrayList<String>(Arrays.asList(permRolesText.split(",")));
                 } catch (Exception e) { }
 
                 Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time, isOpenWorld, isDisplayShort, isFractalEvent, permDiscRoles);
@@ -212,32 +219,32 @@ public class RaidManager {
                 for(String roleAndAmount : roleSplit) {
                     String[] parts = roleAndAmount.split(":");
                     try {
-                    	int amnt = Integer.parseInt(parts[0]);
-                    	String role = parts[1];
+                        int amnt = Integer.parseInt(parts[0]);
+                        String role = parts[1];
                         raid.roles.add(new RaidRole(amnt, role));
                     } catch (Exception excp) {
-                    	System.out.println("Invalid format for role with amount: " + roleAndAmount);
+                        log.info("Invalid format for role with amount: {}", roleAndAmount);
                     }
                 }
-                
+
                 boolean messageUnknown = false;
                 try {
                     RaidBot.getInstance().getServer(serverId).getTextChannelById(channelId).retrieveMessageById(messageId).complete();
                 } catch (Exception excp) {
-                	messageUnknown = true;
+                    messageUnknown = true;
                 }
-                
+
                 if (raid.roles.size() > 0 && !messageUnknown)
-                	raids.add(raid);
+                    raids.add(raid);
                 else {
-                	// delete this raid from the database
-                	try {
-                		db.update("DELETE FROM `raids` WHERE `raidId` = ?", new String[]{ messageId });
-                		db.update("DELETE FROM `raidUsers` WHERE `raidId` = ?", new String[]{ messageId });
+                    // delete this raid from the database
+                    try {
+                        db.update("DELETE FROM `raids` WHERE `raidId` = ?", new String[]{ messageId });
+                        db.update("DELETE FROM `raidUsers` WHERE `raidId` = ?", new String[]{ messageId });
                         db.update("DELETE FROM `raidUsersFlexRoles` WHERE `raidId` = ?", new String[]{messageId});
-                	} catch (Exception excp) {
-                		System.out.println("Could not delete raid without roles from database.");
-                	}
+                    } catch (Exception excp) {
+                        log.warn("Could not delete raid without roles from database.");
+                    }
                 }
             }
             results.getResults().close();
@@ -277,8 +284,7 @@ public class RaidManager {
                 raid.updateMessage();
             }
         } catch (SQLException e) {
-            System.out.println("Couldn't load events... exiting.");
-            e.printStackTrace();
+            log.error("Error while loading events. Exiting.", e);
             System.exit(1);
         }
     }
@@ -292,13 +298,16 @@ public class RaidManager {
     public static boolean deleteRaid(String messageId, boolean delete_message) {
         Raid r = getRaid(messageId);
         if (r != null) {
-        	if (delete_message) {
-        		try {
-        			RaidBot.getInstance().getServer(r.getServerId())
-        			.getTextChannelById(r.getChannelId()).retrieveMessageById(messageId).queue(message -> message.delete().queue(), error -> System.out.println(error.getMessage()));
-        		} catch (Exception e) {
-        			// Nothing, the message doesn't exist - it can happen
-        		}
+            if (delete_message) {
+                try {
+                    RaidBot.getInstance().getServer(r.getServerId())
+                    .getTextChannelById(r.getChannelId()).retrieveMessageById(messageId)
+                    .queue(message -> message.delete().queue(),
+                           error -> log.error("Couldn't remove raid {} from channel {} on server {}.", messageId, r.getChannelId(), r.getServerId(), error));
+                } catch (Exception e) {
+                    // Nothing, the message doesn't exist - it can happen
+                    log.info("Couldn't find raid message for raid id {}.", messageId);
+                }
             }
 
             Iterator<Raid> raidIterator = raids.iterator();
@@ -319,7 +328,7 @@ public class RaidManager {
                 RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsersFlexRoles` WHERE `raidId` = ?",
                         new String[]{messageId});
             } catch (Exception e) {
-                System.out.println("Error encountered deleting event.");
+                log.error("Could not remove event with id {} from database.", messageId, e);
             }
 
             return true;
@@ -349,7 +358,7 @@ public class RaidManager {
      */
     public static List<Raid> getAllRaids()
     {
-    	return raids;
+        return raids;
     }
 
     /**
@@ -359,7 +368,7 @@ public class RaidManager {
      */
     public static String getEventForAutoCreator(String creatorId)
     {
-    	return autoCreatorToEventMap.get(creatorId);
+        return autoCreatorToEventMap.get(creatorId);
     }
 
     /**
@@ -394,9 +403,9 @@ public class RaidManager {
         String data = "";
 
         for (int i = 0; i < stringList.size(); i++) {
-        	data += stringList.get(i);
+            data += stringList.get(i);
             if (i != stringList.size() - 1) {
-            	// add a comma if it is not the last element
+                // add a comma if it is not the last element
                 data += ",";
             }
         }
@@ -426,7 +435,7 @@ public class RaidManager {
      * @return The embedded message
      */
     private static MessageEmbed buildEmbedShort(PendingRaid raid) {
-    	EmbedBuilder builder = new EmbedBuilder();
+        EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle(raid.getName() + " - [" + raid.getDate() + " " + raid.getTime() + "]");
 
         return builder.build();
@@ -464,6 +473,6 @@ public class RaidManager {
      * @return the maximum number of roles per user
      */
     public static int getMaxNumRoles() {
-    	return 15;
+        return 15;
     }
 }

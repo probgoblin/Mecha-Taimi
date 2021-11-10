@@ -1,0 +1,53 @@
+Configuration:
+  status: warn
+  name: YAMLConfigTest
+  properties:
+    property:
+      name: logPath
+      value: "logs"
+  Appenders:
+    Console:
+      - name: ConsoleLog
+        target: SYSTEM_OUT
+        PatternLayout:
+          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %c{1} - %msg%n"
+    RollingFile:
+      - name: RollingFileLog
+        fileName: ${logPath}/logfile.log
+        filePattern: "${logPath}/archive/log.%d{yyyy-MM-dd-hh-mm}.gz"
+        PatternLayout:
+          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %c{1} - %msg%n"
+        Policies:
+          TimeBasedTriggeringPolicy:
+            interval: 1
+            modulate: true
+        DefaultRollOverStrategy:
+          max: 30
+      - name: RollingFileDebugLog
+        fileName: ${logPath}/logfile-debug.log
+        filePattern: "${logPath}/archive/log-debug.%d{yyyy-MM-dd-hh-mm}.gz"
+        PatternLayout:
+          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %c{1} - %msg%n"
+        Filters:
+          ThresholdFilter:
+            - level: info
+              onMatch: deny
+              onMismatch: neutral
+            - level: debug
+              onMatch: accept
+              onMismatch: deny
+        Policies:
+          TimeBasedTriggeringPolicy:
+            interval: 1
+            modulate: true
+        DefaultRollOverStrategy:
+          max: 30
+  Loggers:
+    Root:
+      level: debug
+      AppenderRef:
+        - ref: ConsoleLog
+          level: info
+        - ref: RollingFileLog
+          level: info
+        - ref: RollingFileDebugLog
