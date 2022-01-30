@@ -3,6 +3,8 @@ package me.cbitler.raidbot.handlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
+
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.auto_events.AutoCreationStep;
 import me.cbitler.raidbot.auto_events.AutoStopStep;
@@ -234,7 +236,10 @@ public class DMHandler extends ListenerAdapter {
                 RoleTemplatesEditStep nextStep = step.getNextStep();
                 if(nextStep != null) {
                     bot.getEditRoleTemplatesMap().put(author.getId(), nextStep);
-                    e.getChannel().sendMessage(nextStep.getStepText()).queue();
+                    List<String> msgs = nextStep.getStepText();
+                    for (String msg : msgs) {
+                        e.getChannel().sendMessage(msg).queue();
+                    }
                 } else {
                     // finish editing
                     String serverId = step.getServerID();
