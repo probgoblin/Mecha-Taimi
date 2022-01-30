@@ -2,6 +2,8 @@ package me.cbitler.raidbot.server_settings;
 
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
+import java.util.List;
+
 /**
  * Represents a step while editing role templates
  * @author Franziska Mueller
@@ -25,7 +27,7 @@ public interface RoleTemplatesEditStep {
      * Get the text to display to the user in relation to this step
      * @return The text to display to the user in relation to this step.
      */
-    String getStepText();
+    List<String> getStepText();
 
     /**
      * Get the serverId of the role templates being edited.

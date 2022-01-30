@@ -1,102 +1,37 @@
 package me.cbitler.raidbot.utility;
 
 import me.cbitler.raidbot.raids.RaidRole;
+import me.cbitler.raidbot.server_settings.ServerSettings;
 
-//import java.util.ArrayList;
-//import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class RoleTemplates {
 
-// DEPRECATED: THIS IS NOW HANDLED BY DYNAMIC ROLE TEMPLATES (see ServerSettings)
-	
-//	static RaidRole[][] raidTemplates =
-//	    {
-//	    	{	new RaidRole(1, "Tank"),
-//	            new RaidRole(1, "Supporter"),
-//	            new RaidRole(1, "Druid"),
-//	            new RaidRole(1, "Off-Healer"),
-//	            new RaidRole(1, "BS"),
-//	            new RaidRole(5, "DPS")
-//	        },
-//	    	{	new RaidRole(2, "Chronotank"),
-//	            new RaidRole(1, "Push Druid"),
-//	            new RaidRole(1, "Off-Healer"),
-//	            new RaidRole(1, "BS"),
-//	            new RaidRole(1, "Epi Scourge"),
-//	            new RaidRole(4, "DPS")
-//	        },
-//	    	{	new RaidRole(1, "Tank"),
-//	            new RaidRole(1, "BS (G1)"),
-//	            new RaidRole(1, "Off-Heal Kiter (G2)"),
-//	            new RaidRole(1, "Off-Chrono (G3)"),
-//	            new RaidRole(1, "Stack Druid"),
-//	            new RaidRole(5, "DPS")
-//	        }
-//	    };
-//
-//	static String[] raidTemplateNames = {
-//	            "default raid",
-//	            "Desmina",
-//	            "Dhuum"
-//	    };
+    static RaidRole[][] fractalTemplates =
+        { 	{	new RaidRole(1, "Chrono"),
+                new RaidRole(1, "Healer"),
+                new RaidRole(1, "BS"),
+                new RaidRole(2, "DPS")
+            },
+            {	new RaidRole(1, "Healbrand"),
+                new RaidRole(1, "Alacrigade"),
+                new RaidRole(1, "BS"),
+                new RaidRole(2, "DPS")
+            },
+            {	new RaidRole(1, "Supporter"),
+                new RaidRole(1, "Healer"),
+                new RaidRole(1, "BS"),
+                new RaidRole(2, "DPS")
+            }
+        };
 
-	static RaidRole[][] fractalTemplates =
-	    { 	{	new RaidRole(1, "Chrono"),
-	            new RaidRole(1, "Healer"),
-	            new RaidRole(1, "BS"),
-	            new RaidRole(2, "DPS")
-	        },
-	        {	new RaidRole(1, "Healbrand"),
-	            new RaidRole(1, "Alacrigade"),
-	            new RaidRole(1, "BS"),
-	            new RaidRole(2, "DPS")
-	        },
-	        {	new RaidRole(1, "Supporter"),
-	            new RaidRole(1, "Healer"),
-	            new RaidRole(1, "BS"),
-	            new RaidRole(2, "DPS")
-	        }
-	    };
-
-	static String[] fractalTemplateNames = {
-	            "fractal (Chrono)",
-	            "fractal (Firebrigade)",
-	            "fractal (general)"
-	    };
-
-//	private static List<RaidRole[]> templates = new ArrayList<RaidRole[]>();
-//
-//	private static List<String> templateNames = new ArrayList<String>();
-//
-//    /**
-//     * Get all role templates (merges raid and fractal templates first if not done already)
-//     *
-//     * @return The array of all available role templates
-//     */
-//    public static List<RaidRole[]> getAllTemplates() {
-//    	if (templates.isEmpty()) {
-//    		for (int t = 0; t < raidTemplates.length; t++)
-//    			templates.add(raidTemplates[t]);
-//    		for (int t = 0; t < fractalTemplates.length; t++)
-//    			templates.add(fractalTemplates[t]);
-//    	}
-//    	return templates;
-//    }
-//
-//    /**
-//     * Get all template names (merges raid and fractal template names first if not done already)
-//     *
-//     * @return The array of all template names
-//     */
-//    public static List<String> getAllTemplateNames() {
-//    	if (templateNames.isEmpty()) {
-//    		for (int t = 0; t < raidTemplateNames.length; t++)
-//    			templateNames.add(raidTemplateNames[t]);
-//    		for (int t = 0; t < fractalTemplateNames.length; t++)
-//    			templateNames.add(fractalTemplateNames[t]);
-//    	}
-//    	return templateNames;
-//    }
+    static String[] fractalTemplateNames = {
+                "fractal (Chrono)",
+                "fractal (Firebrigade)",
+                "fractal (general)"
+        };
 
     /**
      * Get fractal templates
@@ -104,7 +39,7 @@ public class RoleTemplates {
      * @return The array of all fractal templates
      */
     public static RaidRole[][] getFractalTemplates() {
-    	return fractalTemplates;
+        return fractalTemplates;
     }
 
     /**
@@ -113,7 +48,7 @@ public class RoleTemplates {
      * @return The array of all fractal template names
      */
     public static String[] getFractalTemplateNames() {
-    	return fractalTemplateNames;
+        return fractalTemplateNames;
     }
 
     /**
@@ -123,15 +58,50 @@ public class RoleTemplates {
      * @return The string representation of the template
      */
     public static String templateToString(String name, RaidRole[] template) {
-    	String message = "";
-    	message += name + " (";
+        String message = "";
+        message += name + " (";
         for (int r = 0; r < template.length; r ++) {
             message += template[r].getAmount() + " x " + template[r].getName();
             if (r != template.length - 1) {
-               message += ", ";
+                message += ", ";
             }
         }
         message += ")";
-    	return message;
+        return message;
+    }
+
+    /**
+     * Builds the list selection messages as a list of messages to send.
+     * @param header The text displayed before the selection list.
+     * @param footer The text displayed after the selection list.
+     * @return The list of messages (as text) to send.
+     */
+    public static List<String> buildListText(String header, String footer, List<String> availableRoleTemplates, List<List<RaidRole>> correspondingRoles) {
+        List<String> messages = new ArrayList<String>();
+        if(header != null && !header.isEmpty()) messages.add(header);
+
+        String currMessage = "";
+        Iterator<String> groupsIt = availableRoleTemplates.iterator();
+        for (int g = 0; g < availableRoleTemplates.size(); g++) {
+            String msg = "`"+groupsIt.next()+"`: " + ServerSettings.templateToString(null, correspondingRoles.get(g)) + "\n";
+            if(msg.length() + currMessage.length() > 1800) {
+                messages.add(currMessage);
+                currMessage = "";
+            }
+            currMessage += msg;
+        }
+        messages.add(currMessage);
+
+        if(footer != null && !footer.isEmpty()) messages.add(footer);
+
+        if(messages.size() <= 3) {
+            String completeMessage = String.join("\n", messages);
+            if(completeMessage.length() < 1900) {
+                messages = new ArrayList<String>();
+                messages.add(completeMessage);
+            }
+        }
+
+        return messages;
     }
 }

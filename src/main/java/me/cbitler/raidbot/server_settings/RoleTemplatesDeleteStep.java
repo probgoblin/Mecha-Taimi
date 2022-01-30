@@ -2,10 +2,10 @@ package me.cbitler.raidbot.server_settings;
 
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
-import java.util.Iterator;
 import java.util.List;
 
 import me.cbitler.raidbot.raids.RaidRole;
+import me.cbitler.raidbot.utility.RoleTemplates;
 
 /**
  * Delete a role template
@@ -13,15 +13,15 @@ import me.cbitler.raidbot.raids.RaidRole;
  */
 public class RoleTemplatesDeleteStep implements RoleTemplatesEditStep {
 
-	private String serverId;
-	private List<String> availableRoleTemplates;
-	private List<List<RaidRole>> correspondingRoles;
+    private String serverId;
+    private List<String> availableRoleTemplates;
+    private List<List<RaidRole>> correspondingRoles;
 
-	public RoleTemplatesDeleteStep(String serverId, List<String> availableRoleTemplates, List<List<RaidRole>> correspondingRoles) {
-		this.serverId = serverId;
-		this.availableRoleTemplates = availableRoleTemplates;
-		this.correspondingRoles = correspondingRoles;
-	}
+    public RoleTemplatesDeleteStep(String serverId, List<String> availableRoleTemplates, List<List<RaidRole>> correspondingRoles) {
+        this.serverId = serverId;
+        this.availableRoleTemplates = availableRoleTemplates;
+        this.correspondingRoles = correspondingRoles;
+    }
 
     /**
      * Handle deleting a role template
@@ -29,48 +29,35 @@ public class RoleTemplatesDeleteStep implements RoleTemplatesEditStep {
      * @return True if a role is deleted, false otherwise
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-    	boolean valid = true;
-    	int templateId = -1;
+        boolean valid = true;
+        int templateId = -1;
 
-    	// try to parse an integer
-    	try {
-    		templateId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
-    		if (templateId < 0 || templateId >= availableRoleTemplates.size())
-    			valid = false;
-    	} catch (Exception excp) {
-    		valid = false;
-    	}
-    	if (valid == false)
-        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Try again.").queue());
-    	else {
-    		ServerSettings.removeRoleTemplate(serverId, templateId);
-    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully deleted role template.").queue());
-    	}
-    	return valid;
+        // try to parse an integer
+        try {
+            templateId = Integer.parseInt(e.getMessage().getContentRaw()) - 1;
+            if (templateId < 0 || templateId >= availableRoleTemplates.size())
+                valid = false;
+        } catch (Exception excp) {
+            valid = false;
+        }
+        if (valid == false)
+            e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid choice. Try again.").queue());
+        else {
+            ServerSettings.removeRoleTemplate(serverId, templateId);
+            e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Successfully deleted role template.").queue());
+        }
+        return valid;
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getStepText() {
-        String message;
-        message = "Which role group do you want to delete? \n";
+    public List<String> getStepText() {
+        String header = "Which role group do you want to delete?";
 
-        Iterator<String> groupsIt = availableRoleTemplates.iterator();
-        for (int g = 0; g < availableRoleTemplates.size(); g++)
-        {
-        	message += "`"+(g+1)+"` "+groupsIt.next()+" [ ";
-        	int numRolesInGroup = correspondingRoles.get(g).size();
-        	for (int r = 0; r < numRolesInGroup; r++)
-        	{
-        		message += Integer.toString(correspondingRoles.get(g).get(r).getAmount()) + " x " + correspondingRoles.get(g).get(r);
-        		if (r < numRolesInGroup - 1)
-        			message += ", ";
-        	}
-        	message += " ]\n";
-        }
+        List<String> messages = RoleTemplates.buildListText(header, null, availableRoleTemplates, correspondingRoles);
 
-        return message;
+        return messages;
     }
 
     /**
@@ -81,7 +68,7 @@ public class RoleTemplatesDeleteStep implements RoleTemplatesEditStep {
     }
 
     @Override
-	public String getServerID() {
-		return serverId;
-	}
+    public String getServerID() {
+        return serverId;
+    }
 }
