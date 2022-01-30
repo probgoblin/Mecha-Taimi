@@ -99,7 +99,43 @@ Then run
 java -jar <path-to-jar>
 ```
 
+Alternatively, run
+
+```sh
+./util/start-bot.sh
+```
+
 Assuming you are still in the project directory and didn't move the jar file yet, the path to the jar file is `target/GW2-Raid-Bot-1.0-SNAPSHOT.jar`.
+
+### Starting As A Service
+
+This repository includes a service definition for `systemd`.
+
+In case you want to register the bot as a service, you may first move the project to a location more suited for running it as a service, such as `etc` or `var`.
+
+After moving the directory to the given place, just run the script located at `util/install-service.sh`. This will automatically install the service definition `util/gw2-event-bot.service` with the variables replaced with the correct paths. To utilize this, just run
+
+```sh
+./util/install-service.sh
+```
+
+Alternatively, you may run this command from wherever on your system using
+
+```sh
+<path-to-dir>/util/install-service.sh
+```
+
+or by simply double-clicking (running from a file explorer) as the installation script completely ignores your working directory.
+
+After the script finished successfully, you can use your preferred way of interacting with systemd to enabled and/or start the service.
+
+For example, you would run
+
+```sh
+sudo systemctl enable gw2-event-bot --now
+```
+
+to enable the service (automatically start on system startup) and immediately start it. If you do not wish to automatically start the service, ommit the `--now` flag.
 
 ### Configuration
 
