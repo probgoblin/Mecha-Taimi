@@ -1,0 +1,10 @@
+[Unit]
+Description=Riz GW2 Event Bot
+
+[Service]
+WorkingDirectory=${dir}
+ExecStart=${dir}/util/start-bot.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
