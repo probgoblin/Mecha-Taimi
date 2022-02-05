@@ -102,7 +102,7 @@ java -jar <path-to-jar>
 Alternatively, run
 
 ```sh
-./util/start-bot.sh
+bash ./util/start-bot.sh
 ```
 
 Assuming you are still in the project directory and didn't move the jar file yet, the path to the jar file is `target/GW2-Raid-Bot-1.0-SNAPSHOT.jar`.
@@ -116,7 +116,7 @@ In case you want to register the bot as a service, you may first move the projec
 After moving the directory to the given place, just run the script located at `util/install-service.sh`. This will automatically install the service definition `util/gw2-event-bot.service` with the variables replaced with the correct paths. To utilize this, just run
 
 ```sh
-./util/install-service.sh
+sudo bash ./util/install-service.sh
 ```
 
 Alternatively, you may run this command from wherever on your system using

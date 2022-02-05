@@ -17,6 +17,7 @@ fi
 SCRIPTPATH=$(dirname $(readlink -f "$0"))
 PROJPATH=$(dirname $SCRIPTPATH)
 
+chmod 754 $SCRIPTPATH/start-bot.sh
 sed -e "s|\${dir}|$PROJPATH|" $SCRIPTPATH/gw2-event-bot.service > $FILE|| exit 1
 
 echo "The service file has been installed successfully. If you want to enable and/or run the service, you can do so now."
