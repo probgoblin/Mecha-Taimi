@@ -978,7 +978,7 @@ public class Raid {
                     if(userEmote == null)
                         text += ("- " + username + " (" + user.getSpec() + ")\n");
                     else
-                        text += ("<:"+userEmote.getName()+":"+userEmote.getId()+"> " + username + " (" + user.getSpec() + ")\n");
+                        text += ("<:"+userEmote.getName()+":"+userEmote.getId()+"> " + username + "\n");
                 }
                 text += "\n";
                 textList.add(text);
@@ -1054,7 +1054,7 @@ public class Raid {
                     if(userEmote == null)
                         text += "   - " + username + " (" + user.spec + ")\n";
                     else
-                        text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + username + " (" + user.spec + ")\n";
+                        text += "   <:"+userEmote.getName()+":"+userEmote.getId()+"> " + username + "\n";
                 }
             }
             text += "\n";
