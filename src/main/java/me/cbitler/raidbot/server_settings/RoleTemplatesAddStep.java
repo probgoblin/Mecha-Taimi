@@ -15,6 +15,7 @@ public class RoleTemplatesAddStep implements RoleTemplatesEditStep {
 
     private String serverId;
     private List<String> availableRoleTemplates;
+    private String delimiter = "#";
 
     public RoleTemplatesAddStep(String serverId, List<String> availableRoleTemplates) {
         this.serverId = serverId;
@@ -37,9 +38,9 @@ public class RoleTemplatesAddStep implements RoleTemplatesEditStep {
         }
 
         String templateName = parts[0].trim();
-        if (templateName.contains(";") || templateName.contains("/") || templateName.contains(","))
+        if (templateName.contains(";") || templateName.contains(delimiter) || templateName.contains(","))
         {
-            e.getChannel().sendMessage("The group name contains invalid symbols. Choose a different name.").queue();
+            e.getChannel().sendMessage("The template name contains invalid symbols. Choose a different name.").queue();
             return false;
         }
         if (availableRoleTemplates.contains(templateName))
@@ -52,7 +53,7 @@ public class RoleTemplatesAddStep implements RoleTemplatesEditStep {
 
         try {
             boolean success = true;
-            String[] roles = parts[1].trim().split("\\s*/\\s*"); // split with delimiter /
+            String[] roles = parts[1].trim().split("\\s*" + delimiter + "\\s*"); // split with delimiter
             for (int r = 0; r < roles.length; r++)
             {
                 String[] nameAmount = roles[r].trim().split(",");
@@ -87,9 +88,9 @@ public class RoleTemplatesAddStep implements RoleTemplatesEditStep {
      */
     public List<String> getStepText() {
         return List.of("Enter a new role template for the server\n"
-                        + "__format:__ `[template name]: [role 1],[amount 1] / [role 2],[amount 2] / ... / [role n],[amount n]`, "
-                        + "e.g., `Standard Raid: Tank,1 / ... / DPS,5`\n"
-                        + "(Note: You cannot use colon `:`, semi-colon `;`, slash `/`, or comma `,` in your template or role names!)\n");
+                        + "__format:__ `[template name]: [role 1],[amount 1] " + delimiter + " [role 2],[amount 2] " + delimiter + " ... " + delimiter + " [role n],[amount n]`, "
+                        + "e.g., `Standard Raid: Tank,1 " + delimiter + " ... " + delimiter + " DPS,5`\n"
+                        + "(Note: You cannot use colon `:`, semi-colon `;`, comma `,`, or `" + delimiter + "` in your template or role names!)\n");
     }
 
     /**
