@@ -41,7 +41,7 @@ public class ReactionHandler extends ListenerAdapter {
     						return;
     					}
     					if (raid.isUserPermitted(e.getMember()) == false) {
-    						e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Sign-up for this event is currently only available for specific discord roles.").queue());
+    						e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Sign-up for this event is currently only available for specific discord roles: " + raid.getPermittedDiscordRoles().toString()).queue());
     						e.getReaction().removeReaction(e.getUser()).queue();
     						return;
     					}
