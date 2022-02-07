@@ -33,6 +33,7 @@ public class ServerSettings {
 
     static HashMap<String, SortedMap<String, List<String>>> permittedDiscordRoles = new HashMap<>();
     static HashMap<String, SortedMap<String, List<RaidRole>>> roleTemplates = new HashMap<>();
+    static String roleTemplatesDelimiter = "#";
 
 
     /**
@@ -560,14 +561,14 @@ public class ServerSettings {
             }
 
             if (g < roleTemplates.size() - 1)
-                result += "/";
+                result += roleTemplatesDelimiter;
         }
         return result;
     }
 
     private static SortedMap<String, List<RaidRole>> convertRoleTemplatesFromString(String input) {
         SortedMap<String, List<RaidRole>> result = new TreeMap<>();
-        String[] templateSplits = input.split("/");
+        String[] templateSplits = input.split(roleTemplatesDelimiter);
         for (int t = 0; t < templateSplits.length; t++)
         {
             String[] nameSplits = templateSplits[t].split(";");

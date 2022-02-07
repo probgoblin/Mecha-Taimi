@@ -15,11 +15,12 @@ public class RoleTemplatesAddStep implements RoleTemplatesEditStep {
 
     private String serverId;
     private List<String> availableRoleTemplates;
-    private String delimiter = "#";
+    private String delimiter;
 
     public RoleTemplatesAddStep(String serverId, List<String> availableRoleTemplates) {
         this.serverId = serverId;
         this.availableRoleTemplates = availableRoleTemplates;
+        delimiter = ServerSettings.roleTemplatesDelimiter;
     }
 
     /**
