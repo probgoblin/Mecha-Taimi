@@ -75,7 +75,7 @@ public class RoleTemplatesIdleStep implements RoleTemplatesEditStep {
                         + "`2` remove a role template \n"
                         + "or type *done* when you want to finish editing.";
 
-        List<String> messages = RoleTemplates.buildListText(header, footer, availableRoleTemplates, correspondingRoles);
+        List<String> messages = RoleTemplates.buildListText(header, footer, availableRoleTemplates, correspondingRoles, false);
 
         return messages;
     }
