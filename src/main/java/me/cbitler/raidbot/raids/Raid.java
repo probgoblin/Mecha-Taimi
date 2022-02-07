@@ -863,7 +863,9 @@ public class Raid {
                 currentFlexText = flexRolesText.get(s);
             }
         }
-        builder.addField(nextFieldName, currentFlexText, true);
+        if (currentFlexText.isEmpty() == false) {
+            builder.addField(nextFieldName, currentFlexText, true);
+        }
         if (provide_instr && this.isOpenWorld == false) {
             builder.addBlankField(false);
             builder.addField("How to sign up:",
@@ -962,14 +964,15 @@ public class Raid {
                     text += ("- " + username + "\n");
                 }
             }
-            textList.add(text);
+            if (text.isEmpty() == false) {
+                textList.add(text);
+            }
         } else {
             Map<String, List<RaidUser>> flexUsersByRole = collectFlexUsersByRole(null);
             for (int r = 0; r < roles.size(); r++) {
                 String text = "";
                 String roleName = roles.get(r).getName();
-                text += (roleName + ": \n");
-
+                
                 for (RaidUser user : flexUsersByRole.get(roleName)) {
                     String username = userIDsToNicknames.get(user.getId());
                     if (username == null)
@@ -980,8 +983,10 @@ public class Raid {
                     else
                         text += ("<:"+userEmote.getName()+":"+userEmote.getId()+"> " + username + "\n");
                 }
-                text += "\n";
-                textList.add(text);
+                if (text.isEmpty() == false || roles.get(r).isFlexOnly()) {
+                    text = roleName + ":\n" + text + "\n";
+                    textList.add(text);
+                }
             }
         }
 
