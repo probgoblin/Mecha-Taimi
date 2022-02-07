@@ -55,7 +55,7 @@ public class RoleTemplatesDeleteStep implements RoleTemplatesEditStep {
     public List<String> getStepText() {
         String header = "Which role group do you want to delete?";
 
-        List<String> messages = RoleTemplates.buildListText(header, null, availableRoleTemplates, correspondingRoles);
+        List<String> messages = RoleTemplates.buildListText(header, null, availableRoleTemplates, correspondingRoles, true);
 
         return messages;
     }

@@ -76,14 +76,14 @@ public class RoleTemplates {
      * @param footer The text displayed after the selection list.
      * @return The list of messages (as text) to send.
      */
-    public static List<String> buildListText(String header, String footer, List<String> availableRoleTemplates, List<List<RaidRole>> correspondingRoles) {
+    public static List<String> buildListText(String header, String footer, List<String> availableRoleTemplates, List<List<RaidRole>> correspondingRoles, boolean isSelection) {
         List<String> messages = new ArrayList<String>();
         if(header != null && !header.isEmpty()) messages.add(header);
 
         String currMessage = "";
         Iterator<String> groupsIt = availableRoleTemplates.iterator();
         for (int g = 0; g < availableRoleTemplates.size(); g++) {
-            String msg = "`"+groupsIt.next()+"`: " + ServerSettings.templateToString(null, correspondingRoles.get(g)) + "\n";
+            String msg = (isSelection ? ("`" + (g + 1) + "` ") : "") + "*" + groupsIt.next() + "*: " + ServerSettings.templateToString(null, correspondingRoles.get(g)) + "\n";
             if(msg.length() + currMessage.length() > 1800) {
                 messages.add(currMessage);
                 currMessage = "";
