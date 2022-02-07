@@ -27,7 +27,7 @@ public class EditDisplayStep implements EditStep {
     	int choiceID = 0;
     	try {
     		choiceID = Integer.parseInt(e.getMessage().getContentRaw());
-    		if (choiceID < 0 || choiceID >= 2)
+    		if (choiceID < 1 || choiceID > 2)
     			valid = false;
     	} catch (Exception excp) {
     		valid = false;
@@ -38,7 +38,7 @@ public class EditDisplayStep implements EditStep {
     	}
 
     	Raid raid = RaidManager.getRaid(messageID);
-        raid.setDisplayShort(choiceID == 1);
+        raid.setDisplayShort(choiceID == 2);
         if (raid.updateDisplayShortDB()) {
         	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Display format successfully updated in database.").queue());
         } else {
@@ -53,9 +53,9 @@ public class EditDisplayStep implements EditStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-    	return "Should the event message be displayed in a short format? \n"
-        		+ "`0` no \n"
-        		+ "`1` yes";
+    	return "Which format should the event message be displayed in?\n"
+        		+ "`1` long\n"
+        		+ "`2` short";
     }
 
     /**

@@ -30,6 +30,7 @@ public class PendingRaid {
     
     public PendingRaid() {
     	this.isFractalEvent = false;
+    	this.isDisplayShort = false;
     }
     
     public boolean isOpenWorld() {

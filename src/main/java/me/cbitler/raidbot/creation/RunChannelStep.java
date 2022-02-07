@@ -81,6 +81,6 @@ public class RunChannelStep implements CreationStep {
      * {@inheritDoc}
      */
     public CreationStep getNextStep() {
-        return new RunDisplayStep();
+        return new RunDateStep();
     }
 }
