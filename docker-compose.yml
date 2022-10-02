@@ -1,6 +1,6 @@
 #I have not tested this on earlier versions, but you 
-#should be running a relativly recent version of 
-#Docker Engine and Compose anywyay.
+#should be running a relatively recent version of 
+#Docker Engine and Compose anyway.
 version: "3"
 #Discord is doing most of the work for us so we only
 #have the one service.

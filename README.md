@@ -1,3 +1,7 @@
+## The Dockerization of the GW2 Event Bot by the coward Johnny Normality
+
+This is provide you an easy way to install and manage the GW2 Event Bot using Docker. The only difference between this repository and the source ([Franziska-Mueller/GW2-Raid-Bot](Franziska-Mueller/GW2-Raid-Bot)) is that I have updated the Reactions.zip file to contain the new End of Dragons class icons and included both a Dockerfile as well as a Docker Compose file. Most of the following readme remains unchanged but installation is now much simpler.
+
 # Riz GW2 Event Bot
 
 This bot is meant to be used to help organize teams for events (raids, fractals, dungeons, etc.) in discord servers for GuildWars 2.

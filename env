@@ -5,7 +5,7 @@
 #https://discord.com/developers/applications
 DISCORD_TOKEN=
 #
-#Uncomment the following two lines if you are selfhosting RAIDAR
+#Uncomment the following two lines if you are self-hosting RAIDAR
 #Note: If you are doing this, you a freak
 #RAIDAR_USERNAME=
 #RAIDAR_PASSWORD=
