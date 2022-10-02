@@ -20,4 +20,4 @@ RUN mvn package
 RUN cp .env ./target/.env
 #Run Taimi, run. Justice is coming for your disgusting
 #peg toothed head.
-RUN java -jar ./target/GW2-Raid-Bot-1.0-SNAPSHOT.jar
+ENTRYPOINT [ "java", "-jar", "./target/GW2-Raid-Bot-1.0-SNAPSHOT.jar" ]
