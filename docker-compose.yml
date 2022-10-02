@@ -1,10 +1,36 @@
+#I have not tested this on earlier versions, but you 
+#should be running a relativly recent version of 
+#Docker Engine and Compose anywyay.
 version: "3"
+#Discord is doing most of the work for us so we only
+#have the one service.
 services:
+#If you want to rename the service, do it here, I'm
+#calling it "bot".
   bot:
+#I built an image just for you to keep compile time
+#down. It is based on Alpine with Maven and a Java
+#SDK installed. But the secret ingredient is...
+#...
+#love!
     image: "probgoblin/mecha-taimi"
+#If you want to rename how the container appears
+#in your Docker engine, do so here:
+    container_name: mecha-taimi
+#Taimi is awful and must never be allowed to rest    
     restart: unless-stopped
+#Here is where we are going to fill out all our 
+#envnironment variables.    
   environment:
+#Enter your bot's token generated from:
+#https://discord.com/developers/applications  
     - DISCORD_TOKEN=
+#These are the values that Mecha Taimi uses for emojis
+#To find these, after you have uploaded the icons to your server simply type:
+#\[EMOJI_NAME] (e.g \BERSERKER)
+#This will generate a response from Discord that looks like:
+#<:Berserker:1025826290374299719>
+#Set the values for the below variables to the number after the ":"    
     - EMOTE_BERSERKER=
     - EMOTE_BLADESWORN=
     - EMOTE_CANCEL=
@@ -46,3 +72,8 @@ services:
     - EMOTE_WARRIOR=
     - EMOTE_WEAVER=
     - EMOTE_WILLBENDER=
+#This builds the actual bot. Sadly we must still do this.    
+  command: mvn package
+#Run Taimi, run. Justice is coming for your disgusting
+#peg toothed head.  
+  entrypoint: [ "java", "-jar", "./target/GW2-Raid-Bot-1.0-SNAPSHOT.jar" ]
