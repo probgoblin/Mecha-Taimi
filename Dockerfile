@@ -1,16 +1,21 @@
-#FROM maven:latest
-FROM maven:3-jdk-10
-WORKDIR /data
-COPY . /data
-#RUN mvn -B -f /data/pom.xml -Ddetail=true clean package
-#RUN mvn -U -X -f /data/pom.xml -Ddetail=true clean package
-#RUN mvn -U -X -f /data/dependency-reduced-pom.xml -Ddetail=true clean package
-RUN mvn -X -f /data/pom.xml clean compile assembly:single
-
-#FROM eclipse-temurin:19_36-jre
-FROM openjdk:10-jre-slim
-WORKDIR /data
-COPY Reactions.zip start LICENSE README.md /bot/
-COPY --from=0 /data/target/GW2-Raid-Bot-1.0-SNAPSHOT-jar-with-dependencies.jar /data/bot.jar
-RUN chmod +x /data/start
-CMD ["/bot/start"]
+#We're using alpine because Java is fat enough.
+FROM alpine:latest
+#The Maven implemntation for Alpine is dependent on  
+#OpenJDK8, which (surprisingly) gives us a full SDK
+#which means it also gives us a JRE so we don't need
+#anything else.
+RUN apk add maven
+#Taimi sucks and this is her crappy house.
+WORKDIR /goblin-hole
+#We're going to throw all of our computer garbage
+#into the goblin hole. She hates it.
+COPY . /goblin-hole/
+#This builds the actual bot. Sadly we must do this.
+RUN mvn package
+#This will move your envionrment file (you did fill
+#out your envionrment file, didn't you?) to the 
+#directory the actual bot is in.
+RUN cp .env ./target/.env
+#Run Taimi, run. Justice is coming for your disgusting
+#peg toothed head.
+RUN java -jar ./target/GW2-Raid-Bot-1.0-SNAPSHOT.jar
