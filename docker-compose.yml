@@ -46,4 +46,3 @@ services:
     - EMOTE_WARRIOR=
     - EMOTE_WEAVER=
     - EMOTE_WILLBENDER=
--     
