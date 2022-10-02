@@ -15,7 +15,7 @@ RUN mvn package
 #This will move your envionrment file (you did fill
 #out your envionrment file, didn't you?) to the 
 #directory the actual bot is in.
-RUN cp .env ./target/.env
+RUN cp env ./target/.env
 #Run Taimi, run. Justice is coming for your disgusting
 #peg toothed head.
-RUN java -jar ./target/GW2-Raid-Bot-1.0-SNAPSHOT.jar
+RUN java -jar ./target/GW2-Raid-Bot-1.0-SNAPSHOT.jar &
