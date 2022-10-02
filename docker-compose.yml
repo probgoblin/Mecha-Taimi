@@ -1,0 +1,49 @@
+version: "3"
+services:
+  bot:
+    image: "probgoblin/mecha-taimi"
+    restart: unless-stopped
+  environment:
+    - DISCORD_TOKEN=
+    - EMOTE_BERSERKER=
+    - EMOTE_BLADESWORN=
+    - EMOTE_CANCEL=
+    - EMOTE_CATALYST=
+    - EMOTE_CHECK=
+    - EMOTE_CHRONOMANCER=
+    - EMOTE_DAREDEVIL=
+    - EMOTE_DEADEYE=
+    - EMOTE_DRAGONHUNTER=
+    - EMOTE_DRUID=
+    - EMOTE_EDIT=
+    - EMOTE_ELEMENTALIST=
+    - EMOTE_ENGINEER=
+    - EMOTE_FIREBRAND=
+    - EMOTE_FLEX=
+    - EMOTE_GUARDIAN=
+    - EMOTE_HARBINGER=
+    - EMOTE_HERALD=
+    - EMOTE_HOLOSMITH=
+    - EMOTE_MECHANIST=
+    - EMOTE_MESMER=
+    - EMOTE_MIRAGE=
+    - EMOTE_NECROMANCER=
+    - EMOTE_RANGER=
+    - EMOTE_REAPER=
+    - EMOTE_RENEGADE=
+    - EMOTE_REVENANT=
+    - EMOTE_SCOURGE=
+    - EMOTE_SCRAPPER=
+    - EMOTE_SOULBEAST=
+    - EMOTE_SPECTER=
+    - EMOTE_SPELLBREAKER=
+    - EMOTE_SWAP=
+    - EMOTE_TEMPEST=
+    - EMOTE_THIEF=
+    - EMOTE_UNTAMED=
+    - EMOTE_VINDICATOR=
+    - EMOTE_VIRTUOSO=
+    - EMOTE_WARRIOR=
+    - EMOTE_WEAVER=
+    - EMOTE_WILLBENDER=
+-     
