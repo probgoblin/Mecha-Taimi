@@ -11,8 +11,9 @@ discord_bots_token
 .factorypath
 /target/
 /logs/
-
+.vscode
 *.DS_Store
 .settings/
 .classpath
 .project
+*.live
